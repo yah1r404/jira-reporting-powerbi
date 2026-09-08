@@ -1,0 +1,121 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/visualContainer/2.12.0/schema.json",
+  "name": "6fba83e0d68849ceaf7e",
+  "position": {
+    "x": 980,
+    "y": 20,
+    "z": 0,
+    "height": 1020,
+    "width": 920,
+    "tabOrder": 1
+  },
+  "visual": {
+    "visualType": "scatterChart",
+    "query": {
+      "queryState": {
+        "Category": {
+          "projections": [
+            {
+              "field": {
+                "Column": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "Jira_Tickets"
+                    }
+                  },
+                  "Property": "Assignee"
+                }
+              },
+              "queryRef": "Jira_Tickets.Assignee",
+              "nativeQueryRef": "Assignee",
+              "active": true
+            }
+          ]
+        },
+        "X": {
+          "projections": [
+            {
+              "field": {
+                "Measure": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "_Medidas"
+                    }
+                  },
+                  "Property": "Promedio Resolucion Horas"
+                }
+              },
+              "queryRef": "_Medidas.Promedio Resolucion Horas",
+              "nativeQueryRef": "Promedio Resolucion Horas",
+              "active": true
+            }
+          ]
+        },
+        "Y": {
+          "projections": [
+            {
+              "field": {
+                "Measure": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "_Medidas"
+                    }
+                  },
+                  "Property": "Total Incidentes"
+                }
+              },
+              "queryRef": "_Medidas.Total Incidentes",
+              "nativeQueryRef": "Total Incidentes"
+            }
+          ]
+        }
+      }
+    }
+  },
+  "filterConfig": {
+    "filters": [
+      {
+        "name": "29d48cc17b7e27b8c04d",
+        "field": {
+          "Column": {
+            "Expression": {
+              "SourceRef": {
+                "Entity": "Jira_Tickets"
+              }
+            },
+            "Property": "Assignee"
+          }
+        },
+        "type": "Categorical"
+      },
+      {
+        "name": "f8f5c7c7365c727db4ea",
+        "field": {
+          "Measure": {
+            "Expression": {
+              "SourceRef": {
+                "Entity": "_Medidas"
+              }
+            },
+            "Property": "Promedio Resolucion Horas"
+          }
+        },
+        "type": "Advanced"
+      },
+      {
+        "name": "45a95bb854f27e226299",
+        "field": {
+          "Measure": {
+            "Expression": {
+              "SourceRef": {
+                "Entity": "_Medidas"
+              }
+            },
+            "Property": "Total Incidentes"
+          }
+        },
+        "type": "Advanced"
+      }
+    ]
+  }
+}

@@ -1,0 +1,76 @@
+table DimFecha
+	lineageTag: 47396195-fcb0-4e36-9c60-f98726d86dc2
+	dataCategory: Time
+
+	column Date
+		dataType: dateTime
+		isKey
+		formatString: Short Date
+		lineageTag: 0bd1daa9-ea3e-4ae4-bf13-6002c32485ac
+		summarizeBy: none
+		isNameInferred
+		sourceColumn: [Date]
+
+		annotation SummarizationSetBy = Automatic
+
+	column Año = YEAR([Date])
+		dataType: int64
+		formatString: 0
+		lineageTag: 395985e1-8a6c-4558-b100-6cd5dba466a5
+		summarizeBy: none
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Mes Numero' = MONTH([Date])
+		dataType: int64
+		formatString: 0
+		lineageTag: 7bbebf03-4c84-483e-b2c1-908e4948a391
+		summarizeBy: none
+
+		annotation SummarizationSetBy = Automatic
+
+	column Mes = FORMAT([Date], "mmmm")
+		dataType: string
+		lineageTag: 2c5b0fe8-aa21-4a16-98a2-efa15219806a
+		summarizeBy: none
+		sortByColumn: 'Mes Numero'
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Año Mes' = FORMAT([Date], "yyyy-mm")
+		dataType: string
+		lineageTag: afaa168d-8ed8-4fa6-9b33-3269b7ddfefc
+		summarizeBy: none
+
+		annotation SummarizationSetBy = Automatic
+
+	column Día = DAY([Date])
+		dataType: int64
+		formatString: 0
+		lineageTag: f65cf22a-79aa-4d9c-ba0d-504ac76ee8f3
+		summarizeBy: none
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Día Semana Numero' = WEEKDAY([Date], 2)
+		dataType: int64
+		formatString: 0
+		lineageTag: 30fb9712-a62b-410c-a14d-c917050617ac
+		summarizeBy: none
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Día Semana' = FORMAT([Date], "dddd")
+		dataType: string
+		lineageTag: c7fc9b5b-4de2-4efc-bab4-a92fe6cc4db5
+		summarizeBy: none
+		sortByColumn: 'Día Semana Numero'
+
+		annotation SummarizationSetBy = Automatic
+
+	partition DimFecha = calculated
+		mode: import
+		source = CALENDAR(MIN('Jira_Tickets'[Created Date]), MAX('Jira_Tickets'[Created Date]))
+
+	annotation PBI_Id = DimFecha_CalendarioPrincipal
+

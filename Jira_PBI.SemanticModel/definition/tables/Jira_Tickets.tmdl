@@ -1,0 +1,509 @@
+table Jira_Tickets
+	lineageTag: 958c4a1c-a95c-43b8-91fa-596ea5902f25
+
+	column 'Issue ID'
+		dataType: string
+		isHidden
+		lineageTag: 0ab26448-0ab1-4f39-9b35-7d58c0e75172
+		summarizeBy: none
+		sourceColumn: Issue ID
+
+		annotation SummarizationSetBy = Automatic
+
+	column Key
+		dataType: string
+		lineageTag: 82fe226c-31b4-4a66-97ef-92a9ead58e23
+		summarizeBy: none
+		sourceColumn: Key
+
+		annotation SummarizationSetBy = Automatic
+
+	column Summary
+		dataType: string
+		lineageTag: da507a3b-fbb1-4513-b8be-a43b42076052
+		summarizeBy: none
+		sourceColumn: Summary
+
+		annotation SummarizationSetBy = Automatic
+
+	column Status
+		dataType: string
+		lineageTag: 911ff072-137f-44e5-927c-f448fb4e7a92
+		summarizeBy: none
+		sourceColumn: Status
+
+		annotation SummarizationSetBy = Automatic
+
+	column Assignee
+		dataType: string
+		lineageTag: 2bb7ba97-84e2-427a-a135-5488a68b6cf7
+		summarizeBy: none
+		sourceColumn: Assignee
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Assignee Account ID'
+		dataType: string
+		isHidden
+		lineageTag: 49c7418c-05cf-40a0-82b3-dc32c4908da1
+		summarizeBy: none
+		sourceColumn: Assignee Account ID
+
+		annotation SummarizationSetBy = Automatic
+
+	column Reporter
+		dataType: string
+		lineageTag: 6e78e267-c45d-4641-9443-a256779971a7
+		summarizeBy: none
+		sourceColumn: Reporter
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Reporter Account ID'
+		dataType: string
+		isHidden
+		lineageTag: f4f53ac7-95e5-42d6-b257-58c7da5d78c9
+		summarizeBy: none
+		sourceColumn: Reporter Account ID
+
+		annotation SummarizationSetBy = Automatic
+
+	column Created
+		dataType: dateTime
+		formatString: General Date
+		lineageTag: 00445da0-17e0-47c0-8cc6-d9eabc8573d1
+		summarizeBy: none
+		sourceColumn: Created
+
+		annotation SummarizationSetBy = Automatic
+
+	column Updated
+		dataType: dateTime
+		formatString: General Date
+		lineageTag: 44bec0ba-8230-47c8-8b96-ec71f4260e2b
+		summarizeBy: none
+		sourceColumn: Updated
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Resolution Date'
+		dataType: dateTime
+		formatString: General Date
+		lineageTag: 964feec1-6b66-46a1-9931-5130785c31a9
+		summarizeBy: none
+		sourceColumn: Resolution Date
+
+		annotation SummarizationSetBy = Automatic
+
+	column Priority
+		dataType: string
+		lineageTag: 569abedf-b3fe-43f7-ab58-d3626b80c837
+		summarizeBy: none
+		sourceColumn: Priority
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Issue Type'
+		dataType: string
+		lineageTag: 7958ec59-a155-421f-8b78-cd4821e7c4a0
+		summarizeBy: none
+		sourceColumn: Issue Type
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Project Key'
+		dataType: string
+		isHidden
+		lineageTag: 70f9b7d0-1fee-4454-8fa5-d7afb491e324
+		summarizeBy: none
+		sourceColumn: Project Key
+
+		annotation SummarizationSetBy = Automatic
+
+	column Project
+		dataType: string
+		lineageTag: ec44b8fb-a01c-44f9-989a-6dc96e1af1fa
+		summarizeBy: none
+		sourceColumn: Project
+
+		annotation SummarizationSetBy = Automatic
+
+	column Labels
+		dataType: string
+		lineageTag: 96c55967-72fd-41d2-b86e-4a0d251b17ea
+		summarizeBy: none
+		sourceColumn: Labels
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Created Date'
+		dataType: dateTime
+		formatString: Short Date
+		lineageTag: f637e09a-9922-494b-a461-575b9123f473
+		summarizeBy: none
+		sourceColumn: Created Date
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation UnderlyingDateTimeDataType = Date
+
+	column 'Resolution Date Only'
+		dataType: dateTime
+		formatString: Short Date
+		lineageTag: abd2eb75-3ad2-44f1-8b33-df8f1a227e09
+		summarizeBy: none
+		sourceColumn: Resolution Date Only
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation UnderlyingDateTimeDataType = Date
+
+	column 'Resolution Hours'
+		dataType: double
+		formatString: 0.00
+		lineageTag: 630d3e00-07fc-44a1-a8f4-0ad0db32b12c
+		summarizeBy: none
+		sourceColumn: Resolution Hours
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column 'Rango Resolucion' = SWITCH(TRUE(), ISBLANK('Jira_Tickets'[Resolution Hours]), "Sin resolver", 'Jira_Tickets'[Resolution Hours] < 1, "< 1 hora", 'Jira_Tickets'[Resolution Hours] < 4, "1 - 4 horas", 'Jira_Tickets'[Resolution Hours] < 8, "4 - 8 horas", 'Jira_Tickets'[Resolution Hours] < 24, "8 - 24 horas", 'Jira_Tickets'[Resolution Hours] < 48, "24 - 48 horas", "48+ horas")
+		dataType: string
+		lineageTag: 0f2a9702-fc4a-4fd8-81a6-ef880305cd80
+		summarizeBy: none
+		sortByColumn: 'Orden Rango Resolucion'
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Orden Rango Resolucion' = SWITCH(TRUE(), ISBLANK('Jira_Tickets'[Resolution Hours]), 0, 'Jira_Tickets'[Resolution Hours] < 1, 1, 'Jira_Tickets'[Resolution Hours] < 4, 2, 'Jira_Tickets'[Resolution Hours] < 8, 3, 'Jira_Tickets'[Resolution Hours] < 24, 4, 'Jira_Tickets'[Resolution Hours] < 48, 5, 6)
+		dataType: int64
+		isHidden
+		formatString: 0
+		lineageTag: b08ae43b-917d-435b-91a1-c0f92f610c54
+		summarizeBy: none
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Jira Link' = "https://secureopsmx.atlassian.net/browse/" & 'Jira_Tickets'[Key]
+		dataType: string
+		lineageTag: 0d3a7823-e9e8-407f-933b-39fd88dc4453
+		dataCategory: WebUrl
+		summarizeBy: none
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Técnicos Asignados'
+		dataType: string
+		lineageTag: bedccfe9-80f8-4fb5-96bc-b6b4e549abd8
+		summarizeBy: none
+		sourceColumn: Técnicos Asignados
+
+		annotation SummarizationSetBy = Automatic
+
+	partition Jira_Tickets = m
+		mode: import
+		source =
+				let
+				
+				    // ========================================
+				    // CONFIGURACIÓN
+				    // ========================================
+				
+				    JiraBaseUrl = "https://secureopsmx.atlassian.net",
+				    FilterId = "10741",
+				
+				
+				    // ========================================
+				    // LEER FILTRO DE JIRA
+				    // ========================================
+				
+				    FilterResponse =
+				        Json.Document(
+				            Web.Contents(
+				                JiraBaseUrl,
+				                [
+				                    RelativePath =
+				                        "rest/api/3/filter/" & FilterId,
+				
+				                    Headers = [
+				                        Accept = "application/json"
+				                    ]
+				                ]
+				            )
+				        ),
+				
+				    JQL = FilterResponse[jql],
+				
+				
+				    // ========================================
+				    // CAMPOS QUE QUEREMOS
+				    // ========================================
+				
+				    JiraFields =
+				        "summary,status,assignee,reporter,created,updated,resolutiondate,priority,issuetype,project,labels,customfield_11042",
+				
+				
+				    // ========================================
+				    // OBTENER UNA PÁGINA
+				    // ========================================
+				
+				    GetPage = (NextToken as nullable text) as record =>
+				
+				        let
+				
+				            BaseQuery = [
+				                jql = JQL,
+				                maxResults = "100",
+				                fields = JiraFields
+				            ],
+				
+				            RequestQuery =
+				                if NextToken = null
+				                then BaseQuery
+				                else
+				                    Record.AddField(
+				                        BaseQuery,
+				                        "nextPageToken",
+				                        NextToken
+				                    ),
+				
+				            Response =
+				                Json.Document(
+				                    Web.Contents(
+				                        JiraBaseUrl,
+				                        [
+				                            RelativePath =
+				                                "rest/api/3/search/jql",
+				
+				                            Query = RequestQuery,
+				
+				                            Headers = [
+				                                Accept = "application/json"
+				                            ]
+				                        ]
+				                    )
+				                )
+				
+				        in
+				            Response,
+				
+				
+				    // ========================================
+				    // PAGINACIÓN
+				    // ========================================
+				
+				    Pages =
+				        List.Generate(
+				            () => GetPage(null),
+				
+				            each _ <> null,
+				
+				            each
+				                let
+				                    Token =
+				                        try [nextPageToken]
+				                        otherwise null
+				                in
+				                    if Token = null
+				                    then null
+				                    else GetPage(Token),
+				
+				            each [issues]
+				        ),
+				
+				
+				    Issues =
+				        List.Combine(Pages),
+				
+				
+				    // ========================================
+				    // JSON → TABLA
+				    // ========================================
+				
+				    IssueTable =
+				        Table.FromList(
+				            Issues,
+				            Splitter.SplitByNothing(),
+				            {"Issue"}
+				        ),
+				
+				
+				    ExpandIssue =
+				        Table.ExpandRecordColumn(
+				            IssueTable,
+				            "Issue",
+				            {
+				                "id",
+				                "key",
+				                "fields"
+				            },
+				            {
+				                "Issue ID",
+				                "Key",
+				                "Fields"
+				            }
+				        ),
+				
+				
+				    ExpandFields =
+				        Table.ExpandRecordColumn(
+				            ExpandIssue,
+				            "Fields",
+				            {
+				                "summary",
+				                "status",
+				                "assignee",
+				                "reporter",
+				                "created",
+				                "updated",
+				                "resolutiondate",
+				                "priority",
+				                "issuetype",
+				                "project",
+				                "labels",
+				                "customfield_11042"
+				            },
+				            {
+				                "Summary",
+				                "Status Record",
+				                "Assignee Record",
+				                "Reporter Record",
+				                "Created",
+				                "Updated",
+				                "Resolution Date",
+				                "Priority Record",
+				                "Issue Type Record",
+				                "Project Record",
+				                "Labels",
+				                "Técnicos Asignados"
+				            }
+				        ),
+				
+				
+				    ExpandStatus =
+				        Table.ExpandRecordColumn(
+				            ExpandFields,
+				            "Status Record",
+				            {"name"},
+				            {"Status"}
+				        ),
+				
+				
+				    ExpandAssignee =
+				        Table.ExpandRecordColumn(
+				            ExpandStatus,
+				            "Assignee Record",
+				            {
+				                "displayName",
+				                "accountId"
+				            },
+				            {
+				                "Assignee",
+				                "Assignee Account ID"
+				            }
+				        ),
+				
+				
+				    ExpandReporter =
+				        Table.ExpandRecordColumn(
+				            ExpandAssignee,
+				            "Reporter Record",
+				            {
+				                "displayName",
+				                "accountId"
+				            },
+				            {
+				                "Reporter",
+				                "Reporter Account ID"
+				            }
+				        ),
+				
+				
+				    ExpandPriority =
+				        Table.ExpandRecordColumn(
+				            ExpandReporter,
+				            "Priority Record",
+				            {"name"},
+				            {"Priority"}
+				        ),
+				
+				
+				    ExpandIssueType =
+				        Table.ExpandRecordColumn(
+				            ExpandPriority,
+				            "Issue Type Record",
+				            {"name"},
+				            {"Issue Type"}
+				        ),
+				
+				
+				    ExpandProject =
+				        Table.ExpandRecordColumn(
+				            ExpandIssueType,
+				            "Project Record",
+				            {
+				                "key",
+				                "name"
+				            },
+				            {
+				                "Project Key",
+				                "Project"
+				            }
+				        ),
+				
+				
+				    CleanLabels =
+				        Table.TransformColumns(
+				            ExpandProject,
+				            {
+				                {
+				                    "Labels",
+				                    each
+				                        if _ is list
+				                        then Text.Combine(
+				                            List.Transform(_, Text.From),
+				                            ", "
+				                        )
+				                        else null,
+				                    type text
+				                }
+				            }
+				        ),
+				    CleanTecnicos =
+				        Table.TransformColumns(
+				            CleanLabels,
+				            {
+				                {
+				                    "Técnicos Asignados",
+				                    each
+				                        if _ is list
+				                        then Text.Combine(
+				                            List.Transform(_, each Record.Field(_, "displayName")),
+				                            ", "
+				                        )
+				                        else null,
+				                    type text
+				                }
+				            }
+				        ),
+				    #"Tipo cambiado" = Table.TransformColumnTypes(CleanTecnicos,{{"Reporter", type text}, {"Assignee", type text}, {"Status", type text}}),
+				    #"Tipo cambiado1" = Table.TransformColumnTypes(#"Tipo cambiado",{{"Created", type datetimezone}, {"Updated", type datetimezone}, {"Resolution Date", type datetimezone}, {"Priority", type text}, {"Issue Type", type text}, {"Project Key", type text}, {"Project", type text}, {"Reporter Account ID", type text}, {"Assignee Account ID", type text}, {"Summary", type text}, {"Key", type text}, {"Issue ID", type text}, {"Técnicos Asignados", type text}}),
+				    #"Personalizada agregada" = Table.AddColumn(#"Tipo cambiado1", "Created Date", each Date.From([Created])),
+				    #"Tipo cambiado2" = Table.TransformColumnTypes(#"Personalizada agregada",{{"Created Date", type date}}),
+				    #"Personalizada agregada1" = Table.AddColumn(#"Tipo cambiado2", "Resolution Date Only", each if [Resolution Date] = null
+				then null
+				else Date.From([Resolution Date])),
+				    #"Tipo cambiado3" = Table.TransformColumnTypes(#"Personalizada agregada1",{{"Resolution Date Only", type date}}),
+				    #"Personalizada agregada2" = Table.AddColumn(#"Tipo cambiado3", "Resolution Hours", each if [Resolution Date] = null
+				then null
+				else Duration.TotalHours([Resolution Date] - [Created])),
+				    #"Tipo cambiado4" = Table.TransformColumnTypes(#"Personalizada agregada2",{{"Resolution Hours", type number}})
+				in
+				    #"Tipo cambiado4"
+
+	annotation PBI_NavigationStepName = Navegación
+
+	annotation PBI_ResultType = Table
+

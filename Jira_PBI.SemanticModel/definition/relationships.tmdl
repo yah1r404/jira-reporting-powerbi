@@ -1,0 +1,4 @@
+relationship 0a6e0f07-c1bc-eb98-29e1-8c51871267ca
+	fromColumn: Jira_Tickets.'Created Date'
+	toColumn: DimFecha.Date
+

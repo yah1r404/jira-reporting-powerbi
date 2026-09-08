@@ -1,0 +1,76 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/visualContainer/2.12.0/schema.json",
+  "name": "082325f72c8043959541",
+  "position": {
+    "x": 1220,
+    "y": 610,
+    "z": 0,
+    "height": 420,
+    "width": 220,
+    "tabOrder": 10
+  },
+  "visual": {
+    "visualType": "slicer",
+    "query": {
+      "queryState": {
+        "Values": {
+          "projections": [
+            {
+              "field": {
+                "Column": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "Jira_Tickets"
+                    }
+                  },
+                  "Property": "Assignee"
+                }
+              },
+              "queryRef": "Jira_Tickets.Assignee",
+              "nativeQueryRef": "Assignee",
+              "active": true
+            }
+          ]
+        }
+      }
+    },
+    "objects": {
+      "general": [
+        {
+          "properties": {}
+        }
+      ],
+      "data": [
+        {
+          "properties": {
+            "mode": {
+              "expr": {
+                "Literal": {
+                  "Value": "'Dropdown'"
+                }
+              }
+            }
+          }
+        }
+      ]
+    }
+  },
+  "filterConfig": {
+    "filters": [
+      {
+        "name": "f6d9c3e530cd844a7a58",
+        "field": {
+          "Column": {
+            "Expression": {
+              "SourceRef": {
+                "Entity": "Jira_Tickets"
+              }
+            },
+            "Property": "Assignee"
+          }
+        },
+        "type": "Categorical"
+      }
+    ]
+  }
+}

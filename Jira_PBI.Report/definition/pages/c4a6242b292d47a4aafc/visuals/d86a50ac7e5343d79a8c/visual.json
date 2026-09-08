@@ -1,0 +1,115 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/visualContainer/2.12.0/schema.json",
+  "name": "d86a50ac7e5343d79a8c",
+  "position": {
+    "x": 20,
+    "y": 20,
+    "z": 0,
+    "height": 1020,
+    "width": 940,
+    "tabOrder": 0
+  },
+  "visual": {
+    "visualType": "pivotTable",
+    "query": {
+      "queryState": {
+        "Rows": {
+          "projections": [
+            {
+              "field": {
+                "Column": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "Jira_Tickets"
+                    }
+                  },
+                  "Property": "Assignee"
+                }
+              },
+              "queryRef": "Jira_Tickets.Assignee",
+              "nativeQueryRef": "Assignee",
+              "active": true
+            }
+          ]
+        },
+        "Values": {
+          "projections": [
+            {
+              "field": {
+                "Measure": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "_Medidas"
+                    }
+                  },
+                  "Property": "Total Incidentes"
+                }
+              },
+              "queryRef": "_Medidas.Total Incidentes",
+              "nativeQueryRef": "Total Incidentes"
+            },
+            {
+              "field": {
+                "Measure": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "_Medidas"
+                    }
+                  },
+                  "Property": "Promedio Resolucion Horas"
+                }
+              },
+              "queryRef": "_Medidas.Promedio Resolucion Horas",
+              "nativeQueryRef": "Promedio Resolucion Horas"
+            },
+            {
+              "field": {
+                "Measure": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "_Medidas"
+                    }
+                  },
+                  "Property": "Mediana Resolucion Horas"
+                }
+              },
+              "queryRef": "_Medidas.Mediana Resolucion Horas",
+              "nativeQueryRef": "Mediana Resolucion Horas"
+            },
+            {
+              "field": {
+                "Measure": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "_Medidas"
+                    }
+                  },
+                  "Property": "P90 Resolucion Horas"
+                }
+              },
+              "queryRef": "_Medidas.P90 Resolucion Horas",
+              "nativeQueryRef": "P90 Resolucion Horas"
+            }
+          ]
+        }
+      },
+      "sortDefinition": {
+        "sort": [
+          {
+            "field": {
+              "Measure": {
+                "Expression": {
+                  "SourceRef": {
+                    "Entity": "_Medidas"
+                  }
+                },
+                "Property": "Mediana Resolucion Horas"
+              }
+            },
+            "direction": "Descending"
+          }
+        ]
+      }
+    }
+  }
+}

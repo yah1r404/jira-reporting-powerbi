@@ -1,0 +1,2 @@
+Max Resolucion Horas =
+MAX(Jira_Tickets[Resolution Hours])
