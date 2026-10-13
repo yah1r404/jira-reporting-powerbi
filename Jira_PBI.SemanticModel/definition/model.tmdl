@@ -11,11 +11,14 @@ annotation __PBI_TimeIntelligenceEnabled = 0
 
 annotation PBI_ProTooling = ["DevMode"]
 
-annotation PBI_QueryOrder = ["Jira_Tickets","_Medidas"]
+annotation PBI_QueryOrder = ["Jira_Tickets","_Medidas","Jira_MDSC_Issues","SLA_Tickets","FactStatusHistory","FactAssigneeHistory"]
 
 ref table Jira_Tickets
 ref table DimFecha
 ref table _Medidas
+ref table SLA_Tickets
+ref table FactStatusHistory
+ref table FactAssigneeHistory
 
 ref cultureInfo es-MX
 

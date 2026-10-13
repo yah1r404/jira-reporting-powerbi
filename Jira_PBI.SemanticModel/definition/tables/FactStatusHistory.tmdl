@@ -1,0 +1,273 @@
+/// Un renglón por cada tramo que un ticket pasó en un estado (desde el changelog). Base para Time in Status.
+table FactStatusHistory
+	lineageTag: 98b96567-1c90-433a-9f47-84369430b6cd
+
+	column Key
+		dataType: string
+		lineageTag: beb63574-5b55-49a6-b2d0-bf281d6b0a42
+		summarizeBy: none
+		sourceColumn: Key
+
+		annotation SummarizationSetBy = Automatic
+
+	column Flujo
+		dataType: string
+		lineageTag: 76910dea-1866-480b-928d-580656023305
+		summarizeBy: none
+		sourceColumn: Flujo
+
+		annotation SummarizationSetBy = Automatic
+
+	column Estado
+		dataType: string
+		lineageTag: 66fa729f-30d8-4beb-aa0d-9b845922a959
+		summarizeBy: none
+		sourceColumn: Estado
+		sortByColumn: 'Orden Estado'
+
+		annotation SummarizationSetBy = Automatic
+
+	/// Orden del estado en el flujo, para ordenar ejes y tablas. Se define en la lista OrdenEstados de la consulta.
+	column 'Orden Estado'
+		dataType: int64
+		isHidden
+		formatString: 0
+		lineageTag: 483c099e-a55c-4ee6-91fe-bbace7c50d2c
+		summarizeBy: none
+		sourceColumn: Orden Estado
+
+		annotation SummarizationSetBy = Automatic
+
+	/// Categoría de Jira del estado: Por hacer / En curso / Listo.
+	column 'Categoría Estado'
+		dataType: string
+		lineageTag: bd325064-946c-4943-aa72-3258bfa4ec11
+		summarizeBy: none
+		sourceColumn: Categoría Estado
+
+		annotation SummarizationSetBy = Automatic
+
+	/// TRUE si el estado es final (categoría "done": Resuelta, Cerrada). Se excluyen de las medidas de Time in Status.
+	column 'Es Estado Final'
+		dataType: boolean
+		isHidden
+		formatString: """TRUE"";""TRUE"";""FALSE"""
+		lineageTag: 0ebb59d1-14dc-42f5-a9d1-4458cb398ccc
+		summarizeBy: none
+		sourceColumn: Es Estado Final
+
+		annotation SummarizationSetBy = Automatic
+
+	/// Número de vez que el ticket entra a un estado (1 = primera vez).
+	column Visita
+		dataType: int64
+		formatString: 0
+		lineageTag: a3b11ac1-9f64-4b72-8f93-838b5a97dae5
+		summarizeBy: none
+		sourceColumn: Visita
+
+		annotation SummarizationSetBy = Automatic
+
+	column Inicio
+		dataType: dateTime
+		formatString: General Date
+		lineageTag: 02481755-6112-4731-8f80-bf0471bf781a
+		summarizeBy: none
+		sourceColumn: Inicio
+
+		annotation SummarizationSetBy = Automatic
+
+	/// Fin del tramo. Si el ticket sigue en ese estado, es la hora del último refresh.
+	column Fin
+		dataType: dateTime
+		formatString: General Date
+		lineageTag: 672a366c-0043-4b29-ac38-a24232fa8b00
+		summarizeBy: none
+		sourceColumn: Fin
+
+		annotation SummarizationSetBy = Automatic
+
+	/// Horas calendario del tramo.
+	column Horas
+		dataType: double
+		formatString: #,##0.00
+		lineageTag: cd90129b-9673-4db9-944d-74a61bea83a1
+		summarizeBy: none
+		sourceColumn: Horas
+
+		annotation SummarizationSetBy = Automatic
+
+	/// TRUE si es el estado actual del ticket (tramo todavía abierto).
+	column 'Es Actual'
+		dataType: boolean
+		formatString: """TRUE"";""TRUE"";""FALSE"""
+		lineageTag: 53183cf8-506d-4bf7-999c-082f89dbd9b5
+		summarizeBy: none
+		sourceColumn: Es Actual
+
+		annotation SummarizationSetBy = Automatic
+
+	partition FactStatusHistory = m
+		mode: import
+		source =
+				let
+				
+				    JiraBaseUrl = "https://secureopsmx.atlassian.net",
+				    Issues = Jira_MDSC_Issues,
+				
+				    // Orden de los estados de ambos flujos (IEP Incident y Mesa de Servicio - Clientes).
+				    // Un estado que no esté aquí se ordena al final.
+				    OrdenEstados = {
+				        "Nueva solicitud", "Reabierta", "N1", "En curso", "N2 RAM", "N2 QCOM",
+				        "Escalado a N2", "Escalado", "Escalado a N3", "Escalado QCOM",
+				        "Esperando al proveedor", "Esperando por el cliente", "Resuelta", "Cerrada"
+				    },
+				
+				
+				    // ========================================
+				    // AYUDANTES
+				    // ========================================
+				
+				    // Jira devuelve fechas con zona ("-0600"); se pasan a hora de Mérida (UTC-6, sin horario de verano)
+				    ToLocal = (t as nullable text) as nullable datetime =>
+				        if t = null then null
+				        else
+				            let
+				                Len = Text.Length(t),
+				                Iso =
+				                    if Len > 5 and List.Contains({"+", "-"}, Text.At(t, Len - 5))
+				                    then Text.Insert(t, Len - 2, ":")
+				                    else t
+				            in
+				                DateTimeZone.RemoveZone(DateTimeZone.SwitchZone(DateTimeZone.FromText(Iso), -6)),
+				
+				    Now = DateTimeZone.RemoveZone(DateTimeZone.SwitchZone(DateTimeZone.UtcNow(), -6)),
+				
+				    NameOf = (r as any, f as text) as any =>
+				        if r is record then Record.FieldOrDefault(r, f, null) else null,
+				
+				
+				    // ========================================
+				    // CATEGORÍA DE CADA ESTADO
+				    // ========================================
+				
+				    ProjectStatuses =
+				        Json.Document(
+				            Web.Contents(
+				                JiraBaseUrl,
+				                [
+				                    RelativePath = "rest/api/3/project/MDSC/statuses",
+				                    Headers = [Accept = "application/json"]
+				                ]
+				            )
+				        ),
+				
+				    Categories =
+				        Table.Distinct(
+				            Table.FromRecords(
+				                List.Transform(
+				                    List.Combine(List.Transform(ProjectStatuses, each [statuses])),
+				                    each [
+				                        Estado = [name],
+				                        CategoriaNombre = [statusCategory][name],
+				                        CategoriaKey = [statusCategory][key]
+				                    ]
+				                ),
+				                type table [Estado = text, CategoriaNombre = text, CategoriaKey = text]
+				            ),
+				            {"Estado"}
+				        ),
+				
+				
+				    // ========================================
+				    // TRAMOS POR TICKET
+				    // ========================================
+				
+				    Segments = (i as record) as list =>
+				        let
+				            f = i[fields],
+				            IssueType = NameOf(Record.FieldOrDefault(f, "issuetype", null), "name"),
+				            FlujoTicket = if IssueType = "IEP INCIDENT" then "IEP Incident" else "Mesa de Servicio - Clientes",
+				            CreatedAt = ToLocal(f[created]),
+				            Changes =
+				                List.Sort(
+				                    List.Combine(
+				                        List.Transform(
+				                            i[histories],
+				                            (h) =>
+				                                List.Transform(
+				                                    List.Select(h[items], each Record.FieldOrDefault(_, "field", null) = "status"),
+				                                    (it) => [At = ToLocal(h[created]), From = it[fromString], To = it[toString]]
+				                                )
+				                        )
+				                    ),
+				                    (a, b) => Value.Compare(a[At], b[At])
+				                ),
+				            InitialStatus =
+				                if List.IsEmpty(Changes)
+				                then NameOf(Record.FieldOrDefault(f, "status", null), "name")
+				                else Changes{0}[From],
+				            Starts =
+				                {[EstadoTramo = InitialStatus, InicioTramo = CreatedAt]}
+				                & List.Transform(Changes, each [EstadoTramo = [To], InicioTramo = [At]]),
+				            Total = List.Count(Starts)
+				        in
+				            List.Transform(
+				                {0 .. Total - 1},
+				                (n) =>
+				                    let
+				                        s = Starts{n},
+				                        IsLast = n = Total - 1,
+				                        FinTramo = if IsLast then Now else Starts{n + 1}[InicioTramo],
+				                        Posicion = List.PositionOf(OrdenEstados, s[EstadoTramo])
+				                    in
+				                        [
+				                            Key = i[key],
+				                            Flujo = FlujoTicket,
+				                            Estado = s[EstadoTramo],
+				                            #"Orden Estado" = if Posicion < 0 then 99 else Posicion + 1,
+				                            Visita = n + 1,
+				                            Inicio = s[InicioTramo],
+				                            Fin = FinTramo,
+				                            Horas = Duration.TotalHours(FinTramo - s[InicioTramo]),
+				                            #"Es Actual" = IsLast
+				                        ]
+				            ),
+				
+				    Base =
+				        Table.FromRecords(
+				            List.Combine(List.Transform(Issues, Segments)),
+				            type table [
+				                Key = text,
+				                Flujo = text,
+				                Estado = text,
+				                #"Orden Estado" = Int64.Type,
+				                Visita = Int64.Type,
+				                Inicio = datetime,
+				                Fin = datetime,
+				                Horas = number,
+				                #"Es Actual" = logical
+				            ]
+				        ),
+				
+				    Joined = Table.NestedJoin(Base, {"Estado"}, Categories, {"Estado"}, "Cat", JoinKind.LeftOuter),
+				    Expanded = Table.ExpandTableColumn(Joined, "Cat", {"CategoriaNombre", "CategoriaKey"}),
+				
+				    WithCategory =
+				        Table.AddColumn(
+				            Expanded,
+				            "Categoría Estado",
+				            each if [CategoriaNombre] = null then "Desconocida" else [CategoriaNombre],
+				            type text
+				        ),
+				
+				    WithFinal =
+				        Table.AddColumn(WithCategory, "Es Estado Final", each [CategoriaKey] = "done", type logical),
+				
+				    Result = Table.RemoveColumns(WithFinal, {"CategoriaNombre", "CategoriaKey"})
+				
+				in
+				    Result
+
+	annotation PBI_ResultType = Table
+
