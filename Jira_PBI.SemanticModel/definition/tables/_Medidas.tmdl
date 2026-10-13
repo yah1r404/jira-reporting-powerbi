@@ -98,6 +98,220 @@ table _Medidas
 		formatString: #,##0
 		lineageTag: 14dc21dd-72e3-4e83-bc6d-9b079ae6536d
 
+	/// Tickets de la mesa MDSC en el contexto actual.
+	measure Tickets = COUNTROWS(SLA_Tickets)
+		formatString: #,##0
+		displayFolder: SLA
+		lineageTag: 3223c518-f5d7-4ab3-a344-09d51d8ea303
+
+	/// Tickets con fecha de resolución.
+	measure 'Tickets Resueltos' = CALCULATE([Tickets], NOT ISBLANK(SLA_Tickets[Resolution Date]))
+		formatString: #,##0
+		displayFolder: SLA
+		lineageTag: 737c2adf-b541-439e-bdaa-c624d8f13550
+
+	/// Tickets sin fecha de resolución.
+	measure 'Tickets Abiertos' = [Tickets] - [Tickets Resueltos]
+		formatString: #,##0
+		displayFolder: SLA
+		lineageTag: 231f3a65-a547-48f2-af53-67626259ada1
+
+	/// Tickets que cumplieron el SLA "Tiempo hasta resolución" de JSM.
+	measure 'SLA Resolución Cumplidos' = CALCULATE([Tickets], SLA_Tickets[SLA Resolución Estado] = "Cumplido")
+		formatString: #,##0
+		displayFolder: SLA\Resolución
+		lineageTag: 12bc689e-fbfc-41a2-bd72-7a192f75d8b5
+
+	/// Tickets que incumplieron el SLA de resolución (incluye abiertos ya vencidos).
+	measure 'SLA Resolución Incumplidos' = CALCULATE([Tickets], SLA_Tickets[SLA Resolución Estado] = "Incumplido")
+		formatString: #,##0
+		displayFolder: SLA\Resolución
+		lineageTag: 3ca773cd-6f18-43fb-b2cb-837ec06dc714
+
+	/// Tickets abiertos con 25% o menos del tiempo de SLA de resolución restante.
+	measure 'SLA Resolución En Riesgo' = CALCULATE([Tickets], SLA_Tickets[SLA Resolución Estado] = "En riesgo")
+		formatString: #,##0
+		displayFolder: SLA\Resolución
+		lineageTag: 156bc5fa-eed3-43cd-be95-0dafcbf1e244
+
+	/// Cumplidos / (Cumplidos + Incumplidos). No cuenta tickets en curso ni sin SLA.
+	measure '% SLA Resolución' = DIVIDE([SLA Resolución Cumplidos], [SLA Resolución Cumplidos] + [SLA Resolución Incumplidos])
+		formatString: 0.0%;-0.0%;0.0%
+		displayFolder: SLA\Resolución
+		lineageTag: 2ef20b9c-b948-40c2-b13c-658a43a688dd
+
+	/// Promedio del tiempo de SLA de resolución medido por JSM (respeta pausas y calendario del SLA).
+	measure 'Prom Horas SLA Resolución' = AVERAGE(SLA_Tickets[SLA Resolución Horas])
+		formatString: #,##0.00
+		displayFolder: SLA\Resolución
+		lineageTag: fe47d848-4205-42b9-9356-ef8afc5191ee
+
+	/// Tickets que cumplieron el SLA "Tiempo hasta primera respuesta" de JSM.
+	measure 'SLA Respuesta Cumplidos' = CALCULATE([Tickets], SLA_Tickets[SLA Respuesta Estado] = "Cumplido")
+		formatString: #,##0
+		displayFolder: SLA\Primera Respuesta
+		lineageTag: dc9f86d7-6653-446b-bc68-cbec71744d28
+
+	/// Tickets que incumplieron el SLA de primera respuesta (incluye abiertos ya vencidos).
+	measure 'SLA Respuesta Incumplidos' = CALCULATE([Tickets], SLA_Tickets[SLA Respuesta Estado] = "Incumplido")
+		formatString: #,##0
+		displayFolder: SLA\Primera Respuesta
+		lineageTag: e6021d46-e528-422e-a6a0-eaddaaf9da33
+
+	/// Cumplidos / (Cumplidos + Incumplidos) del SLA de primera respuesta.
+	measure '% SLA Primera Respuesta' = DIVIDE([SLA Respuesta Cumplidos], [SLA Respuesta Cumplidos] + [SLA Respuesta Incumplidos])
+		formatString: 0.0%;-0.0%;0.0%
+		displayFolder: SLA\Primera Respuesta
+		lineageTag: 9033ff50-fa3a-4c56-bebe-aae0c4a48f20
+
+	/// Promedio del tiempo de SLA de primera respuesta medido por JSM.
+	measure 'Prom Horas SLA Respuesta' = AVERAGE(SLA_Tickets[SLA Respuesta Horas])
+		formatString: #,##0.00
+		displayFolder: SLA\Primera Respuesta
+		lineageTag: 4a1d7c0e-6b2f-4e8a-9d13-5c7f0b9e2a61
+
+	/// Promedio de horas CALENDARIO entre creación y resolución (no es el tiempo de SLA).
+	measure 'Prom Horas Resolución Calendario' = AVERAGE(SLA_Tickets[Resolution Hours])
+		formatString: #,##0.00
+		displayFolder: SLA\Calendario
+		lineageTag: 5b2e8d1f-7c30-4f9b-8e24-6d80c1af3b72
+
+	/// Mediana de horas calendario entre creación y resolución.
+	measure 'Mediana Horas Resolución Calendario' = MEDIAN(SLA_Tickets[Resolution Hours])
+		formatString: #,##0.00
+		displayFolder: SLA\Calendario
+		lineageTag: 6c3f9e20-8d41-4a0c-9f35-7e91d2b04c83
+
+	/// Percentil 90 de horas calendario entre creación y resolución.
+	measure 'P90 Horas Resolución Calendario' = PERCENTILEX.INC(SLA_Tickets, SLA_Tickets[Resolution Hours], 0.90)
+		formatString: #,##0.00
+		displayFolder: SLA\Calendario
+		lineageTag: 7d40af31-9e52-4b1d-8a46-8fa2e3c15d94
+
+	/// Horas totales en estados no finales (excluye Resuelta/Cerrada).
+	measure 'Horas en Estado' = CALCULATE(SUM(FactStatusHistory[Horas]), FactStatusHistory[Es Estado Final] = FALSE())
+		formatString: #,##0.00
+		displayFolder: Time in Status
+		lineageTag: 8e51b042-af63-4c2e-9b57-90b3f4d26ea5
+
+	/// Tickets que pasaron por el estado (estados no finales).
+	measure 'Tickets en Estado' = CALCULATE(DISTINCTCOUNT(FactStatusHistory[Key]), FactStatusHistory[Es Estado Final] = FALSE())
+		formatString: #,##0
+		displayFolder: Time in Status
+		lineageTag: 9f62c153-b074-4d3f-8c68-a1c4f5e37fb6
+
+	/// Horas promedio que un ticket pasa en el estado (suma todas sus visitas al estado).
+	measure 'Prom Horas en Estado' = DIVIDE([Horas en Estado], [Tickets en Estado])
+		formatString: #,##0.00
+		displayFolder: Time in Status
+		lineageTag: a073d264-c185-4e40-8d79-b2d5a6f48a07
+
+	/// Mediana por ticket de las horas en el estado.
+	measure 'Mediana Horas en Estado' =
+			CALCULATE(
+			    MEDIANX(VALUES(FactStatusHistory[Key]), CALCULATE(SUM(FactStatusHistory[Horas]))),
+			    FactStatusHistory[Es Estado Final] = FALSE()
+			)
+		formatString: #,##0.00
+		displayFolder: Time in Status
+		lineageTag: b184e375-d296-4f51-8e8a-c3e5b7a59b18
+
+	/// Percentil 90 por ticket de las horas en el estado.
+	measure 'P90 Horas en Estado' =
+			CALCULATE(
+			    PERCENTILEX.INC(VALUES(FactStatusHistory[Key]), CALCULATE(SUM(FactStatusHistory[Horas])), 0.90),
+			    FactStatusHistory[Es Estado Final] = FALSE()
+			)
+		formatString: #,##0.00
+		displayFolder: Time in Status
+		lineageTag: c295f486-e3a7-4062-9f60-d4f6c86a6c29
+
+	/// Horas totales que los tickets estuvieron asignados (hasta su resolución).
+	measure 'Horas Asignado' = SUM(FactAssigneeHistory[Horas])
+		formatString: #,##0.00
+		displayFolder: Time in Assignee
+		lineageTag: d3a60597-f4b8-4173-a071-e5a7e7b97d3a
+
+	/// Tickets distintos que la persona tuvo asignados.
+	measure 'Tickets Atendidos' = DISTINCTCOUNT(FactAssigneeHistory[Key])
+		formatString: #,##0
+		displayFolder: Time in Assignee
+		lineageTag: e4b716a8-05c9-4284-b182-f6b8f8c08e4b
+
+	/// Horas promedio que un ticket estuvo asignado a la persona.
+	measure 'Prom Horas Asignado por Ticket' = DIVIDE([Horas Asignado], [Tickets Atendidos])
+		formatString: #,##0.00
+		displayFolder: Time in Assignee
+		lineageTag: f5c827b9-16da-4395-8c39-07c9d9019f5c
+
+	/// Mediana por ticket de las horas asignado a la persona.
+	measure 'Mediana Horas Asignado' = MEDIANX(VALUES(FactAssigneeHistory[Key]), CALCULATE(SUM(FactAssigneeHistory[Horas])))
+		formatString: #,##0.00
+		displayFolder: Time in Assignee
+		lineageTag: 06d938ca-27eb-44a6-9d4a-18c9fa1a0a6d
+
+	/// Cambios de responsable en los tickets del contexto.
+	measure 'Total Reasignaciones' = SUM(SLA_Tickets[Reasignaciones])
+		formatString: #,##0
+		displayFolder: Time in Assignee
+		lineageTag: 17ea49db-38eb-4b5f-ae4b-29da1b2b1b7e
+
+	/// % SLA de resolución de los tickets que la persona tuvo asignados en algún momento.
+	measure '% SLA Resolución Tickets Atendidos' =
+			CALCULATE(
+			    [% SLA Resolución],
+			    TREATAS(VALUES(FactAssigneeHistory[Key]), SLA_Tickets[Key])
+			)
+		formatString: 0.0%;-0.0%;0.0%
+		displayFolder: Time in Assignee
+		lineageTag: 28fb5aec-49ec-4c6c-bf28-3a2c3c3c2c8f
+
+	/// Meta de cumplimiento de SLA usada por el semáforo (verde desde aquí). Ajustar al acuerdo de servicio.
+	measure 'Meta % SLA' = 0.95
+		formatString: 0.0%;-0.0%;0.0%
+		displayFolder: SLA\Semáforo
+		lineageTag: 39a1c2d4-5e6f-4a7b-8c9d-0e1f2a3b4c5d
+
+	/// Umbral de alerta del semáforo (amarillo desde aquí, rojo por debajo). Ajustar al acuerdo de servicio.
+	measure 'Umbral Alerta % SLA' = 0.85
+		formatString: 0.0%;-0.0%;0.0%
+		displayFolder: SLA\Semáforo
+		lineageTag: 4ab2d3e5-6f70-4b8c-9dae-1f203b4c5d6e
+
+	/// Color de semáforo para % SLA Resolución: verde >= meta, ámbar >= umbral, rojo debajo.
+	measure 'Color % SLA Resolución' =
+			VAR v = [% SLA Resolución]
+			RETURN
+			    SWITCH(
+			        TRUE(),
+			        ISBLANK(v), "#8A97A8",
+			        v >= [Meta % SLA], "#1E8E5A",
+			        v >= [Umbral Alerta % SLA], "#C98A00",
+			        "#C8382E"
+			    )
+		displayFolder: SLA\Semáforo
+		lineageTag: 5bc3e4f6-7081-4c9d-aebf-203a4c5d6e7f
+
+	/// Color de semáforo para % SLA Primera Respuesta.
+	measure 'Color % SLA Primera Respuesta' =
+			VAR v = [% SLA Primera Respuesta]
+			RETURN
+			    SWITCH(
+			        TRUE(),
+			        ISBLANK(v), "#8A97A8",
+			        v >= [Meta % SLA], "#1E8E5A",
+			        v >= [Umbral Alerta % SLA], "#C98A00",
+			        "#C8382E"
+			    )
+		displayFolder: SLA\Semáforo
+		lineageTag: 6cd4f507-8192-4dae-bfc0-314b5d6e7f80
+
+	/// Fecha y hora del último refresh de los datos de Jira (hora de Mérida).
+	measure 'Última Actualización' = CALCULATE(MAX(FactStatusHistory[Fin]), REMOVEFILTERS())
+		formatString: dd/mm/yyyy hh:nn
+		displayFolder: SLA
+		lineageTag: 7de50618-92a3-4ebf-80d1-425c6e7f8091
+
 	partition _Medidas = m
 		mode: import
 		source =

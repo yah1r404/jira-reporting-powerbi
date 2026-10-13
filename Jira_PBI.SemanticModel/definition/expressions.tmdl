@@ -1,0 +1,171 @@
+/// Tickets de la mesa MDSC (últimos 6 meses) con su changelog completo. No se carga al modelo; la usan SLA_Tickets, FactStatusHistory y FactAssigneeHistory.
+expression Jira_MDSC_Issues =
+		let
+		
+		    // ========================================
+		    // CONFIGURACIÓN
+		    // ========================================
+		
+		    JiraBaseUrl = "https://secureopsmx.atlassian.net",
+		    JQL = "project = MDSC AND created >= startOfMonth(-5) ORDER BY created ASC",
+		
+		
+		    // ========================================
+		    // CAMPOS
+		    // ========================================
+		
+		    // "tipo de ticket" (radio buttons) se busca por nombre para no fijar su ID
+		    AllFields =
+		        Json.Document(
+		            Web.Contents(
+		                JiraBaseUrl,
+		                [
+		                    RelativePath = "rest/api/3/field",
+		                    Headers = [Accept = "application/json"]
+		                ]
+		            )
+		        ),
+		
+		    TipoTicketMatches =
+		        List.Select(
+		            AllFields,
+		            each
+		                Text.Lower(Text.Trim([name])) = "tipo de ticket"
+		                and Text.Contains(
+		                    Text.From(Record.FieldOrDefault(Record.FieldOrDefault(_, "schema", []), "custom", "")),
+		                    "radiobuttons"
+		                )
+		        ),
+		
+		    TipoTicketFieldId =
+		        if List.IsEmpty(TipoTicketMatches) then null else TipoTicketMatches{0}[id],
+		
+		    // customfield_10010 = Request Type
+		    // customfield_10936 = Tiempo hasta primera respuesta (SLA JSM)
+		    // customfield_10937 = Tiempo hasta resolución (SLA JSM)
+		    // customfield_11042 = Técnico(s) asignado(s)
+		    BaseFields = {
+		        "summary", "status", "issuetype", "priority", "assignee", "created", "resolutiondate",
+		        "customfield_10010", "customfield_10936", "customfield_10937", "customfield_11042"
+		    },
+		
+		    JiraFields =
+		        Text.Combine(
+		            if TipoTicketFieldId = null then BaseFields else BaseFields & {TipoTicketFieldId},
+		            ","
+		        ),
+		
+		
+		    // ========================================
+		    // BÚSQUEDA PAGINADA (con changelog)
+		    // ========================================
+		
+		    GetPage = (NextToken as nullable text) as record =>
+		        let
+		            BaseQuery = [
+		                jql = JQL,
+		                maxResults = "100",
+		                fields = JiraFields,
+		                expand = "changelog"
+		            ],
+		            RequestQuery =
+		                if NextToken = null
+		                then BaseQuery
+		                else Record.AddField(BaseQuery, "nextPageToken", NextToken)
+		        in
+		            Json.Document(
+		                Web.Contents(
+		                    JiraBaseUrl,
+		                    [
+		                        RelativePath = "rest/api/3/search/jql",
+		                        Query = RequestQuery,
+		                        Headers = [Accept = "application/json"]
+		                    ]
+		                )
+		            ),
+		
+		    Pages =
+		        List.Generate(
+		            () => GetPage(null),
+		            each _ <> null,
+		            each
+		                let
+		                    Token = Record.FieldOrDefault(_, "nextPageToken", null)
+		                in
+		                    if Token = null then null else GetPage(Token),
+		            each [issues]
+		        ),
+		
+		    RawIssues = List.Combine(Pages),
+		
+		
+		    // ========================================
+		    // CHANGELOG COMPLETO
+		    // ========================================
+		
+		    // La búsqueda puede traer el changelog truncado; en ese caso se pide por ticket
+		    GetChangelogPage = (IssueKey as text, StartAt as number) as record =>
+		        Json.Document(
+		            Web.Contents(
+		                JiraBaseUrl,
+		                [
+		                    RelativePath = "rest/api/3/issue/" & IssueKey & "/changelog",
+		                    Query = [startAt = Text.From(StartAt), maxResults = "100"],
+		                    Headers = [Accept = "application/json"]
+		                ]
+		            )
+		        ),
+		
+		    GetFullChangelog = (IssueKey as text) as list =>
+		        List.Combine(
+		            List.Generate(
+		                () => GetChangelogPage(IssueKey, 0),
+		                each _ <> null,
+		                each
+		                    let
+		                        Next = [startAt] + List.Count([values])
+		                    in
+		                        if List.IsEmpty([values]) or Next >= [total]
+		                        then null
+		                        else GetChangelogPage(IssueKey, Next),
+		                each [values]
+		            )
+		        ),
+		
+		    GetHistories = (Issue as record) as list =>
+		        let
+		            Changelog = Record.FieldOrDefault(Issue, "changelog", null),
+		            Embedded =
+		                if Changelog = null then null
+		                else Record.FieldOrDefault(Changelog, "histories", null),
+		            IsComplete =
+		                Embedded <> null
+		                and List.Count(Embedded) >= Record.FieldOrDefault(Changelog, "total", 0)
+		        in
+		            if IsComplete then Embedded else GetFullChangelog(Issue[key]),
+		
+		
+		    // ========================================
+		    // RESULTADO
+		    // ========================================
+		
+		    Issues =
+		        List.Transform(
+		            RawIssues,
+		            each [
+		                id = [id],
+		                key = [key],
+		                fields = [fields],
+		                tipoTicketFieldId = TipoTicketFieldId,
+		                histories = GetHistories(_)
+		            ]
+		        )
+		
+		in
+		    Issues
+	lineageTag: 3f6a1c52-8d4e-4b7a-9e21-6c0d5b8a7f13
+
+	annotation PBI_NavigationStepName = Navegación
+
+	annotation PBI_ResultType = List
+

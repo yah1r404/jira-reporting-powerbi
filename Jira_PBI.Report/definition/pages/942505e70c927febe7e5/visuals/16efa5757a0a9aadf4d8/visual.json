@@ -1,0 +1,97 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/visualContainer/2.12.0/schema.json",
+  "name": "16efa5757a0a9aadf4d8",
+  "position": {
+    "x": 1090,
+    "y": 632,
+    "z": 23000,
+    "height": 428,
+    "width": 810,
+    "tabOrder": 23
+  },
+  "visual": {
+    "visualType": "pivotTable",
+    "query": {
+      "queryState": {
+        "Rows": {
+          "projections": [
+            {
+              "field": {
+                "Column": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "FactAssigneeHistory"
+                    }
+                  },
+                  "Property": "Responsable"
+                }
+              },
+              "queryRef": "FactAssigneeHistory.Responsable",
+              "nativeQueryRef": "Responsable",
+              "active": true
+            }
+          ]
+        },
+        "Values": {
+          "projections": [
+            {
+              "field": {
+                "Measure": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "_Medidas"
+                    }
+                  },
+                  "Property": "Prom Horas Asignado por Ticket"
+                }
+              },
+              "queryRef": "_Medidas.Prom Horas Asignado por Ticket",
+              "nativeQueryRef": "Prom Horas Asignado por Ticket"
+            }
+          ]
+        },
+        "Columns": {
+          "projections": [
+            {
+              "field": {
+                "Column": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "SLA_Tickets"
+                    }
+                  },
+                  "Property": "Request Type"
+                }
+              },
+              "queryRef": "SLA_Tickets.Request Type",
+              "nativeQueryRef": "Request Type",
+              "active": true
+            }
+          ]
+        }
+      }
+    },
+    "visualContainerObjects": {
+      "title": [
+        {
+          "properties": {
+            "show": {
+              "expr": {
+                "Literal": {
+                  "Value": "true"
+                }
+              }
+            },
+            "text": {
+              "expr": {
+                "Literal": {
+                  "Value": "'Horas promedio asignado por persona y request type'"
+                }
+              }
+            }
+          }
+        }
+      ]
+    }
+  }
+}

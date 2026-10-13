@@ -1,0 +1,164 @@
+/// Un renglón por cada tramo en que un ticket estuvo asignado a una persona (desde el changelog). Base para Time in Assignee.
+table FactAssigneeHistory
+	lineageTag: 3fa6a01b-bd87-4a02-a7dc-15bbab7fdadb
+
+	column Key
+		dataType: string
+		lineageTag: ee962397-143a-4e7d-9244-529e1f12a52e
+		summarizeBy: none
+		sourceColumn: Key
+
+		annotation SummarizationSetBy = Automatic
+
+	/// Persona asignada en el tramo, o "Sin asignar".
+	column Responsable
+		dataType: string
+		lineageTag: 1490330c-a3fb-4222-8a41-04a95db63b25
+		summarizeBy: none
+		sourceColumn: Responsable
+
+		annotation SummarizationSetBy = Automatic
+
+	column Inicio
+		dataType: dateTime
+		formatString: General Date
+		lineageTag: 4c2470e9-5ff8-4532-a355-e78a70646ced
+		summarizeBy: none
+		sourceColumn: Inicio
+
+		annotation SummarizationSetBy = Automatic
+
+	/// Fin del tramo. Se corta en la fecha de resolución; si el ticket sigue abierto, es la hora del último refresh.
+	column Fin
+		dataType: dateTime
+		formatString: General Date
+		lineageTag: 94b9ade6-3909-42ee-bd35-94e30ecafe2c
+		summarizeBy: none
+		sourceColumn: Fin
+
+		annotation SummarizationSetBy = Automatic
+
+	/// Horas calendario del tramo.
+	column Horas
+		dataType: double
+		formatString: #,##0.00
+		lineageTag: df99e166-1737-435a-be6a-b707b2de49de
+		summarizeBy: none
+		sourceColumn: Horas
+
+		annotation SummarizationSetBy = Automatic
+
+	/// TRUE si es el responsable actual y el ticket sigue abierto.
+	column 'Es Actual'
+		dataType: boolean
+		formatString: """TRUE"";""TRUE"";""FALSE"""
+		lineageTag: b42accef-6b06-41ef-9ec0-ba2064e37e97
+		summarizeBy: none
+		sourceColumn: Es Actual
+
+		annotation SummarizationSetBy = Automatic
+
+	partition FactAssigneeHistory = m
+		mode: import
+		source =
+				let
+				
+				    Issues = Jira_MDSC_Issues,
+				
+				
+				    // ========================================
+				    // AYUDANTES
+				    // ========================================
+				
+				    // Jira devuelve fechas con zona ("-0600"); se pasan a hora de Mérida (UTC-6, sin horario de verano)
+				    ToLocal = (t as nullable text) as nullable datetime =>
+				        if t = null then null
+				        else
+				            let
+				                Len = Text.Length(t),
+				                Iso =
+				                    if Len > 5 and List.Contains({"+", "-"}, Text.At(t, Len - 5))
+				                    then Text.Insert(t, Len - 2, ":")
+				                    else t
+				            in
+				                DateTimeZone.RemoveZone(DateTimeZone.SwitchZone(DateTimeZone.FromText(Iso), -6)),
+				
+				    Now = DateTimeZone.RemoveZone(DateTimeZone.SwitchZone(DateTimeZone.UtcNow(), -6)),
+				
+				    NameOf = (r as any, f as text) as any =>
+				        if r is record then Record.FieldOrDefault(r, f, null) else null,
+				
+				
+				    // ========================================
+				    // TRAMOS POR TICKET
+				    // ========================================
+				
+				    Segments = (i as record) as list =>
+				        let
+				            f = i[fields],
+				            CreatedAt = ToLocal(f[created]),
+				            ResolvedAt = ToLocal(Record.FieldOrDefault(f, "resolutiondate", null)),
+				            EndAt = if ResolvedAt = null then Now else ResolvedAt,
+				            Changes =
+				                List.Sort(
+				                    List.Combine(
+				                        List.Transform(
+				                            i[histories],
+				                            (h) =>
+				                                List.Transform(
+				                                    List.Select(h[items], each Record.FieldOrDefault(_, "field", null) = "assignee"),
+				                                    (it) => [At = ToLocal(h[created]), From = it[fromString], To = it[toString]]
+				                                )
+				                        )
+				                    ),
+				                    (a, b) => Value.Compare(a[At], b[At])
+				                ),
+				            InitialAssignee =
+				                if List.IsEmpty(Changes)
+				                then NameOf(Record.FieldOrDefault(f, "assignee", null), "displayName")
+				                else Changes{0}[From],
+				            Starts =
+				                {[Persona = InitialAssignee, InicioTramo = CreatedAt]}
+				                & List.Transform(Changes, each [Persona = [To], InicioTramo = [At]]),
+				            Total = List.Count(Starts),
+				            Rows =
+				                List.Transform(
+				                    {0 .. Total - 1},
+				                    (n) =>
+				                        let
+				                            s = Starts{n},
+				                            IsLast = n = Total - 1,
+				                            RawFin = if IsLast then EndAt else Starts{n + 1}[InicioTramo],
+				                            FinTramo = if RawFin > EndAt then EndAt else RawFin
+				                        in
+				                            [
+				                                Key = i[key],
+				                                Responsable = if s[Persona] = null then "Sin asignar" else s[Persona],
+				                                Inicio = s[InicioTramo],
+				                                Fin = FinTramo,
+				                                Horas = Duration.TotalHours(FinTramo - s[InicioTramo]),
+				                                #"Es Actual" = IsLast and ResolvedAt = null
+				                            ]
+				                )
+				        in
+				            // Se descartan tramos posteriores a la resolución
+				            List.Select(Rows, each [Horas] > 0),
+				
+				    Result =
+				        Table.FromRecords(
+				            List.Combine(List.Transform(Issues, Segments)),
+				            type table [
+				                Key = text,
+				                Responsable = text,
+				                Inicio = datetime,
+				                Fin = datetime,
+				                Horas = number,
+				                #"Es Actual" = logical
+				            ]
+				        )
+				
+				in
+				    Result
+
+	annotation PBI_ResultType = Table
+
