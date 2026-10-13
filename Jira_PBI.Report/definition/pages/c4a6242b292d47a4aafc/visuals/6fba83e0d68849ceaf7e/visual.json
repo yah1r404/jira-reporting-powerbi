@@ -61,11 +61,11 @@
                       "Entity": "_Medidas"
                     }
                   },
-                  "Property": "Total Incidentes"
+                  "Property": "Total Tickets"
                 }
               },
-              "queryRef": "_Medidas.Total Incidentes",
-              "nativeQueryRef": "Total Incidentes"
+              "queryRef": "_Medidas.Total Tickets",
+              "nativeQueryRef": "Total Tickets"
             }
           ]
         }
@@ -111,7 +111,7 @@
                 "Entity": "_Medidas"
               }
             },
-            "Property": "Total Incidentes"
+            "Property": "Total Tickets"
           }
         },
         "type": "Advanced"

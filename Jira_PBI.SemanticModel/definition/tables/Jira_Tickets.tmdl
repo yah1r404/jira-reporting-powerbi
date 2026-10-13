@@ -212,7 +212,7 @@ table Jira_Tickets
 				    // ========================================
 				
 				    JiraBaseUrl = "https://secureopsmx.atlassian.net",
-				    FilterId = "10741",
+				    FilterId = "10888",
 				
 				
 				    // ========================================
