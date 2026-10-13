@@ -1,0 +1,389 @@
+/// Un renglón por ticket de la mesa MDSC (últimos 6 meses), con los SLA de Jira Service Management.
+table SLA_Tickets
+	lineageTag: 7a90439c-e813-4ab4-8071-a89ee466fed7
+
+	column Key
+		dataType: string
+		isKey
+		lineageTag: b8608028-7adf-4c3b-bb7f-9395e4ca8ef7
+		summarizeBy: none
+		sourceColumn: Key
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Issue ID'
+		dataType: string
+		isHidden
+		lineageTag: bd66c140-c701-4030-a683-139c3c4ce27e
+		summarizeBy: none
+		sourceColumn: Issue ID
+
+		annotation SummarizationSetBy = Automatic
+
+	column Summary
+		dataType: string
+		lineageTag: 88ebd01a-9177-4a4a-90b7-f2962fb71180
+		summarizeBy: none
+		sourceColumn: Summary
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Issue Type'
+		dataType: string
+		lineageTag: 7d7d3c5e-c956-44a9-a409-066fe1af0df0
+		summarizeBy: none
+		sourceColumn: Issue Type
+
+		annotation SummarizationSetBy = Automatic
+
+	/// Flujo de trabajo del ticket: "IEP Incident" (tipo IEP INCIDENT) o "Mesa de Servicio - Clientes" (resto de tipos).
+	column Flujo
+		dataType: string
+		lineageTag: 763fe92f-2999-44bb-90d3-1c3c96da9cd1
+		summarizeBy: none
+		sourceColumn: Flujo
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Request Type'
+		dataType: string
+		lineageTag: f34a79a3-0680-4cd8-9887-b81face8bca8
+		summarizeBy: none
+		sourceColumn: Request Type
+
+		annotation SummarizationSetBy = Automatic
+
+	/// Valor del campo "tipo de ticket" (radio buttons) de Jira.
+	column 'Tipo de Ticket'
+		dataType: string
+		lineageTag: bf189e99-f498-41cb-a1e3-7f1a53e22e11
+		summarizeBy: none
+		sourceColumn: Tipo de Ticket
+
+		annotation SummarizationSetBy = Automatic
+
+	column Priority
+		dataType: string
+		lineageTag: a903b2cc-7dab-42b7-ad75-d7c7a02e19d7
+		summarizeBy: none
+		sourceColumn: Priority
+
+		annotation SummarizationSetBy = Automatic
+
+	column Status
+		dataType: string
+		lineageTag: 21799827-4e65-47ed-8d25-7be09d265e65
+		summarizeBy: none
+		sourceColumn: Status
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Status Category'
+		dataType: string
+		lineageTag: 8d54d29b-c82c-4370-9502-ec3e67812ff9
+		summarizeBy: none
+		sourceColumn: Status Category
+
+		annotation SummarizationSetBy = Automatic
+
+	column Assignee
+		dataType: string
+		lineageTag: 6ca1ab35-8ab4-4b9d-94f7-749ff8adf504
+		summarizeBy: none
+		sourceColumn: Assignee
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Técnicos Asignados'
+		dataType: string
+		lineageTag: e8668f4c-29bc-434a-ba02-43524d20e1a7
+		summarizeBy: none
+		sourceColumn: Técnicos Asignados
+
+		annotation SummarizationSetBy = Automatic
+
+	/// Fecha y hora de creación en hora de Mérida (UTC-6).
+	column Created
+		dataType: dateTime
+		formatString: General Date
+		lineageTag: 889b3ea9-2d23-4117-a576-9d701f3f629f
+		summarizeBy: none
+		sourceColumn: Created
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Created Date'
+		dataType: dateTime
+		formatString: Short Date
+		lineageTag: 845fd657-44fa-4737-97d0-195567b2b68d
+		summarizeBy: none
+		sourceColumn: Created Date
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation UnderlyingDateTimeDataType = Date
+
+	column 'Resolution Date'
+		dataType: dateTime
+		formatString: General Date
+		lineageTag: cedb7f76-abf2-4f90-9676-acdea2826bfe
+		summarizeBy: none
+		sourceColumn: Resolution Date
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Resolution Date Only'
+		dataType: dateTime
+		formatString: Short Date
+		lineageTag: 19854b65-0179-4eba-b3c2-3504945863b3
+		summarizeBy: none
+		sourceColumn: Resolution Date Only
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation UnderlyingDateTimeDataType = Date
+
+	/// Horas CALENDARIO entre creación y resolución (no es el tiempo de SLA).
+	column 'Resolution Hours'
+		dataType: double
+		formatString: #,##0.00
+		lineageTag: 88dd5fe8-8f3c-4e5b-8596-4bfac8bb668f
+		summarizeBy: none
+		sourceColumn: Resolution Hours
+
+		annotation SummarizationSetBy = Automatic
+
+	/// Meta del SLA "Tiempo hasta primera respuesta" de JSM, en horas.
+	column 'SLA Respuesta Meta Horas'
+		dataType: double
+		formatString: #,##0.00
+		lineageTag: 632fc5ee-2f0b-47c6-bfce-dd0cbff6077d
+		summarizeBy: none
+		sourceColumn: SLA Respuesta Meta Horas
+
+		annotation SummarizationSetBy = Automatic
+
+	/// Tiempo transcurrido del SLA de primera respuesta según JSM (respeta pausas y calendario del SLA).
+	column 'SLA Respuesta Horas'
+		dataType: double
+		formatString: #,##0.00
+		lineageTag: 3fc2e1a5-2400-4670-9603-7d48c565e660
+		summarizeBy: none
+		sourceColumn: SLA Respuesta Horas
+
+		annotation SummarizationSetBy = Automatic
+
+	/// Cumplido / Incumplido / En curso / En riesgo (queda 25% o menos) / Sin SLA.
+	column 'SLA Respuesta Estado'
+		dataType: string
+		lineageTag: e10e3e97-23ac-45a4-8f85-9c9606751598
+		summarizeBy: none
+		sourceColumn: SLA Respuesta Estado
+
+		annotation SummarizationSetBy = Automatic
+
+	/// Meta del SLA "Tiempo hasta resolución" de JSM, en horas.
+	column 'SLA Resolución Meta Horas'
+		dataType: double
+		formatString: #,##0.00
+		lineageTag: d1155f00-a4d6-4a4f-97c3-dd99eee60bea
+		summarizeBy: none
+		sourceColumn: SLA Resolución Meta Horas
+
+		annotation SummarizationSetBy = Automatic
+
+	/// Tiempo transcurrido del SLA de resolución según JSM (respeta pausas y calendario del SLA).
+	column 'SLA Resolución Horas'
+		dataType: double
+		formatString: #,##0.00
+		lineageTag: 0c1a658b-8112-423a-9a53-b263e2d8e170
+		summarizeBy: none
+		sourceColumn: SLA Resolución Horas
+
+		annotation SummarizationSetBy = Automatic
+
+	/// Cumplido / Incumplido / En curso / En riesgo (queda 25% o menos) / Sin SLA.
+	column 'SLA Resolución Estado'
+		dataType: string
+		lineageTag: ae8479a5-3f74-46c8-a622-bc32f4b662ba
+		summarizeBy: none
+		sourceColumn: SLA Resolución Estado
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Jira Link' = "https://secureopsmx.atlassian.net/browse/" & SLA_Tickets[Key]
+		dataType: string
+		lineageTag: a9170f5f-e912-4294-865b-15f7d7dd923b
+		dataCategory: WebUrl
+		summarizeBy: none
+
+		annotation SummarizationSetBy = Automatic
+
+	/// Veces que el ticket cambió de responsable (sin contar la primera asignación ni los tramos sin asignar).
+	column Reasignaciones =
+			VAR Tramos =
+			    COUNTROWS(
+			        FILTER(
+			            RELATEDTABLE(FactAssigneeHistory),
+			            FactAssigneeHistory[Responsable] <> "Sin asignar"
+			        )
+			    )
+			RETURN
+			    MAX(0, Tramos - 1)
+		dataType: int64
+		formatString: 0
+		lineageTag: 07e1c598-2b04-465d-97d2-2ee9114dafb5
+		summarizeBy: none
+
+		annotation SummarizationSetBy = Automatic
+
+	partition SLA_Tickets = m
+		mode: import
+		source =
+				let
+				
+				    Issues = Jira_MDSC_Issues,
+				
+				
+				    // ========================================
+				    // AYUDANTES
+				    // ========================================
+				
+				    // Jira devuelve fechas con zona ("-0600"); se pasan a hora de Mérida (UTC-6, sin horario de verano)
+				    ToLocal = (t as nullable text) as nullable datetime =>
+				        if t = null then null
+				        else
+				            let
+				                Len = Text.Length(t),
+				                Iso =
+				                    if Len > 5 and List.Contains({"+", "-"}, Text.At(t, Len - 5))
+				                    then Text.Insert(t, Len - 2, ":")
+				                    else t
+				            in
+				                DateTimeZone.RemoveZone(DateTimeZone.SwitchZone(DateTimeZone.FromText(Iso), -6)),
+				
+				    NameOf = (r as any, f as text) as any =>
+				        if r is record then Record.FieldOrDefault(r, f, null) else null,
+				
+				    // Resume un campo SLA de JSM: meta, tiempo transcurrido y estado
+				    SlaInfo = (v as any) as record =>
+				        let
+				            Ongoing = if v is record then Record.FieldOrDefault(v, "ongoingCycle", null) else null,
+				            Cycles =
+				                (if v is record then Record.FieldOrDefault(v, "completedCycles", {}) else {})
+				                & (if Ongoing = null then {} else {Ongoing}),
+				            Last = if List.IsEmpty(Cycles) then null else List.Last(Cycles),
+				            Hours = (c as record, f as text) as nullable number =>
+				                let
+				                    d = Record.FieldOrDefault(c, f, null)
+				                in
+				                    if d = null then null else d[millis] / 3600000,
+				            Breached =
+				                List.AnyTrue(
+				                    List.Transform(Cycles, each Record.FieldOrDefault(_, "breached", false) = true)
+				                ),
+				            Goal = if Last = null then null else Hours(Last, "goalDuration"),
+				            Elapsed = if Last = null then null else Hours(Last, "elapsedTime"),
+				            Remaining = if Last = null then null else Hours(Last, "remainingTime"),
+				            EstadoSla =
+				                if Last = null then "Sin SLA"
+				                else if Breached then "Incumplido"
+				                else if Ongoing = null then "Cumplido"
+				                else if Goal <> null and Remaining <> null and Remaining <= Goal * 0.25 then "En riesgo"
+				                else "En curso"
+				        in
+				            [Meta = Goal, Transcurrido = Elapsed, Estado = EstadoSla],
+				
+				
+				    // ========================================
+				    // UN RENGLÓN POR TICKET
+				    // ========================================
+				
+				    Rows =
+				        List.Transform(
+				            Issues,
+				            (i) =>
+				                let
+				                    f = i[fields],
+				                    IssueType = NameOf(Record.FieldOrDefault(f, "issuetype", null), "name"),
+				                    RequestType =
+				                        NameOf(
+				                            NameOf(Record.FieldOrDefault(f, "customfield_10010", null), "requestType"),
+				                            "name"
+				                        ),
+				                    Tipo =
+				                        if i[tipoTicketFieldId] = null then null
+				                        else NameOf(Record.FieldOrDefault(f, i[tipoTicketFieldId], null), "value"),
+				                    StatusRec = Record.FieldOrDefault(f, "status", null),
+				                    AssigneeName = NameOf(Record.FieldOrDefault(f, "assignee", null), "displayName"),
+				                    Tecnicos = Record.FieldOrDefault(f, "customfield_11042", null),
+				                    CreatedAt = ToLocal(f[created]),
+				                    Resolved = ToLocal(Record.FieldOrDefault(f, "resolutiondate", null)),
+				                    Respuesta = SlaInfo(Record.FieldOrDefault(f, "customfield_10936", null)),
+				                    Resolucion = SlaInfo(Record.FieldOrDefault(f, "customfield_10937", null))
+				                in
+				                    [
+				                        Key = i[key],
+				                        #"Issue ID" = i[id],
+				                        Summary = Record.FieldOrDefault(f, "summary", null),
+				                        #"Issue Type" = IssueType,
+				                        Flujo = if IssueType = "IEP INCIDENT" then "IEP Incident" else "Mesa de Servicio - Clientes",
+				                        #"Request Type" = if RequestType = null then "Sin request type" else RequestType,
+				                        #"Tipo de Ticket" = if Tipo = null then "Sin tipo" else Tipo,
+				                        Priority = NameOf(Record.FieldOrDefault(f, "priority", null), "name"),
+				                        Status = NameOf(StatusRec, "name"),
+				                        #"Status Category" = NameOf(NameOf(StatusRec, "statusCategory"), "name"),
+				                        Assignee = if AssigneeName = null then "Sin asignar" else AssigneeName,
+				                        #"Técnicos Asignados" =
+				                            if Tecnicos is list
+				                            then Text.Combine(List.Transform(Tecnicos, each NameOf(_, "displayName")), ", ")
+				                            else null,
+				                        Created = CreatedAt,
+				                        #"Created Date" = Date.From(CreatedAt),
+				                        #"Resolution Date" = Resolved,
+				                        #"Resolution Date Only" = if Resolved = null then null else Date.From(Resolved),
+				                        #"Resolution Hours" = if Resolved = null then null else Duration.TotalHours(Resolved - CreatedAt),
+				                        #"SLA Respuesta Meta Horas" = Respuesta[Meta],
+				                        #"SLA Respuesta Horas" = Respuesta[Transcurrido],
+				                        #"SLA Respuesta Estado" = Respuesta[Estado],
+				                        #"SLA Resolución Meta Horas" = Resolucion[Meta],
+				                        #"SLA Resolución Horas" = Resolucion[Transcurrido],
+				                        #"SLA Resolución Estado" = Resolucion[Estado]
+				                    ]
+				        ),
+				
+				    Tickets =
+				        Table.FromRecords(
+				            Rows,
+				            type table [
+				                Key = text,
+				                #"Issue ID" = text,
+				                Summary = nullable text,
+				                #"Issue Type" = nullable text,
+				                Flujo = text,
+				                #"Request Type" = text,
+				                #"Tipo de Ticket" = text,
+				                Priority = nullable text,
+				                Status = nullable text,
+				                #"Status Category" = nullable text,
+				                Assignee = text,
+				                #"Técnicos Asignados" = nullable text,
+				                Created = datetime,
+				                #"Created Date" = date,
+				                #"Resolution Date" = nullable datetime,
+				                #"Resolution Date Only" = nullable date,
+				                #"Resolution Hours" = nullable number,
+				                #"SLA Respuesta Meta Horas" = nullable number,
+				                #"SLA Respuesta Horas" = nullable number,
+				                #"SLA Respuesta Estado" = text,
+				                #"SLA Resolución Meta Horas" = nullable number,
+				                #"SLA Resolución Horas" = nullable number,
+				                #"SLA Resolución Estado" = text
+				            ]
+				        )
+				
+				in
+				    Tickets
+
+	annotation PBI_ResultType = Table
+
