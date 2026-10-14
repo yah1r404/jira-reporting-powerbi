@@ -1,0 +1,52 @@
+/// Opciones del filtro "SLA objetivo". Sin relaciones: las medidas de "SLA Seleccionado" leen la opción elegida.
+/// Horas = 0 significa usar la meta de Jira de cada ticket. Para agregar otra meta, agregar un renglón al DATATABLE.
+table 'SLA Objetivo'
+	lineageTag: 0b3c4d5e-6f70-4a81-9b2c-3d4e5f607182
+
+	column Opción
+		dataType: string
+		lineageTag: 1c4d5e6f-7081-4b92-8c3d-4e5f60718293
+		summarizeBy: none
+		isNameInferred
+		sourceColumn: [Opción]
+		sortByColumn: Orden
+
+		annotation SummarizationSetBy = Automatic
+
+	column Horas
+		dataType: double
+		formatString: 0
+		lineageTag: 2d5e6f70-8192-4ca3-9d4e-5f60718293a4
+		summarizeBy: none
+		isNameInferred
+		sourceColumn: [Horas]
+
+		annotation SummarizationSetBy = Automatic
+
+	column Orden
+		dataType: int64
+		isHidden
+		formatString: 0
+		lineageTag: 3e6f7081-92a3-4db4-8e5f-60718293a4b5
+		summarizeBy: none
+		isNameInferred
+		sourceColumn: [Orden]
+
+		annotation SummarizationSetBy = Automatic
+
+	partition 'SLA Objetivo' = calculated
+		mode: import
+		source =
+				DATATABLE(
+				    "Opción", STRING,
+				    "Horas", DOUBLE,
+				    "Orden", INTEGER,
+				    {
+				        { "Meta de Jira", 0, 0 },
+				        { "4 hrs", 4, 1 },
+				        { "6 hrs", 6, 2 },
+				        { "15 hrs", 15, 3 },
+				        { "18 hrs", 18, 4 }
+				    }
+				)
+

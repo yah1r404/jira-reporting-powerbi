@@ -1,12 +1,12 @@
 {
-  "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/visualContainer/2.12.0/schema.json",
+  "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/visualContainer/2.13.0/schema.json",
   "name": "d86a50ac7e5343d79a8c",
   "position": {
-    "x": 20,
-    "y": 20,
+    "x": 264,
+    "y": 196,
     "z": 0,
-    "height": 1020,
-    "width": 940,
+    "height": 864,
+    "width": 900,
     "tabOrder": 0
   },
   "visual": {
@@ -42,11 +42,11 @@
                       "Entity": "_Medidas"
                     }
                   },
-                  "Property": "Total Incidentes"
+                  "Property": "Total Tickets"
                 }
               },
-              "queryRef": "_Medidas.Total Incidentes",
-              "nativeQueryRef": "Total Incidentes"
+              "queryRef": "_Medidas.Total Tickets",
+              "nativeQueryRef": "Total Tickets"
             },
             {
               "field": {
@@ -89,6 +89,20 @@
               },
               "queryRef": "_Medidas.P90 Resolucion Horas",
               "nativeQueryRef": "P90 Resolucion Horas"
+            },
+            {
+              "field": {
+                "Measure": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "_Medidas"
+                    }
+                  },
+                  "Property": "Max Resolucion Horas"
+                }
+              },
+              "queryRef": "_Medidas.Max Resolucion Horas",
+              "nativeQueryRef": "Max Resolucion Horas"
             }
           ]
         }
@@ -110,6 +124,28 @@
           }
         ]
       }
+    },
+    "visualContainerObjects": {
+      "title": [
+        {
+          "properties": {
+            "show": {
+              "expr": {
+                "Literal": {
+                  "Value": "true"
+                }
+              }
+            },
+            "text": {
+              "expr": {
+                "Literal": {
+                  "Value": "'Volumen y tiempos por responsable'"
+                }
+              }
+            }
+          }
+        }
+      ]
     }
   }
 }

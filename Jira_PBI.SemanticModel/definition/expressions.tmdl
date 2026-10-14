@@ -1,4 +1,4 @@
-/// Tickets de la mesa MDSC (últimos 6 meses) con su changelog completo. No se carga al modelo; la usan SLA_Tickets, FactStatusHistory y FactAssigneeHistory.
+/// Tickets de la mesa MDSC (últimos 6 meses, sin Emailed request ni tickets en Cerrada) con su changelog completo. No se carga al modelo; la usan SLA_Tickets, FactStatusHistory y FactAssigneeHistory.
 expression Jira_MDSC_Issues =
 		let
 		
@@ -7,7 +7,8 @@ expression Jira_MDSC_Issues =
 		    // ========================================
 		
 		    JiraBaseUrl = "https://secureopsmx.atlassian.net",
-		    JQL = "project = MDSC AND created >= startOfMonth(-5) ORDER BY created ASC",
+		    // Se excluyen los Emailed request y los tickets en estado Cerrada (en JQL: Closed)
+		    JQL = "project = MDSC AND issuetype != ""Emailed request"" AND status != Closed AND created >= startOfMonth(-5) ORDER BY created ASC",
 		
 		
 		    // ========================================
@@ -44,9 +45,11 @@ expression Jira_MDSC_Issues =
 		    // customfield_10936 = Tiempo hasta primera respuesta (SLA JSM)
 		    // customfield_10937 = Tiempo hasta resolución (SLA JSM)
 		    // customfield_11042 = Técnico(s) asignado(s)
+		    // customfield_10002 = Organizations (cliente)
 		    BaseFields = {
 		        "summary", "status", "issuetype", "priority", "assignee", "created", "resolutiondate",
-		        "customfield_10010", "customfield_10936", "customfield_10937", "customfield_11042"
+		        "customfield_10010", "customfield_10936", "customfield_10937", "customfield_11042",
+		        "customfield_10002"
 		    },
 		
 		    JiraFields =

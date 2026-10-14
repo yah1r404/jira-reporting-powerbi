@@ -1,12 +1,12 @@
 {
-  "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/visualContainer/2.12.0/schema.json",
+  "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/visualContainer/2.13.0/schema.json",
   "name": "072d70baa305472a8da0",
   "position": {
-    "x": 20,
-    "y": 20,
+    "x": 264,
+    "y": 196,
     "z": 0,
-    "height": 130,
-    "width": 360,
+    "height": 128,
+    "width": 400,
     "tabOrder": 0
   },
   "visual": {
@@ -23,11 +23,11 @@
                       "Entity": "_Medidas"
                     }
                   },
-                  "Property": "Total Incidentes"
+                  "Property": "Total Tickets"
                 }
               },
-              "queryRef": "_Medidas.Total Incidentes",
-              "nativeQueryRef": "Total Incidentes"
+              "queryRef": "_Medidas.Total Tickets",
+              "nativeQueryRef": "Total Tickets"
             }
           ]
         }

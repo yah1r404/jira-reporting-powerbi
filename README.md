@@ -21,9 +21,10 @@ Para abrirlo, abre `Jira_PBI.pbip` con Power BI Desktop.
 
 | Consulta | Qué trae | ¿Se carga al modelo? |
 |---|---|---|
-| `Jira_Tickets` | Tickets del **filtro 10741** de Jira (incidentes IEP del mes). Es la consulta original del proyecto. | Sí |
-| `Jira_MDSC_Issues` | Todos los tickets de **MDSC creados en los últimos 6 meses** (`project = MDSC AND created >= startOfMonth(-5)`), con sus campos y su changelog completo. Las tres tablas de abajo salen de aquí. | No |
-| `SLA_Tickets` | Un renglón por ticket: flujo, request type, tipo de ticket, prioridad, estado, responsable, fechas y los **SLA de Jira Service Management**. | Sí |
+| `Jira_Tickets` | Consulta original del proyecto (vista clásica). Usa **el mismo alcance que el tablero de SLA**: mesa MDSC, últimos 6 meses, sin Emailed request ni tickets en Cerrada, con JQL directo y sin filtros guardados. | Sí |
+| `Jira_MDSC_Issues` | Tickets de **MDSC creados en los últimos 6 meses**, **sin Emailed request y sin tickets en estado Cerrada** (`project = MDSC AND issuetype != "Emailed request" AND status != Closed AND created >= startOfMonth(-5)`), con sus campos y su changelog completo. Las tres tablas de abajo salen de aquí. | No |
+| `SLA_Tickets` | Un renglón por ticket: flujo, request type, tipo de ticket, **organización**, prioridad, estado, responsable, fechas y los **SLA de Jira Service Management**. | Sí |
+| `SLA Objetivo` | Tabla calculada con las opciones del filtro de SLA del cliente: Meta de Jira, 4, 6, 15 y 18 hrs. No tiene relaciones. | Sí |
 | `FactStatusHistory` | Un renglón por cada tramo que un ticket pasó en un estado (**Time in Status**). | Sí |
 | `FactAssigneeHistory` | Un renglón por cada tramo que un ticket estuvo asignado a una persona (**Time in Assignee**). | Sí |
 
@@ -35,6 +36,7 @@ Para abrirlo, abre `Jira_PBI.pbip` con Power BI Desktop.
 | Tiempo hasta primera respuesta (SLA JSM, meta 30 min) | `customfield_10936` |
 | Tiempo hasta resolución (SLA JSM, meta 15 h / 24 h) | `customfield_10937` |
 | Técnico(s) asignado(s) | `customfield_11042` |
+| Organizations (cliente) | `customfield_10002` |
 | Tipo de ticket (radio buttons) | se busca por nombre al actualizar |
 
 ### Flujos de la mesa
@@ -42,7 +44,7 @@ Para abrirlo, abre `Jira_PBI.pbip` con Power BI Desktop.
 | Flujo | Tipos de ticket | Estados principales |
 |---|---|---|
 | **IEP Incident** | IEP INCIDENT | Nueva solicitud → N1 → N2 RAM / N2 QCOM → Escalado QCOM → Resuelta → Cerrada |
-| **Mesa de Servicio - Clientes** | Task, Emailed request y los demás tipos | Nueva solicitud → En curso → Escalado a N2 / N3 → Esperando al proveedor → Resuelta → Cerrada |
+| **Mesa de Servicio - Clientes** | Task y los demás tipos (los Emailed request se excluyen) | Nueva solicitud → En curso → Escalado a N2 / N3 → Esperando al proveedor → Resuelta → Cerrada |
 
 Los dos flujos comparten "Esperando por el cliente", "Escalado" y "Reabierta". El orden de los estados para gráficos y tablas se define en la lista `OrdenEstados` de la consulta `FactStatusHistory`.
 
@@ -61,14 +63,17 @@ Todas las relaciones son de uno a muchos y en una sola dirección. `DimFecha` es
 
 | Carpeta | Medidas |
 |---|---|
-| *(raíz)* | Medidas originales sobre `Jira_Tickets`: Total Incidentes, promedios, mediana y percentiles de resolución, rangos de horas |
+| *(raíz)* | Medidas originales sobre `Jira_Tickets`: Total Tickets, promedios, mediana y percentiles de resolución, rangos de horas |
 | SLA | Tickets, Tickets Resueltos, Tickets Abiertos, Última Actualización |
 | SLA \ Resolución | SLA Resolución Cumplidos / Incumplidos / En Riesgo, **% SLA Resolución**, Prom Horas SLA Resolución |
 | SLA \ Primera Respuesta | SLA Respuesta Cumplidos / Incumplidos, **% SLA Primera Respuesta**, Prom Horas SLA Respuesta |
 | SLA \ Calendario | Prom / Mediana / P90 Horas Resolución Calendario |
 | SLA \ Semáforo | Meta % SLA (95%), Umbral Alerta % SLA (85%), colores de semáforo |
 | Time in Status | Horas en Estado, Tickets en Estado, Prom / Mediana / P90 Horas en Estado |
-| Time in Assignee | Horas Asignado, Tickets Atendidos, Prom Horas Asignado por Ticket, Mediana Horas Asignado, Total Reasignaciones, % SLA Resolución Tickets Atendidos |
+| SLA Seleccionado | Meta SLA Seleccionada, Meta SLA Aplicada, Cumplen / Incumplen / Evaluados SLA Seleccionado, **% SLA Seleccionado**, Horas Ticket Incumplido, Meta Ticket Incumplido, Horas Excedidas SLA, Horas en Estado Incumplidos |
+| Filtros | Filtros Activos, Filtros Activos Jira (texto de los filtros aplicados) |
+| Time in Assignee | Horas Asignado, Tickets Atendidos, Prom Horas Asignado por Ticket, Mediana Horas Asignado, Personas por Ticket, Prom Horas Sin Asignar, Total Reasignaciones, % SLA Resolución Tickets Atendidos |
+| Línea de Tiempo | Gantt Responsable, Gantt Estado y sus colores (tabla auxiliar `Línea de Tiempo`, horas 0 a 48+) |
 
 ### Reglas de cálculo
 
@@ -79,36 +84,71 @@ Todas las relaciones son de uno a muchos y en una sola dirección. `DimFecha` es
   - *En riesgo*: abierto con 25% o menos del tiempo restante.
   - *En curso*
   - *Sin SLA*
+- **Estados vigentes**: solo se muestran los estados que tiene hoy el flujo de cada ticket en Jira. El tiempo en estados de flujos anteriores se descarta. Los estados se identifican por su ID y se muestran con su nombre actual.
 - **Time in Status** está en horas de reloj y no incluye estados finales (Resuelta, Cerrada). Si un ticket sigue en un estado, su tramo cuenta hasta la hora del último refresh.
-- **Time in Assignee** está en horas de reloj y se corta en la fecha de resolución. El tiempo sin responsable aparece como "Sin asignar".
+- **Time in Assignee** está en horas de reloj, desde la creación hasta la resolución, y **solo cuenta tickets resueltos**. El tiempo sin responsable no se atribuye a nadie (se ve aparte en *Prom Horas Sin Asignar*).
 - **Reasignaciones**: cambios de responsable, sin contar la primera asignación.
+- **SLA objetivo (filtro)**: cada ticket se compara contra las horas elegidas en el filtro *SLA objetivo*; con "Meta de Jira" se usa la meta de JSM de cada ticket. Las horas comparadas (`Horas SLA Base`) son el tiempo de SLA de resolución de JSM, que respeta pausas y horario; si el ticket no tiene SLA en JSM, se usan las horas de reloj. Un ticket abierto que ya pasó la meta cuenta como incumplido.
 - **Fechas** en hora de Mérida (UTC-6).
 - El **semáforo** (verde ≥ 95%, ámbar ≥ 85%, rojo debajo) usa metas provisionales. Se ajustan en las medidas `Meta % SLA` y `Umbral Alerta % SLA`.
 
 ## 4. Páginas del reporte
 
-| Página | Contenido |
-|---|---|
-| 01 - Resumen Ejecutivo | Página original sobre el filtro 10741 (incidentes IEP) |
-| 02 - Tiempos de Resolución | Página original: tiempos calendario de resolución |
-| 03 - Responsables | Página original: análisis por responsable |
-| 04 - Detalle de Incidentes | Página original: tabla de incidentes |
-| **05 - SLA Resumen** | KPIs de SLA con semáforo, tendencia mensual, % SLA por request type, tickets por flujo y estado de SLA |
-| **06 - SLA por Tipo de Ticket** | % SLA por flujo, request type y prioridad; detalle de cumplimiento y tiempos |
-| **07 - Time in Status** | Horas promedio por estado comparando los dos flujos, con mediana y P90 |
-| **08 - Time in Assignee** | Horas promedio asignado y tickets atendidos por persona, % SLA de sus tickets |
-| **09 - Detalle SLA** | Tabla ticket por ticket con estado de SLA y link a Jira |
+| Página | Datos | Contenido |
+|---|---|---|
+| **01 - Vista Ejecutiva** | Mesa MDSC | Selector de **SLA objetivo del cliente** (solo esta página). % de cumplimiento con semáforo, tendencia mensual, estados donde se va más tiempo por flujo, **lista de tickets incumplidos con su clave de Jira** y horas por estado de cada incumplido |
+| **02 - SLA Resumen** | Mesa MDSC | KPIs de SLA con las metas de Jira y semáforo, tendencia mensual, % SLA por request type, tickets por flujo y estado de SLA |
+| **03 - SLA por Tipo de Ticket** | Mesa MDSC | % SLA por flujo, request type y prioridad; detalle de cumplimiento y tiempos |
+| **04 - Detalle SLA** | Mesa MDSC | Tabla ticket por ticket con estado de SLA y link a Jira |
+| **05 - Time in Status** | Mesa MDSC | Horas promedio por estado vigente, comparando los dos flujos, con mediana y P90 |
+| **06 - Time in Assignee** | Mesa MDSC | Horas promedio asignado por ticket resuelto y tickets atendidos por persona. Filtro propio: responsable |
+| **07 - Línea de Tiempo** | Mesa MDSC | Diagrama tipo Gantt por ticket, hora por hora desde la creación (0h a 48h+): quién lo tuvo y en qué estado estuvo. Filtro propio: ticket |
+| 08 - Resumen (vista clásica) | `Jira_Tickets` | Total y promedio de resolución, tickets por día, por responsable y por prioridad. Filtros propios: responsable, prioridad y reportó |
+| 09 - Tiempos de Resolución (vista clásica) | `Jira_Tickets` | Promedio, mediana, P90, P95 y máximo de horas de resolución; tendencia y rangos de horas |
+| 10 - Responsables (vista clásica) | `Jira_Tickets` | Volumen y tiempos por responsable (incluye máximo) y dispersión volumen vs. horas |
+| 11 - Detalle de Tickets (vista clásica) | `Jira_Tickets` | Tabla de tickets con link a Jira |
+| Filtros avanzados *(oculta en el menú)* | Mesa MDSC | Panel de filtros en modo borrador: se abre con el botón «Filtros avanzados» |
 
-Las páginas 05 a 09 tienen barra lateral de navegación, encabezado con la hora de la última actualización y filtros por mes, flujo, request type, prioridad y tipo de ticket (o responsable).
+Todas las páginas comparten la misma estructura: barra lateral con el logo y el menú (página activa en amarillo), encabezado con título y descripción, barra de filtros y una línea con los **filtros activos**.
+
+### Filtros
+
+| Tipo | Filtros | Dónde aplican |
+|---|---|---|
+| **Globales sincronizados** | Periodo (fecha de creación), Organización, Flujo de trabajo, Request type, Prioridad | El periodo aplica en las 11 páginas. Los demás aplican en las páginas 01 a 07 (no existen en `Jira_Tickets`). Al cambiar de página se conservan. |
+| **Adicionales** (en «Filtros avanzados») | Tipo de ticket, Estado del SLA de resolución, Estado actual, Responsable actual | Páginas 01 a 07, sincronizados de forma oculta |
+| **Propios de la página** | SLA objetivo (01), Responsable (06), Ticket (07), Responsable / Prioridad / Reportó (08) | Solo en su página; no modifican los globales |
+
+- **Limpiar filtros** quita todos los filtros de la página y, por la sincronía, los globales en todas las páginas. Para quitar uno solo, usa el borrador del encabezado de ese filtro.
+- **Filtros avanzados**: los cambios no se aplican hasta pulsar **Aplicar filtros**. **Cancelar** regresa a la página anterior sin aplicarlos.
+- Todas las fechas son de **creación del ticket**, en hora de Mérida (UTC-6). El rango incluye el último día.
 
 ## 5. Diseño
 
-- Tema corporativo **RAM** en `Jira_PBI.Report/StaticResources/RegisteredResources/RAM_Tema.json`. Se aplica a todo el reporte.
+- Tema corporativo **RAM** en `Jira_PBI.Report/StaticResources/RegisteredResources/RAM_Tema.json`. Es la fuente única de colores, tipografía, tarjetas, tablas y gráficos de todo el reporte.
 - Colores tomados del logo: azul `#06519A` (principal), amarillo `#F1D72C` (acento), azul oscuro `#0A2E5C` (títulos) y grises neutros.
+- **Tipografía única: Segoe UI** (regular, Semibold y Bold). Power BI no permite fuentes externas como Inter.
+- **Botones**, con contraste WCAG AA en sus estados normal, hover y presionado:
+  - Navegación: azul con texto blanco; activo en amarillo con texto azul oscuro.
+  - Primario: azul con texto blanco.
+  - Secundario: blanco con borde y texto azul oscuro.
+  - Acento: amarillo con texto azul oscuro.
+- **Colores con significado** (iguales en todas las páginas):
+
+  | Significado | Color | Dónde |
+  |---|---|---|
+  | Neutro / cumplido | Azul `#06519A` | SLA cumplido, % SLA en meta, prioridad Lowest |
+  | En curso | Azul claro `#6A9BD8` | SLA en curso, prioridad Low |
+  | En riesgo / atención | Amarillo `#F1D72C` (texto ámbar `#8A6100`) | SLA en riesgo, % SLA bajo el umbral, prioridad Medium |
+  | No cumple / urgente | Rojo `#C8382E` | SLA incumplido, % SLA bajo el umbral de alerta, tarjetas e importes de incumplimiento, prioridad High (Highest en rojo oscuro) |
+  | Sin dato | Gris `#A9B4C2` | Sin SLA |
+
+  Las reglas viven en las medidas de la carpeta *Colores* (`Color Estado SLA Resolución`, `Color Estado SLA Respuesta`, `Color Prioridad`, `Color Alerta`) y *SLA \ Semáforo*.
 - Logo en `Jira_PBI.Report/StaticResources/RegisteredResources/redesmayab_logo.jpg`.
 
 ## 6. Pendientes
 
 - Confirmar las metas reales de % SLA para el semáforo.
 - Validar los números contra Jira después del primer refresh completo.
-- Decidir si las páginas 01 a 04 también llevan la barra lateral y el nuevo diseño.
+- Definir si las páginas de la vista clásica (08 a 11) se mantienen: ahora usan los mismos tickets que las páginas 01 a 07.
+- Definir si Time in Status y Time in Assignee se calculan en horas hábiles.

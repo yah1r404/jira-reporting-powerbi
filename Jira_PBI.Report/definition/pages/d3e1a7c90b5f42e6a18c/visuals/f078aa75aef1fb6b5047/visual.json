@@ -1,0 +1,130 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/visualContainer/2.12.0/schema.json",
+  "name": "f078aa75aef1fb6b5047",
+  "position": {
+    "x": 1180,
+    "y": 686,
+    "z": 29000,
+    "height": 374,
+    "width": 720,
+    "tabOrder": 29
+  },
+  "visual": {
+    "visualType": "pivotTable",
+    "query": {
+      "queryState": {
+        "Rows": {
+          "projections": [
+            {
+              "field": {
+                "Column": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "SLA_Tickets"
+                    }
+                  },
+                  "Property": "Flujo"
+                }
+              },
+              "queryRef": "SLA_Tickets.Flujo",
+              "nativeQueryRef": "Flujo",
+              "active": true
+            },
+            {
+              "field": {
+                "Column": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "SLA_Tickets"
+                    }
+                  },
+                  "Property": "Key"
+                }
+              },
+              "queryRef": "SLA_Tickets.Key",
+              "nativeQueryRef": "Key",
+              "active": true
+            }
+          ]
+        },
+        "Values": {
+          "projections": [
+            {
+              "field": {
+                "Measure": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "_Medidas"
+                    }
+                  },
+                  "Property": "Horas en Estado Incumplidos"
+                }
+              },
+              "queryRef": "_Medidas.Horas en Estado Incumplidos",
+              "nativeQueryRef": "Horas en Estado Incumplidos"
+            }
+          ]
+        },
+        "Columns": {
+          "projections": [
+            {
+              "field": {
+                "Column": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "FactStatusHistory"
+                    }
+                  },
+                  "Property": "Estado"
+                }
+              },
+              "queryRef": "FactStatusHistory.Estado",
+              "nativeQueryRef": "Estado",
+              "active": true
+            }
+          ]
+        }
+      },
+      "sortDefinition": {
+        "sort": [
+          {
+            "field": {
+              "Column": {
+                "Expression": {
+                  "SourceRef": {
+                    "Entity": "FactStatusHistory"
+                  }
+                },
+                "Property": "Estado"
+              }
+            },
+            "direction": "Ascending"
+          }
+        ],
+        "isDefaultSort": true
+      }
+    },
+    "visualContainerObjects": {
+      "title": [
+        {
+          "properties": {
+            "show": {
+              "expr": {
+                "Literal": {
+                  "Value": "true"
+                }
+              }
+            },
+            "text": {
+              "expr": {
+                "Literal": {
+                  "Value": "'¿Dónde se fue el tiempo en los incumplidos? Horas por estado, por flujo'"
+                }
+              }
+            }
+          }
+        }
+      ]
+    }
+  }
+}

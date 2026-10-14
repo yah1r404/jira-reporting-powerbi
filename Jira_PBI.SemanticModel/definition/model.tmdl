@@ -19,6 +19,8 @@ ref table _Medidas
 ref table SLA_Tickets
 ref table FactStatusHistory
 ref table FactAssigneeHistory
+ref table 'SLA Objetivo'
+ref table 'Línea de Tiempo'
 
 ref cultureInfo es-MX
 

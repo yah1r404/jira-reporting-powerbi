@@ -1,7 +1,7 @@
 {
   "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/page/2.1.0/schema.json",
   "name": "53cbabc53efc4dfa9ef9",
-  "displayName": "04 - Detalle de Incidentes",
+  "displayName": "11 - Detalle de Tickets (vista clásica)",
   "displayOption": "FitToPage",
   "height": 1080,
   "width": 1920

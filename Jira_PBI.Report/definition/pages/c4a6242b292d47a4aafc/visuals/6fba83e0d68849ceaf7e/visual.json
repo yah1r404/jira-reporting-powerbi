@@ -1,12 +1,12 @@
 {
-  "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/visualContainer/2.12.0/schema.json",
+  "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/visualContainer/2.13.0/schema.json",
   "name": "6fba83e0d68849ceaf7e",
   "position": {
-    "x": 980,
-    "y": 20,
+    "x": 1180,
+    "y": 196,
     "z": 0,
-    "height": 1020,
-    "width": 920,
+    "height": 864,
+    "width": 720,
     "tabOrder": 1
   },
   "visual": {
@@ -61,15 +61,37 @@
                       "Entity": "_Medidas"
                     }
                   },
-                  "Property": "Total Incidentes"
+                  "Property": "Total Tickets"
                 }
               },
-              "queryRef": "_Medidas.Total Incidentes",
-              "nativeQueryRef": "Total Incidentes"
+              "queryRef": "_Medidas.Total Tickets",
+              "nativeQueryRef": "Total Tickets"
             }
           ]
         }
       }
+    },
+    "visualContainerObjects": {
+      "title": [
+        {
+          "properties": {
+            "show": {
+              "expr": {
+                "Literal": {
+                  "Value": "true"
+                }
+              }
+            },
+            "text": {
+              "expr": {
+                "Literal": {
+                  "Value": "'Volumen vs. horas promedio de resolución'"
+                }
+              }
+            }
+          }
+        }
+      ]
     }
   },
   "filterConfig": {
@@ -111,7 +133,7 @@
                 "Entity": "_Medidas"
               }
             },
-            "Property": "Total Incidentes"
+            "Property": "Total Tickets"
           }
         },
         "type": "Advanced"
