@@ -11,7 +11,7 @@ annotation __PBI_TimeIntelligenceEnabled = 0
 
 annotation PBI_ProTooling = ["DevMode"]
 
-annotation PBI_QueryOrder = ["Jira_Tickets","_Medidas","Jira_MDSC_Issues","SLA_Tickets","FactStatusHistory","FactAssigneeHistory"]
+annotation PBI_QueryOrder = ["Jira_Tickets","_Medidas","Jira_MDSC_Issues","SLA_Tickets","FactStatusHistory","FactAssigneeHistory","HorasLaborales"]
 
 ref table Jira_Tickets
 ref table DimFecha
@@ -19,6 +19,9 @@ ref table _Medidas
 ref table SLA_Tickets
 ref table FactStatusHistory
 ref table FactAssigneeHistory
+ref table 'SLA Objetivo'
+ref table 'Línea de Tiempo'
+ref table 'Horario Cálculo'
 
 ref cultureInfo es-MX
 

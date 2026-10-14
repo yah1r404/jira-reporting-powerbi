@@ -1,12 +1,12 @@
 {
-  "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/visualContainer/2.12.0/schema.json",
+  "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/visualContainer/2.13.0/schema.json",
   "name": "ea8656e56e374da59f9c",
   "position": {
-    "x": 40,
-    "y": 47.777777777777779,
+    "x": 264,
+    "y": 196,
     "z": 0,
-    "height": 1020,
-    "width": 1880,
+    "height": 864,
+    "width": 1636,
     "tabOrder": 0
   },
   "visual": {
@@ -239,6 +239,60 @@
           },
           "selector": {
             "metadata": "Jira_Tickets.Resolution Hours"
+          }
+        }
+      ],
+      "values": [
+        {
+          "properties": {
+            "fontColor": {
+              "solid": {
+                "color": {
+                  "expr": {
+                    "Measure": {
+                      "Expression": {
+                        "SourceRef": {
+                          "Entity": "_Medidas"
+                        }
+                      },
+                      "Property": "Color Prioridad"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "selector": {
+            "data": [
+              {
+                "dataViewWildcard": {
+                  "matchingOption": 1
+                }
+              }
+            ],
+            "metadata": "Jira_Tickets.Priority"
+          }
+        }
+      ]
+    },
+    "visualContainerObjects": {
+      "title": [
+        {
+          "properties": {
+            "show": {
+              "expr": {
+                "Literal": {
+                  "Value": "true"
+                }
+              }
+            },
+            "text": {
+              "expr": {
+                "Literal": {
+                  "Value": "'Tickets de la mesa MDSC'"
+                }
+              }
+            }
           }
         }
       ]

@@ -107,6 +107,38 @@ table FactStatusHistory
 
 		annotation SummarizationSetBy = Automatic
 
+	/// Horas desde la creación del ticket hasta el inicio del tramo (para la línea de tiempo).
+	column 'Hora Inicio'
+		dataType: double
+		isHidden
+		formatString: #,##0.00
+		lineageTag: 23d4e5f6-0718-4293-9da4-e5f60718293a
+		summarizeBy: none
+		sourceColumn: Hora Inicio
+
+		annotation SummarizationSetBy = Automatic
+
+	/// Horas desde la creación del ticket hasta el fin del tramo (para la línea de tiempo).
+	column 'Hora Fin'
+		dataType: double
+		isHidden
+		formatString: #,##0.00
+		lineageTag: 34e5f607-1829-43a4-8eb5-f60718293a4b
+		summarizeBy: none
+		sourceColumn: Hora Fin
+
+		annotation SummarizationSetBy = Automatic
+
+	/// Horas del tramo dentro del horario laboral de la mesa (L-V 6:00-23:00, Sáb 9:00-19:00). Ver función HorasLaborales.
+	column 'Horas Hábiles'
+		dataType: double
+		formatString: #,##0.00
+		lineageTag: 1b2c3d4e-5f60-4b7c-9d8e-0f1a2b3c4d5e
+		summarizeBy: none
+		sourceColumn: Horas Hábiles
+
+		annotation SummarizationSetBy = Automatic
+
 	partition FactStatusHistory = m
 		mode: import
 		source =
@@ -148,9 +180,11 @@ table FactStatusHistory
 				
 				
 				    // ========================================
-				    // CATEGORÍA DE CADA ESTADO
+				    // ESTADOS VIGENTES POR FLUJO
 				    // ========================================
 				
+				    // Estados que tiene HOY cada tipo de ticket en Jira. Los tramos en estados que ya no
+				    // existen en el flujo del ticket (flujos anteriores) se descartan.
 				    ProjectStatuses =
 				        Json.Document(
 				            Web.Contents(
@@ -162,20 +196,31 @@ table FactStatusHistory
 				            )
 				        ),
 				
-				    Categories =
+				    FlujoDe = (IssueType as nullable text) as text =>
+				        if IssueType = "IEP INCIDENT" then "IEP Incident" else "Mesa de Servicio - Clientes",
+				
+				    Vigentes =
 				        Table.Distinct(
 				            Table.FromRecords(
-				                List.Transform(
-				                    List.Combine(List.Transform(ProjectStatuses, each [statuses])),
-				                    each [
-				                        Estado = [name],
-				                        CategoriaNombre = [statusCategory][name],
-				                        CategoriaKey = [statusCategory][key]
-				                    ]
+				                List.Combine(
+				                    List.Transform(
+				                        List.Select(ProjectStatuses, each [name] <> "Emailed request"),
+				                        (t) =>
+				                            List.Transform(
+				                                t[statuses],
+				                                (s) => [
+				                                    Flujo = FlujoDe(t[name]),
+				                                    EstadoId = Text.From(s[id]),
+				                                    EstadoNombre = s[name],
+				                                    CategoriaNombre = s[statusCategory][name],
+				                                    CategoriaKey = s[statusCategory][key]
+				                                ]
+				                            )
+				                    )
 				                ),
-				                type table [Estado = text, CategoriaNombre = text, CategoriaKey = text]
+				                type table [Flujo = text, EstadoId = text, EstadoNombre = text, CategoriaNombre = text, CategoriaKey = text]
 				            ),
-				            {"Estado"}
+				            {"Flujo", "EstadoId"}
 				        ),
 				
 				
@@ -183,12 +228,13 @@ table FactStatusHistory
 				    // TRAMOS POR TICKET
 				    // ========================================
 				
+				    // El estado se identifica por ID (el nombre del historial puede venir en otro idioma o con un nombre anterior)
 				    Segments = (i as record) as list =>
 				        let
 				            f = i[fields],
-				            IssueType = NameOf(Record.FieldOrDefault(f, "issuetype", null), "name"),
-				            FlujoTicket = if IssueType = "IEP INCIDENT" then "IEP Incident" else "Mesa de Servicio - Clientes",
+				            FlujoTicket = FlujoDe(NameOf(Record.FieldOrDefault(f, "issuetype", null), "name")),
 				            CreatedAt = ToLocal(f[created]),
+				            CurrentStatus = Record.FieldOrDefault(f, "status", null),
 				            Changes =
 				                List.Sort(
 				                    List.Combine(
@@ -197,19 +243,23 @@ table FactStatusHistory
 				                            (h) =>
 				                                List.Transform(
 				                                    List.Select(h[items], each Record.FieldOrDefault(_, "field", null) = "status"),
-				                                    (it) => [At = ToLocal(h[created]), From = it[fromString], To = it[toString]]
+				                                    (it) => [
+				                                        At = ToLocal(h[created]),
+				                                        FromId = Text.From(Record.FieldOrDefault(it, "from", null)),
+				                                        ToId = Text.From(Record.FieldOrDefault(it, "to", null))
+				                                    ]
 				                                )
 				                        )
 				                    ),
 				                    (a, b) => Value.Compare(a[At], b[At])
 				                ),
-				            InitialStatus =
+				            InitialId =
 				                if List.IsEmpty(Changes)
-				                then NameOf(Record.FieldOrDefault(f, "status", null), "name")
-				                else Changes{0}[From],
+				                then Text.From(NameOf(CurrentStatus, "id"))
+				                else Changes{0}[FromId],
 				            Starts =
-				                {[EstadoTramo = InitialStatus, InicioTramo = CreatedAt]}
-				                & List.Transform(Changes, each [EstadoTramo = [To], InicioTramo = [At]]),
+				                {[IdTramo = InitialId, InicioTramo = CreatedAt]}
+				                & List.Transform(Changes, each [IdTramo = [ToId], InicioTramo = [At]]),
 				            Total = List.Count(Starts)
 				        in
 				            List.Transform(
@@ -218,19 +268,20 @@ table FactStatusHistory
 				                    let
 				                        s = Starts{n},
 				                        IsLast = n = Total - 1,
-				                        FinTramo = if IsLast then Now else Starts{n + 1}[InicioTramo],
-				                        Posicion = List.PositionOf(OrdenEstados, s[EstadoTramo])
+				                        FinTramo = if IsLast then Now else Starts{n + 1}[InicioTramo]
 				                    in
 				                        [
 				                            Key = i[key],
 				                            Flujo = FlujoTicket,
-				                            Estado = s[EstadoTramo],
-				                            #"Orden Estado" = if Posicion < 0 then 99 else Posicion + 1,
+				                            EstadoId = s[IdTramo],
 				                            Visita = n + 1,
 				                            Inicio = s[InicioTramo],
 				                            Fin = FinTramo,
 				                            Horas = Duration.TotalHours(FinTramo - s[InicioTramo]),
-				                            #"Es Actual" = IsLast
+				                            #"Horas Hábiles" = HorasLaborales(s[InicioTramo], FinTramo),
+				                            #"Es Actual" = IsLast,
+				                            #"Hora Inicio" = Duration.TotalHours(s[InicioTramo] - CreatedAt),
+				                            #"Hora Fin" = Duration.TotalHours(FinTramo - CreatedAt)
 				                        ]
 				            ),
 				
@@ -240,33 +291,49 @@ table FactStatusHistory
 				            type table [
 				                Key = text,
 				                Flujo = text,
-				                Estado = text,
-				                #"Orden Estado" = Int64.Type,
+				                EstadoId = nullable text,
 				                Visita = Int64.Type,
 				                Inicio = datetime,
 				                Fin = datetime,
 				                Horas = number,
-				                #"Es Actual" = logical
+				                #"Horas Hábiles" = number,
+				                #"Es Actual" = logical,
+				                #"Hora Inicio" = number,
+				                #"Hora Fin" = number
 				            ]
 				        ),
 				
-				    Joined = Table.NestedJoin(Base, {"Estado"}, Categories, {"Estado"}, "Cat", JoinKind.LeftOuter),
-				    Expanded = Table.ExpandTableColumn(Joined, "Cat", {"CategoriaNombre", "CategoriaKey"}),
+				    // Unión interna: solo se quedan los tramos en estados vigentes del flujo del ticket
+				    Joined = Table.NestedJoin(Base, {"Flujo", "EstadoId"}, Vigentes, {"Flujo", "EstadoId"}, "Vig", JoinKind.Inner),
+				    Expanded = Table.ExpandTableColumn(Joined, "Vig", {"EstadoNombre", "CategoriaNombre", "CategoriaKey"}),
 				
-				    WithCategory =
+				    WithEstado = Table.AddColumn(Expanded, "Estado", each [EstadoNombre], type text),
+				
+				    WithOrden =
 				        Table.AddColumn(
-				            Expanded,
-				            "Categoría Estado",
-				            each if [CategoriaNombre] = null then "Desconocida" else [CategoriaNombre],
-				            type text
+				            WithEstado,
+				            "Orden Estado",
+				            each
+				                let
+				                    Posicion = List.PositionOf(OrdenEstados, [Estado])
+				                in
+				                    if Posicion < 0 then 99 else Posicion + 1,
+				            Int64.Type
 				        ),
 				
-				    WithFinal =
-				        Table.AddColumn(WithCategory, "Es Estado Final", each [CategoriaKey] = "done", type logical),
+				    WithCategory = Table.AddColumn(WithOrden, "Categoría Estado", each [CategoriaNombre], type text),
 				
-				    Result = Table.RemoveColumns(WithFinal, {"CategoriaNombre", "CategoriaKey"})
+				    WithFinal = Table.AddColumn(WithCategory, "Es Estado Final", each [CategoriaKey] = "done", type logical),
 				
-				in
+				    Result =
+				        Table.SelectColumns(
+				            WithFinal,
+				            {
+				                "Key", "Flujo", "Estado", "Orden Estado", "Categoría Estado", "Es Estado Final",
+				                "Visita", "Inicio", "Fin", "Horas", "Horas Hábiles", "Es Actual", "Hora Inicio", "Hora Fin"
+				            }
+				        )
+								in
 				    Result
 
 	annotation PBI_ResultType = Table

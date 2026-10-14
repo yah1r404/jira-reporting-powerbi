@@ -189,7 +189,7 @@ table _Medidas
 		lineageTag: 7d40af31-9e52-4b1d-8a46-8fa2e3c15d94
 
 	/// Horas totales en estados no finales (excluye Resuelta/Cerrada).
-	measure 'Horas en Estado' = CALCULATE(SUM(FactStatusHistory[Horas]), FactStatusHistory[Es Estado Final] = FALSE())
+	measure 'Horas en Estado' = CALCULATE([Suma Horas Estado], FactStatusHistory[Es Estado Final] = FALSE())
 		formatString: #,##0.00
 		displayFolder: Time in Status
 		lineageTag: 8e51b042-af63-4c2e-9b57-90b3f4d26ea5
@@ -209,7 +209,7 @@ table _Medidas
 	/// Mediana por ticket de las horas en el estado.
 	measure 'Mediana Horas en Estado' =
 			CALCULATE(
-			    MEDIANX(VALUES(FactStatusHistory[Key]), CALCULATE(SUM(FactStatusHistory[Horas]))),
+			    MEDIANX(VALUES(FactStatusHistory[Key]), CALCULATE([Suma Horas Estado])),
 			    FactStatusHistory[Es Estado Final] = FALSE()
 			)
 		formatString: #,##0.00
@@ -219,33 +219,48 @@ table _Medidas
 	/// Percentil 90 por ticket de las horas en el estado.
 	measure 'P90 Horas en Estado' =
 			CALCULATE(
-			    PERCENTILEX.INC(VALUES(FactStatusHistory[Key]), CALCULATE(SUM(FactStatusHistory[Horas])), 0.90),
+			    PERCENTILEX.INC(VALUES(FactStatusHistory[Key]), CALCULATE([Suma Horas Estado]), 0.90),
 			    FactStatusHistory[Es Estado Final] = FALSE()
 			)
 		formatString: #,##0.00
 		displayFolder: Time in Status
 		lineageTag: c295f486-e3a7-4062-9f60-d4f6c86a6c29
 
-	/// Horas totales que los tickets estuvieron asignados (hasta su resolución).
-	measure 'Horas Asignado' = SUM(FactAssigneeHistory[Horas])
+	/// Horas que las personas tuvieron asignados tickets ya resueltos, hasta su resolución. Excluye "Sin asignar" y tickets abiertos.
+	measure 'Horas Asignado' =
+			CALCULATE(
+			    [Suma Horas Asignado],
+			    FactAssigneeHistory[Ticket Resuelto] = TRUE(),
+			    FactAssigneeHistory[Responsable] <> "Sin asignar"
+			)
 		formatString: #,##0.00
 		displayFolder: Time in Assignee
 		lineageTag: d3a60597-f4b8-4173-a071-e5a7e7b97d3a
 
-	/// Tickets distintos que la persona tuvo asignados.
-	measure 'Tickets Atendidos' = DISTINCTCOUNT(FactAssigneeHistory[Key])
+	/// Tickets resueltos que la persona tuvo asignados en algún momento.
+	measure 'Tickets Atendidos' =
+			CALCULATE(
+			    DISTINCTCOUNT(FactAssigneeHistory[Key]),
+			    FactAssigneeHistory[Ticket Resuelto] = TRUE(),
+			    FactAssigneeHistory[Responsable] <> "Sin asignar"
+			)
 		formatString: #,##0
 		displayFolder: Time in Assignee
 		lineageTag: e4b716a8-05c9-4284-b182-f6b8f8c08e4b
 
-	/// Horas promedio que un ticket estuvo asignado a la persona.
+	/// Horas promedio que un ticket resuelto estuvo asignado a la persona durante su vida (de la creación a la resolución).
 	measure 'Prom Horas Asignado por Ticket' = DIVIDE([Horas Asignado], [Tickets Atendidos])
 		formatString: #,##0.00
 		displayFolder: Time in Assignee
 		lineageTag: f5c827b9-16da-4395-8c39-07c9d9019f5c
 
-	/// Mediana por ticket de las horas asignado a la persona.
-	measure 'Mediana Horas Asignado' = MEDIANX(VALUES(FactAssigneeHistory[Key]), CALCULATE(SUM(FactAssigneeHistory[Horas])))
+	/// Mediana por ticket de las horas asignado a la persona (tickets resueltos, sin "Sin asignar"). Menos sensible a casos extremos que el promedio.
+	measure 'Mediana Horas Asignado' =
+			CALCULATE(
+			    MEDIANX(VALUES(FactAssigneeHistory[Key]), CALCULATE([Suma Horas Asignado])),
+			    FactAssigneeHistory[Ticket Resuelto] = TRUE(),
+			    FactAssigneeHistory[Responsable] <> "Sin asignar"
+			)
 		formatString: #,##0.00
 		displayFolder: Time in Assignee
 		lineageTag: 06d938ca-27eb-44a6-9d4a-18c9fa1a0a6d
@@ -278,14 +293,14 @@ table _Medidas
 		displayFolder: SLA\Semáforo
 		lineageTag: 4ab2d3e5-6f70-4b8c-9dae-1f203b4c5d6e
 
-	/// Color de semáforo para % SLA Resolución: verde >= meta, ámbar >= umbral, rojo debajo.
+	/// Color de semáforo para % SLA Resolución: azul (neutro) >= meta, ámbar >= umbral, rojo debajo.
 	measure 'Color % SLA Resolución' =
 			VAR v = [% SLA Resolución]
 			RETURN
 			    SWITCH(
 			        TRUE(),
 			        ISBLANK(v), "#8A97A8",
-			        v >= [Meta % SLA], "#1E8E5A",
+			        v >= [Meta % SLA], "#06519A",
 			        v >= [Umbral Alerta % SLA], "#C98A00",
 			        "#C8382E"
 			    )
@@ -299,7 +314,7 @@ table _Medidas
 			    SWITCH(
 			        TRUE(),
 			        ISBLANK(v), "#8A97A8",
-			        v >= [Meta % SLA], "#1E8E5A",
+			        v >= [Meta % SLA], "#06519A",
 			        v >= [Umbral Alerta % SLA], "#C98A00",
 			        "#C8382E"
 			    )
@@ -311,6 +326,389 @@ table _Medidas
 		formatString: dd/mm/yyyy hh:nn
 		displayFolder: SLA
 		lineageTag: 7de50618-92a3-4ebf-80d1-425c6e7f8091
+
+	/// Horas del SLA objetivo elegido en el filtro. En blanco = meta de Jira de cada ticket.
+	measure 'Meta SLA Seleccionada' =
+			VAR Sel = SELECTEDVALUE('SLA Objetivo'[Horas])
+			RETURN IF(Sel > 0, Sel)
+		formatString: 0.## "hrs"
+		displayFolder: SLA Seleccionado
+		lineageTag: 4f708192-a3b4-4ec5-9f60-718293a4b5c6
+
+	/// Texto de la meta aplicada, para mostrar en tarjetas.
+	measure 'Meta SLA Aplicada' =
+			VAR Meta = [Meta SLA Seleccionada]
+			RETURN IF(ISBLANK(Meta), "Meta de Jira", FORMAT(Meta, "0.##") & " hrs")
+		displayFolder: SLA Seleccionado
+		lineageTag: 508192a3-b4c5-4fd6-8071-8293a4b5c6d7
+
+	/// Tickets resueltos dentro del SLA objetivo elegido (Horas SLA Base <= meta).
+	measure 'Cumplen SLA Seleccionado' =
+			VAR MetaSel = [Meta SLA Seleccionada]
+			VAR T =
+			    ADDCOLUMNS(
+			        SLA_Tickets,
+			        "@Meta", IF(ISBLANK(MetaSel), SLA_Tickets[SLA Resolución Meta Horas], MetaSel),
+			        "@Horas", SLA_Tickets[Horas SLA Base]
+			    )
+			RETURN
+			    COUNTROWS(
+			        FILTER(
+			            T,
+			            NOT ISBLANK(SLA_Tickets[Resolution Date])
+			                && NOT ISBLANK([@Meta]) && NOT ISBLANK([@Horas])
+			                && [@Horas] <= [@Meta]
+			        )
+			    )
+		formatString: #,##0
+		displayFolder: SLA Seleccionado
+		lineageTag: 6192a3b4-c5d6-40e7-9182-93a4b5c6d7e8
+
+	/// Tickets que superaron el SLA objetivo elegido (resueltos fuera de tiempo o abiertos ya vencidos).
+	measure 'Incumplen SLA Seleccionado' =
+			VAR MetaSel = [Meta SLA Seleccionada]
+			VAR T =
+			    ADDCOLUMNS(
+			        SLA_Tickets,
+			        "@Meta", IF(ISBLANK(MetaSel), SLA_Tickets[SLA Resolución Meta Horas], MetaSel),
+			        "@Horas", SLA_Tickets[Horas SLA Base]
+			    )
+			RETURN
+			    COUNTROWS(
+			        FILTER(T, NOT ISBLANK([@Meta]) && NOT ISBLANK([@Horas]) && [@Horas] > [@Meta])
+			    )
+		formatString: #,##0
+		displayFolder: SLA Seleccionado
+		lineageTag: 72a3b4c5-d6e7-41f8-a293-a4b5c6d7e8f9
+
+	/// Tickets evaluados contra el SLA objetivo (cumplen + incumplen). No cuenta abiertos dentro de tiempo.
+	measure 'Evaluados SLA Seleccionado' = [Cumplen SLA Seleccionado] + [Incumplen SLA Seleccionado]
+		formatString: #,##0
+		displayFolder: SLA Seleccionado
+		lineageTag: 83b4c5d6-e7f8-4209-b3a4-b5c6d7e8f90a
+
+	/// % de cumplimiento contra el SLA objetivo elegido.
+	measure '% SLA Seleccionado' = DIVIDE([Cumplen SLA Seleccionado], [Evaluados SLA Seleccionado])
+		formatString: 0.0%;-0.0%;0.0%
+		displayFolder: SLA Seleccionado
+		lineageTag: 94c5d6e7-f809-431a-84b5-c6d7e8f90a1b
+
+	/// Color de semáforo para % SLA Seleccionado.
+	measure 'Color % SLA Seleccionado' =
+			VAR v = [% SLA Seleccionado]
+			RETURN
+			    SWITCH(
+			        TRUE(),
+			        ISBLANK(v), "#8A97A8",
+			        v >= [Meta % SLA], "#06519A",
+			        v >= [Umbral Alerta % SLA], "#C98A00",
+			        "#C8382E"
+			    )
+		displayFolder: SLA Seleccionado
+		lineageTag: a5d6e7f8-091a-442b-95c6-d7e8f90a1b2c
+
+	/// Horas de SLA del ticket, solo si incumplió el SLA objetivo (en blanco si cumplió). Sirve para listar los incumplidos.
+	measure 'Horas Ticket Incumplido' =
+			VAR MetaSel = [Meta SLA Seleccionada]
+			VAR T =
+			    ADDCOLUMNS(
+			        SLA_Tickets,
+			        "@Meta", IF(ISBLANK(MetaSel), SLA_Tickets[SLA Resolución Meta Horas], MetaSel),
+			        "@Horas", SLA_Tickets[Horas SLA Base]
+			    )
+			RETURN
+			    SUMX(FILTER(T, NOT ISBLANK([@Meta]) && NOT ISBLANK([@Horas]) && [@Horas] > [@Meta]), [@Horas])
+		formatString: #,##0.00
+		displayFolder: SLA Seleccionado
+		lineageTag: b6e7f809-1a2b-453c-a6d7-e8f90a1b2c3d
+
+	/// Meta que se le aplicó al ticket incumplido (en blanco si cumplió).
+	measure 'Meta Ticket Incumplido' =
+			VAR MetaSel = [Meta SLA Seleccionada]
+			VAR T =
+			    ADDCOLUMNS(
+			        SLA_Tickets,
+			        "@Meta", IF(ISBLANK(MetaSel), SLA_Tickets[SLA Resolución Meta Horas], MetaSel),
+			        "@Horas", SLA_Tickets[Horas SLA Base]
+			    )
+			RETURN
+			    MAXX(FILTER(T, NOT ISBLANK([@Meta]) && NOT ISBLANK([@Horas]) && [@Horas] > [@Meta]), [@Meta])
+		formatString: #,##0.00
+		displayFolder: SLA Seleccionado
+		lineageTag: c7f8091a-2b3c-464d-b7e8-f90a1b2c3d4e
+
+	/// Horas por encima del SLA objetivo en los tickets incumplidos.
+	measure 'Horas Excedidas SLA' =
+			VAR MetaSel = [Meta SLA Seleccionada]
+			VAR T =
+			    ADDCOLUMNS(
+			        SLA_Tickets,
+			        "@Meta", IF(ISBLANK(MetaSel), SLA_Tickets[SLA Resolución Meta Horas], MetaSel),
+			        "@Horas", SLA_Tickets[Horas SLA Base]
+			    )
+			RETURN
+			    SUMX(FILTER(T, NOT ISBLANK([@Meta]) && NOT ISBLANK([@Horas]) && [@Horas] > [@Meta]), [@Horas] - [@Meta])
+		formatString: #,##0.00
+		displayFolder: SLA Seleccionado
+		lineageTag: d8091a2b-3c4d-475e-88f9-0a1b2c3d4e5f
+
+	/// Horas en cada estado, solo de los tickets que incumplieron el SLA objetivo. Muestra dónde se fue el tiempo.
+	measure 'Horas en Estado Incumplidos' =
+			SUMX(
+			    FILTER(VALUES(SLA_Tickets[Key]), [Incumplen SLA Seleccionado] > 0),
+			    [Horas en Estado]
+			)
+		formatString: #,##0.00
+		displayFolder: SLA Seleccionado
+		lineageTag: e91a2b3c-4d5e-486f-99a0-1b2c3d4e5f60
+
+	/// Promedio de personas distintas que atendieron cada ticket resuelto.
+	measure 'Personas por Ticket' =
+			CALCULATE(
+			    AVERAGEX(VALUES(FactAssigneeHistory[Key]), CALCULATE(DISTINCTCOUNT(FactAssigneeHistory[Responsable]))),
+			    FactAssigneeHistory[Ticket Resuelto] = TRUE(),
+			    FactAssigneeHistory[Responsable] <> "Sin asignar"
+			)
+		formatString: #,##0.0
+		displayFolder: Time in Assignee
+		lineageTag: 45f60718-293a-44b5-8fc6-0718293a4b5c
+
+	/// Horas promedio que los tickets resueltos pasaron sin responsable.
+	measure 'Prom Horas Sin Asignar' =
+			CALCULATE(
+			    DIVIDE([Suma Horas Asignado], DISTINCTCOUNT(FactAssigneeHistory[Key])),
+			    FactAssigneeHistory[Ticket Resuelto] = TRUE(),
+			    FactAssigneeHistory[Responsable] = "Sin asignar"
+			)
+		formatString: #,##0.00
+		displayFolder: Time in Assignee
+		lineageTag: 5607182a-3a4b-45c6-80d7-18293a4b5c6d
+
+	/// Línea de tiempo: 1 si la persona tenía asignado el ticket durante esa hora desde su creación.
+	measure 'Gantt Responsable' =
+			VAR H = SELECTEDVALUE('Línea de Tiempo'[Hora])
+			VAR Ultima = CALCULATE(MAX('Línea de Tiempo'[Hora]), ALL('Línea de Tiempo'))
+			RETURN
+			    IF(
+			        NOT ISBLANK(H),
+			        IF(
+			            COUNTROWS(
+			                FILTER(
+			                    FactAssigneeHistory,
+			                    FactAssigneeHistory[Hora Fin] > H
+			                        && (H = Ultima || FactAssigneeHistory[Hora Inicio] < H + 1)
+			                )
+			            ) > 0,
+			            1
+			        )
+			    )
+		formatString: 0
+		displayFolder: Línea de Tiempo
+		lineageTag: 67182a3b-4b5c-46d7-91e8-293a4b5c6d7e
+
+	/// Color de la celda de la línea de tiempo de responsables: azul con persona, gris sin asignar.
+	measure 'Color Gantt Responsable' =
+			IF(
+			    NOT ISBLANK([Gantt Responsable]),
+			    IF(SELECTEDVALUE(FactAssigneeHistory[Responsable]) = "Sin asignar", "#C9D3E0", "#06519A")
+			)
+		displayFolder: Línea de Tiempo
+		lineageTag: 782a3b4c-5c6d-47e8-a2f9-3a4b5c6d7e8f
+
+	/// Línea de tiempo: 1 si el ticket estaba en ese estado durante esa hora desde su creación. No incluye estados finales.
+	measure 'Gantt Estado' =
+			VAR H = SELECTEDVALUE('Línea de Tiempo'[Hora])
+			VAR Ultima = CALCULATE(MAX('Línea de Tiempo'[Hora]), ALL('Línea de Tiempo'))
+			RETURN
+			    IF(
+			        NOT ISBLANK(H),
+			        IF(
+			            COUNTROWS(
+			                FILTER(
+			                    FactStatusHistory,
+			                    FactStatusHistory[Es Estado Final] = FALSE()
+			                        && FactStatusHistory[Hora Fin] > H
+			                        && (H = Ultima || FactStatusHistory[Hora Inicio] < H + 1)
+			                )
+			            ) > 0,
+			            1
+			        )
+			    )
+		formatString: 0
+		displayFolder: Línea de Tiempo
+		lineageTag: 893b4c5d-6d7e-48f9-b30a-4b5c6d7e8f90
+
+	/// Color de la celda de la línea de tiempo de estados: amarillo en espera, azul en atención, gris por hacer.
+	measure 'Color Gantt Estado' =
+			VAR Estado = SELECTEDVALUE(FactStatusHistory[Estado])
+			VAR Categoria = SELECTEDVALUE(FactStatusHistory[Categoría Estado])
+			RETURN
+			    IF(
+			        NOT ISBLANK([Gantt Estado]),
+			        SWITCH(
+			            TRUE(),
+			            CONTAINSSTRING(Estado, "Esperando"), "#F1D72C",
+			            Categoria = "Por hacer", "#A9C3E6",
+			            "#06519A"
+			        )
+			    )
+		displayFolder: Línea de Tiempo
+		lineageTag: 9a4c5d6e-7e8f-4901-840b-5c6d7e8f90a1
+
+	/// Texto con los filtros aplicados en las páginas de la mesa MDSC (se muestra debajo de la barra de filtros).
+	measure 'Filtros Activos' =
+			VAR Periodo =
+			    IF(
+			        ISFILTERED(DimFecha[Date]),
+			        "Periodo: " & FORMAT(MIN(DimFecha[Date]), "dd/mm/yyyy") & " – " & FORMAT(MAX(DimFecha[Date]), "dd/mm/yyyy")
+			    )
+			VAR Org =
+			    IF(
+			        ISFILTERED(SLA_Tickets[Organización]),
+			        "Organización: "
+			            & IF(
+			                COUNTROWS(VALUES(SLA_Tickets[Organización])) > 2,
+			                COUNTROWS(VALUES(SLA_Tickets[Organización])) & " seleccionadas",
+			                CONCATENATEX(VALUES(SLA_Tickets[Organización]), SLA_Tickets[Organización], ", ")
+			            )
+			    )
+			VAR Flujo =
+			    IF(
+			        ISFILTERED(SLA_Tickets[Flujo]),
+			        "Flujo: " & CONCATENATEX(VALUES(SLA_Tickets[Flujo]), SLA_Tickets[Flujo], ", ")
+			    )
+			VAR RT =
+			    IF(
+			        ISFILTERED(SLA_Tickets[Request Type]),
+			        "Request type: "
+			            & IF(
+			                COUNTROWS(VALUES(SLA_Tickets[Request Type])) > 2,
+			                COUNTROWS(VALUES(SLA_Tickets[Request Type])) & " seleccionados",
+			                CONCATENATEX(VALUES(SLA_Tickets[Request Type]), SLA_Tickets[Request Type], ", ")
+			            )
+			    )
+			VAR Prio =
+			    IF(
+			        ISFILTERED(SLA_Tickets[Priority]),
+			        "Prioridad: " & CONCATENATEX(VALUES(SLA_Tickets[Priority]), SLA_Tickets[Priority], ", ")
+			    )
+			VAR Tipo =
+			    IF(
+			        ISFILTERED(SLA_Tickets[Tipo de Ticket]),
+			        "Tipo de ticket: " & CONCATENATEX(VALUES(SLA_Tickets[Tipo de Ticket]), SLA_Tickets[Tipo de Ticket], ", ")
+			    )
+			VAR EstadoSla =
+			    IF(
+			        ISFILTERED(SLA_Tickets[SLA Resolución Estado]),
+			        "Estado SLA: " & CONCATENATEX(VALUES(SLA_Tickets[SLA Resolución Estado]), SLA_Tickets[SLA Resolución Estado], ", ")
+			    )
+			VAR EstadoActual =
+			    IF(
+			        ISFILTERED(SLA_Tickets[Status]),
+			        "Estado actual: " & CONCATENATEX(VALUES(SLA_Tickets[Status]), SLA_Tickets[Status], ", ")
+			    )
+			VAR Resp =
+			    IF(
+			        ISFILTERED(SLA_Tickets[Assignee]),
+			        "Responsable actual: "
+			            & IF(
+			                COUNTROWS(VALUES(SLA_Tickets[Assignee])) > 2,
+			                COUNTROWS(VALUES(SLA_Tickets[Assignee])) & " seleccionados",
+			                CONCATENATEX(VALUES(SLA_Tickets[Assignee]), SLA_Tickets[Assignee], ", ")
+			            )
+			    )
+			VAR Horario = "Horas: " & IF([Usa Horario Laboral], "horario laboral (L-V 6-23, Sáb 9-19)", "24/7")
+			VAR Partes = { Periodo, Org, Flujo, RT, Prio, Tipo, EstadoSla, EstadoActual, Resp, Horario }
+			VAR Texto =
+			    CONCATENATEX(FILTER(Partes, NOT ISBLANK([Value])), [Value], "   ·   ")
+			RETURN
+			    IF(
+			        ISBLANK(Texto) || Texto = "",
+			        "Filtros activos: ninguno (todos los tickets de MDSC de los últimos 6 meses)",
+			        "Filtros activos:   " & Texto
+			    )
+		displayFolder: Filtros
+		lineageTag: ad5e6f70-8192-4a3b-9c4d-5e6f708192a3
+
+	/// Texto con los filtros aplicados en las páginas de la vista clásica (tabla Jira_Tickets). Solo aplica el periodo global.
+	measure 'Filtros Activos Jira' =
+			VAR Periodo =
+			    IF(
+			        ISFILTERED(DimFecha[Date]),
+			        "Periodo: " & FORMAT(MIN(DimFecha[Date]), "dd/mm/yyyy") & " – " & FORMAT(MAX(DimFecha[Date]), "dd/mm/yyyy"),
+			        "Periodo: todo"
+			    )
+			RETURN
+			    "Filtros activos:   " & Periodo
+			        & "   ·   Vista clásica (Jira_Tickets): organización, flujo y request type no aplican aquí"
+		displayFolder: Filtros
+		lineageTag: be6f7081-92a3-4b4c-8d5e-6f708192a3b4
+
+	/// Color de texto para el estado del SLA de resolución: rojo incumplido, ámbar en riesgo, azul cumplido.
+	measure 'Color Estado SLA Resolución' =
+			SWITCH(
+			    SELECTEDVALUE(SLA_Tickets[SLA Resolución Estado]),
+			    "Incumplido", "#C8382E",
+			    "En riesgo", "#8A6100",
+			    "Cumplido", "#06519A",
+			    "En curso", "#2F76C2",
+			    "#5B6B7F"
+			)
+		displayFolder: Colores
+		lineageTag: cf708192-a3b4-4c5d-9e6f-708192a3b4c5
+
+	/// Color de texto para el estado del SLA de primera respuesta.
+	measure 'Color Estado SLA Respuesta' =
+			SWITCH(
+			    SELECTEDVALUE(SLA_Tickets[SLA Respuesta Estado]),
+			    "Incumplido", "#C8382E",
+			    "En riesgo", "#8A6100",
+			    "Cumplido", "#06519A",
+			    "En curso", "#2F76C2",
+			    "#5B6B7F"
+			)
+		displayFolder: Colores
+		lineageTag: d08192a3-b4c5-4d6e-8f70-8192a3b4c5d6
+
+	/// Color de texto para la prioridad: rojo alta, ámbar media, azul baja.
+	measure 'Color Prioridad' =
+			VAR P = COALESCE(SELECTEDVALUE(SLA_Tickets[Priority]), SELECTEDVALUE(Jira_Tickets[Priority]))
+			RETURN
+			    SWITCH(
+			        TRUE(),
+			        P IN { "Highest", "Muy alta", "Crítica", "Critical", "Blocker" }, "#8E1B14",
+			        P IN { "High", "Alta" }, "#C8382E",
+			        P IN { "Medium", "Media" }, "#8A6100",
+			        P IN { "Low", "Baja" }, "#2F76C2",
+			        P IN { "Lowest", "Muy baja" }, "#06519A",
+			        "#5B6B7F"
+			    )
+		displayFolder: Colores
+		lineageTag: e192a3b4-c5d6-4e7f-9081-92a3b4c5d6e7
+
+	/// Color de texto para valores que indican incumplimiento (siempre rojo).
+	measure 'Color Alerta' = "#C8382E"
+		displayFolder: Colores
+		lineageTag: f2a3b4c5-d6e7-4f80-8192-a3b4c5d6e7f8
+
+	/// TRUE si las horas se calculan en horario laboral (L-V 6:00-23:00, Sáb 9:00-19:00). Es el valor predeterminado.
+	measure 'Usa Horario Laboral' = SELECTEDVALUE('Horario Cálculo'[Clave], "laboral") = "laboral"
+		displayFolder: Horario
+		lineageTag: 718293a4-b5c6-41d2-9d4e-6f708192a3b4
+
+	/// Suma de horas en estado según el horario de cálculo (laboral o 24/7).
+	measure 'Suma Horas Estado' = IF([Usa Horario Laboral], SUM(FactStatusHistory[Horas Hábiles]), SUM(FactStatusHistory[Horas]))
+		formatString: #,##0.00
+		isHidden
+		displayFolder: Horario
+		lineageTag: 8293a4b5-c6d7-42e3-8e5f-708192a3b4c5
+
+	/// Suma de horas asignado según el horario de cálculo (laboral o 24/7).
+	measure 'Suma Horas Asignado' = IF([Usa Horario Laboral], SUM(FactAssigneeHistory[Horas Hábiles]), SUM(FactAssigneeHistory[Horas]))
+		formatString: #,##0.00
+		isHidden
+		displayFolder: Horario
+		lineageTag: 93a4b5c6-d7e8-43f4-9f60-8192a3b4c5d6
 
 	partition _Medidas = m
 		mode: import

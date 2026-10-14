@@ -84,20 +84,6 @@
                       "Entity": "_Medidas"
                     }
                   },
-                  "Property": "Horas Asignado"
-                }
-              },
-              "queryRef": "_Medidas.Horas Asignado",
-              "nativeQueryRef": "Horas Asignado"
-            },
-            {
-              "field": {
-                "Measure": {
-                  "Expression": {
-                    "SourceRef": {
-                      "Entity": "_Medidas"
-                    }
-                  },
                   "Property": "% SLA Resolución Tickets Atendidos"
                 }
               },
@@ -122,7 +108,7 @@
             "text": {
               "expr": {
                 "Literal": {
-                  "Value": "'Eficiencia por persona'"
+                  "Value": "'Eficiencia por persona (tickets resueltos)'"
                 }
               }
             }

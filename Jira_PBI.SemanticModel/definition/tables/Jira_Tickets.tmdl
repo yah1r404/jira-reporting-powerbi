@@ -212,29 +212,10 @@ table Jira_Tickets
 				    // ========================================
 				
 				    JiraBaseUrl = "https://secureopsmx.atlassian.net",
-				    FilterId = "10888",
-				
-				
-				    // ========================================
-				    // LEER FILTRO DE JIRA
-				    // ========================================
-				
-				    FilterResponse =
-				        Json.Document(
-				            Web.Contents(
-				                JiraBaseUrl,
-				                [
-				                    RelativePath =
-				                        "rest/api/3/filter/" & FilterId,
-				
-				                    Headers = [
-				                        Accept = "application/json"
-				                    ]
-				                ]
-				            )
-				        ),
-				
-				    JQL = FilterResponse[jql],
+
+				    // Mismo alcance que el tablero de SLA (Jira_MDSC_Issues): mesa MDSC, últimos 6 meses,
+				    // sin Emailed request ni tickets en estado Cerrada (en JQL: Closed). No depende de filtros guardados.
+				    JQL = "project = MDSC AND issuetype != ""Emailed request"" AND status != Closed AND created >= startOfMonth(-5) ORDER BY created ASC",
 				
 				
 				    // ========================================

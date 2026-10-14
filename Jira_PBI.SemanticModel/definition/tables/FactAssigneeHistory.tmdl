@@ -58,6 +58,48 @@ table FactAssigneeHistory
 
 		annotation SummarizationSetBy = Automatic
 
+	/// Horas desde la creación del ticket hasta el inicio del tramo (para la línea de tiempo).
+	column 'Hora Inicio'
+		dataType: double
+		isHidden
+		formatString: #,##0.00
+		lineageTag: f0a1b2c3-d4e5-4f60-8a71-b2c3d4e5f607
+		summarizeBy: none
+		sourceColumn: Hora Inicio
+
+		annotation SummarizationSetBy = Automatic
+
+	/// Horas desde la creación del ticket hasta el fin del tramo (para la línea de tiempo).
+	column 'Hora Fin'
+		dataType: double
+		isHidden
+		formatString: #,##0.00
+		lineageTag: 01b2c3d4-e5f6-4071-9b82-c3d4e5f60718
+		summarizeBy: none
+		sourceColumn: Hora Fin
+
+		annotation SummarizationSetBy = Automatic
+
+	/// TRUE si el ticket ya está resuelto. Las medidas de Time in Assignee solo cuentan tickets resueltos.
+	column 'Ticket Resuelto'
+		dataType: boolean
+		formatString: """TRUE"";""TRUE"";""FALSE"""
+		lineageTag: 12c3d4e5-f607-4182-8c93-d4e5f6071829
+		summarizeBy: none
+		sourceColumn: Ticket Resuelto
+
+		annotation SummarizationSetBy = Automatic
+
+	/// Horas del tramo dentro del horario laboral de la mesa (L-V 6:00-23:00, Sáb 9:00-19:00). Ver función HorasLaborales.
+	column 'Horas Hábiles'
+		dataType: double
+		formatString: #,##0.00
+		lineageTag: 2c3d4e5f-6071-4c8d-8e9f-1a2b3c4d5e6f
+		summarizeBy: none
+		sourceColumn: Horas Hábiles
+
+		annotation SummarizationSetBy = Automatic
+
 	partition FactAssigneeHistory = m
 		mode: import
 		source =
@@ -137,7 +179,11 @@ table FactAssigneeHistory
 				                                Inicio = s[InicioTramo],
 				                                Fin = FinTramo,
 				                                Horas = Duration.TotalHours(FinTramo - s[InicioTramo]),
-				                                #"Es Actual" = IsLast and ResolvedAt = null
+				                                #"Horas Hábiles" = HorasLaborales(s[InicioTramo], FinTramo),
+				                                #"Es Actual" = IsLast and ResolvedAt = null,
+				                                #"Hora Inicio" = Duration.TotalHours(s[InicioTramo] - CreatedAt),
+				                                #"Hora Fin" = Duration.TotalHours(FinTramo - CreatedAt),
+				                                #"Ticket Resuelto" = ResolvedAt <> null
 				                            ]
 				                )
 				        in
@@ -153,7 +199,11 @@ table FactAssigneeHistory
 				                Inicio = datetime,
 				                Fin = datetime,
 				                Horas = number,
-				                #"Es Actual" = logical
+				                #"Horas Hábiles" = number,
+				                #"Es Actual" = logical,
+				                #"Hora Inicio" = number,
+				                #"Hora Fin" = number,
+				                #"Ticket Resuelto" = logical
 				            ]
 				        )
 				

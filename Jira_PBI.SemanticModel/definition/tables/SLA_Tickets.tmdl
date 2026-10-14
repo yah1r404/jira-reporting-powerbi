@@ -237,6 +237,24 @@ table SLA_Tickets
 
 		annotation SummarizationSetBy = Automatic
 
+	/// Organización (cliente) de JSM. Si el ticket tiene varias, se separan con comas.
+	column Organización
+		dataType: string
+		lineageTag: 8f1e2d3c-4b5a-4c6d-9e7f-0a1b2c3d4e5f
+		summarizeBy: none
+		sourceColumn: Organización
+
+		annotation SummarizationSetBy = Automatic
+
+	/// Horas que se comparan contra el SLA objetivo elegido: tiempo de SLA de resolución de JSM (respeta pausas y horario); si el ticket no tiene SLA en JSM, horas calendario de resolución.
+	column 'Horas SLA Base' = IF(NOT ISBLANK(SLA_Tickets[SLA Resolución Horas]), SLA_Tickets[SLA Resolución Horas], SLA_Tickets[Resolution Hours])
+		dataType: double
+		formatString: #,##0.00
+		lineageTag: 9a2f3e4d-5c6b-4d7e-8f90-1b2c3d4e5f60
+		summarizeBy: none
+
+		annotation SummarizationSetBy = Automatic
+
 	partition SLA_Tickets = m
 		mode: import
 		source =
@@ -317,6 +335,7 @@ table SLA_Tickets
 				                    StatusRec = Record.FieldOrDefault(f, "status", null),
 				                    AssigneeName = NameOf(Record.FieldOrDefault(f, "assignee", null), "displayName"),
 				                    Tecnicos = Record.FieldOrDefault(f, "customfield_11042", null),
+				                    Orgs = Record.FieldOrDefault(f, "customfield_10002", null),
 				                    CreatedAt = ToLocal(f[created]),
 				                    Resolved = ToLocal(Record.FieldOrDefault(f, "resolutiondate", null)),
 				                    Respuesta = SlaInfo(Record.FieldOrDefault(f, "customfield_10936", null)),
@@ -338,6 +357,10 @@ table SLA_Tickets
 				                            if Tecnicos is list
 				                            then Text.Combine(List.Transform(Tecnicos, each NameOf(_, "displayName")), ", ")
 				                            else null,
+				                        #"Organización" =
+				                            if Orgs is list and not List.IsEmpty(Orgs)
+				                            then Text.Combine(List.Transform(Orgs, each NameOf(_, "name")), ", ")
+				                            else "Sin organización",
 				                        Created = CreatedAt,
 				                        #"Created Date" = Date.From(CreatedAt),
 				                        #"Resolution Date" = Resolved,
@@ -368,6 +391,7 @@ table SLA_Tickets
 				                #"Status Category" = nullable text,
 				                Assignee = text,
 				                #"Técnicos Asignados" = nullable text,
+				                #"Organización" = text,
 				                Created = datetime,
 				                #"Created Date" = date,
 				                #"Resolution Date" = nullable datetime,

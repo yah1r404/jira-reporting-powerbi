@@ -1,0 +1,49 @@
+/// Opciones del selector "Horario de cálculo" para Time in Status y Time in Assignee. Sin relaciones.
+/// Sin selección se usa el horario laboral.
+table 'Horario Cálculo'
+	lineageTag: 3d4e5f60-7182-4d9e-9f0a-2b3c4d5e6f70
+
+	column Horario
+		dataType: string
+		lineageTag: 4e5f6071-8293-4eaf-8a1b-3c4d5e6f7081
+		summarizeBy: none
+		isNameInferred
+		sourceColumn: [Horario]
+		sortByColumn: Orden
+
+		annotation SummarizationSetBy = Automatic
+
+	column Clave
+		dataType: string
+		isHidden
+		lineageTag: 5f607182-93a4-4fb0-9b2c-4d5e6f708192
+		summarizeBy: none
+		isNameInferred
+		sourceColumn: [Clave]
+
+		annotation SummarizationSetBy = Automatic
+
+	column Orden
+		dataType: int64
+		isHidden
+		formatString: 0
+		lineageTag: 60718293-a4b5-40c1-8c3d-5e6f708192a3
+		summarizeBy: none
+		isNameInferred
+		sourceColumn: [Orden]
+
+		annotation SummarizationSetBy = Automatic
+
+	partition 'Horario Cálculo' = calculated
+		mode: import
+		source =
+				DATATABLE(
+				    "Horario", STRING,
+				    "Clave", STRING,
+				    "Orden", INTEGER,
+				    {
+				        { "Horario laboral", "laboral", 1 },
+				        { "24/7 (reloj)", "247", 2 }
+				    }
+				)
+
