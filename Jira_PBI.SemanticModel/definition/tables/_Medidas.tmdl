@@ -1,7 +1,7 @@
 table _Medidas
 	lineageTag: 0cdf12bc-8e55-4227-a993-f259e17d333d
 
-	/// Número total de tickets incluidos en el filtro actual (Filter 10888 - todos los tickets del espacio).
+	/// Número total de tickets de la vista clásica (Jira_Tickets: mesa MDSC, últimos 6 meses) en el contexto actual.
 	measure 'Total Tickets' =
 			
 			COUNTROWS(Jira_Tickets)

@@ -1,3 +1,4 @@
+/// Vista "clásica" de los tickets de la mesa MDSC (mismo alcance que SLA_Tickets, vía Jira_MDSC_Issues), con columnas simples para las páginas de Resumen, Tiempos de Resolución, Responsables y Detalle.
 table Jira_Tickets
 	lineageTag: 958c4a1c-a95c-43b8-91fa-596ea5902f25
 
@@ -206,268 +207,85 @@ table Jira_Tickets
 		mode: import
 		source =
 				let
-				
-				    // ========================================
-				    // CONFIGURACIÓN
-				    // ========================================
-				
-				    JiraBaseUrl = "https://secureopsmx.atlassian.net",
 
-				    // Mismo alcance que el tablero de SLA (Jira_MDSC_Issues): mesa MDSC, últimos 6 meses,
-				    // sin Emailed request ni tickets en estado Cerrada (en JQL: Closed). No depende de filtros guardados.
-				    JQL = "project = MDSC AND issuetype != ""Emailed request"" AND status != Closed AND created >= startOfMonth(-5) ORDER BY created ASC",
-				
-				
 				    // ========================================
-				    // CAMPOS QUE QUEREMOS
+				    // FUENTE COMPARTIDA
 				    // ========================================
-				
-				    JiraFields =
-				        "summary,status,assignee,reporter,created,updated,resolutiondate,priority,issuetype,project,labels,customfield_11042",
-				
-				
+
+				    // Mismo alcance que el tablero de SLA: se reutiliza Jira_MDSC_Issues (una sola llamada a la
+				    // API para toda la mesa MDSC) en vez de volver a consultar Jira con el mismo JQL. Esta tabla
+				    // no usa el changelog que trae Jira_MDSC_Issues, solo los campos planos del ticket.
+				    Issues = Jira_MDSC_Issues,
+
+				    NameOf = (r as any, f as text) as any =>
+				        if r is record then Record.FieldOrDefault(r, f, null) else null,
+
+
 				    // ========================================
-				    // OBTENER UNA PÁGINA
+				    // UN RENGLÓN POR TICKET
 				    // ========================================
-				
-				    GetPage = (NextToken as nullable text) as record =>
-				
-				        let
-				
-				            BaseQuery = [
-				                jql = JQL,
-				                maxResults = "100",
-				                fields = JiraFields
-				            ],
-				
-				            RequestQuery =
-				                if NextToken = null
-				                then BaseQuery
-				                else
-				                    Record.AddField(
-				                        BaseQuery,
-				                        "nextPageToken",
-				                        NextToken
-				                    ),
-				
-				            Response =
-				                Json.Document(
-				                    Web.Contents(
-				                        JiraBaseUrl,
-				                        [
-				                            RelativePath =
-				                                "rest/api/3/search/jql",
-				
-				                            Query = RequestQuery,
-				
-				                            Headers = [
-				                                Accept = "application/json"
-				                            ]
-				                        ]
-				                    )
-				                )
-				
-				        in
-				            Response,
-				
-				
-				    // ========================================
-				    // PAGINACIÓN
-				    // ========================================
-				
-				    Pages =
-				        List.Generate(
-				            () => GetPage(null),
-				
-				            each _ <> null,
-				
-				            each
-				                let
-				                    Token =
-				                        try [nextPageToken]
-				                        otherwise null
-				                in
-				                    if Token = null
-				                    then null
-				                    else GetPage(Token),
-				
-				            each [issues]
-				        ),
-				
-				
-				    Issues =
-				        List.Combine(Pages),
-				
-				
-				    // ========================================
-				    // JSON → TABLA
-				    // ========================================
-				
-				    IssueTable =
-				        Table.FromList(
+
+				    Rows =
+				        List.Transform(
 				            Issues,
-				            Splitter.SplitByNothing(),
-				            {"Issue"}
+				            (i) =>
+				                let
+				                    f = i[fields],
+				                    AssigneeRec = Record.FieldOrDefault(f, "assignee", null),
+				                    ReporterRec = Record.FieldOrDefault(f, "reporter", null),
+				                    ProjectRec = Record.FieldOrDefault(f, "project", null),
+				                    LabelsList = Record.FieldOrDefault(f, "labels", null),
+				                    TecnicosList = Record.FieldOrDefault(f, "customfield_11042", null)
+				                in
+				                    [
+				                        #"Issue ID" = i[id],
+				                        Key = i[key],
+				                        Summary = Record.FieldOrDefault(f, "summary", null),
+				                        Status = NameOf(Record.FieldOrDefault(f, "status", null), "name"),
+				                        Assignee = NameOf(AssigneeRec, "displayName"),
+				                        #"Assignee Account ID" = NameOf(AssigneeRec, "accountId"),
+				                        Reporter = NameOf(ReporterRec, "displayName"),
+				                        #"Reporter Account ID" = NameOf(ReporterRec, "accountId"),
+				                        Created = f[created],
+				                        Updated = Record.FieldOrDefault(f, "updated", null),
+				                        #"Resolution Date" = Record.FieldOrDefault(f, "resolutiondate", null),
+				                        Priority = NameOf(Record.FieldOrDefault(f, "priority", null), "name"),
+				                        #"Issue Type" = NameOf(Record.FieldOrDefault(f, "issuetype", null), "name"),
+				                        #"Project Key" = NameOf(ProjectRec, "key"),
+				                        Project = NameOf(ProjectRec, "name"),
+				                        Labels =
+				                            if LabelsList is list
+				                            then Text.Combine(List.Transform(LabelsList, Text.From), ", ")
+				                            else null,
+				                        #"Técnicos Asignados" =
+				                            if TecnicosList is list
+				                            then Text.Combine(List.Transform(TecnicosList, each NameOf(_, "displayName")), ", ")
+				                            else null
+				                    ]
 				        ),
-				
-				
-				    ExpandIssue =
-				        Table.ExpandRecordColumn(
-				            IssueTable,
-				            "Issue",
-				            {
-				                "id",
-				                "key",
-				                "fields"
-				            },
-				            {
-				                "Issue ID",
-				                "Key",
-				                "Fields"
-				            }
-				        ),
-				
-				
-				    ExpandFields =
-				        Table.ExpandRecordColumn(
-				            ExpandIssue,
-				            "Fields",
-				            {
-				                "summary",
-				                "status",
-				                "assignee",
-				                "reporter",
-				                "created",
-				                "updated",
-				                "resolutiondate",
-				                "priority",
-				                "issuetype",
-				                "project",
-				                "labels",
-				                "customfield_11042"
-				            },
-				            {
-				                "Summary",
-				                "Status Record",
-				                "Assignee Record",
-				                "Reporter Record",
-				                "Created",
-				                "Updated",
-				                "Resolution Date",
-				                "Priority Record",
-				                "Issue Type Record",
-				                "Project Record",
-				                "Labels",
-				                "Técnicos Asignados"
-				            }
-				        ),
-				
-				
-				    ExpandStatus =
-				        Table.ExpandRecordColumn(
-				            ExpandFields,
-				            "Status Record",
-				            {"name"},
-				            {"Status"}
-				        ),
-				
-				
-				    ExpandAssignee =
-				        Table.ExpandRecordColumn(
-				            ExpandStatus,
-				            "Assignee Record",
-				            {
-				                "displayName",
-				                "accountId"
-				            },
-				            {
-				                "Assignee",
-				                "Assignee Account ID"
-				            }
-				        ),
-				
-				
-				    ExpandReporter =
-				        Table.ExpandRecordColumn(
-				            ExpandAssignee,
-				            "Reporter Record",
-				            {
-				                "displayName",
-				                "accountId"
-				            },
-				            {
-				                "Reporter",
-				                "Reporter Account ID"
-				            }
-				        ),
-				
-				
-				    ExpandPriority =
-				        Table.ExpandRecordColumn(
-				            ExpandReporter,
-				            "Priority Record",
-				            {"name"},
-				            {"Priority"}
-				        ),
-				
-				
-				    ExpandIssueType =
-				        Table.ExpandRecordColumn(
-				            ExpandPriority,
-				            "Issue Type Record",
-				            {"name"},
-				            {"Issue Type"}
-				        ),
-				
-				
-				    ExpandProject =
-				        Table.ExpandRecordColumn(
-				            ExpandIssueType,
-				            "Project Record",
-				            {
-				                "key",
-				                "name"
-				            },
-				            {
-				                "Project Key",
-				                "Project"
-				            }
-				        ),
-				
-				
-				    CleanLabels =
-				        Table.TransformColumns(
-				            ExpandProject,
-				            {
-				                {
-				                    "Labels",
-				                    each
-				                        if _ is list
-				                        then Text.Combine(
-				                            List.Transform(_, Text.From),
-				                            ", "
-				                        )
-				                        else null,
-				                    type text
-				                }
-				            }
-				        ),
+
 				    CleanTecnicos =
-				        Table.TransformColumns(
-				            CleanLabels,
-				            {
-				                {
-				                    "Técnicos Asignados",
-				                    each
-				                        if _ is list
-				                        then Text.Combine(
-				                            List.Transform(_, each Record.Field(_, "displayName")),
-				                            ", "
-				                        )
-				                        else null,
-				                    type text
-				                }
-				            }
+				        Table.FromRecords(
+				            Rows,
+				            type table [
+				                #"Issue ID" = text,
+				                Key = text,
+				                Summary = nullable text,
+				                Status = nullable text,
+				                Assignee = nullable text,
+				                #"Assignee Account ID" = nullable text,
+				                Reporter = nullable text,
+				                #"Reporter Account ID" = nullable text,
+				                Created = text,
+				                Updated = nullable text,
+				                #"Resolution Date" = nullable text,
+				                Priority = nullable text,
+				                #"Issue Type" = nullable text,
+				                #"Project Key" = nullable text,
+				                Project = nullable text,
+				                Labels = nullable text,
+				                #"Técnicos Asignados" = nullable text
+				            ]
 				        ),
 				    #"Tipo cambiado" = Table.TransformColumnTypes(CleanTecnicos,{{"Reporter", type text}, {"Assignee", type text}, {"Status", type text}}),
 				    #"Tipo cambiado1" = Table.TransformColumnTypes(#"Tipo cambiado",{{"Created", type datetimezone}, {"Updated", type datetimezone}, {"Resolution Date", type datetimezone}, {"Priority", type text}, {"Issue Type", type text}, {"Project Key", type text}, {"Project", type text}, {"Reporter Account ID", type text}, {"Assignee Account ID", type text}, {"Summary", type text}, {"Key", type text}, {"Issue ID", type text}, {"Técnicos Asignados", type text}}),

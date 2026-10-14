@@ -49,7 +49,7 @@ expression Jira_MDSC_Issues =
 		    BaseFields = {
 		        "summary", "status", "issuetype", "priority", "assignee", "created", "resolutiondate",
 		        "customfield_10010", "customfield_10936", "customfield_10937", "customfield_11042",
-		        "customfield_10002"
+		        "customfield_10002", "reporter", "updated", "project", "labels"
 		    },
 		
 		    JiraFields =
