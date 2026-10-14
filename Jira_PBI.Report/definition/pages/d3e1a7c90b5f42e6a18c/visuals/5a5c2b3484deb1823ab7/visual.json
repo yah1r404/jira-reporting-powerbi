@@ -61,7 +61,7 @@
             "text": {
               "expr": {
                 "Literal": {
-                  "Value": "'SLA objetivo del cliente'"
+                  "Value": "'SLA objetivo del cliente · solo esta página'"
                 }
               }
             },
@@ -186,11 +186,6 @@
           }
         }
       ]
-    },
-    "syncGroup": {
-      "groupName": "Global_SLAObjetivo",
-      "fieldChanges": true,
-      "filterChanges": true
     }
   }
 }
