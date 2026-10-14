@@ -231,7 +231,7 @@ table _Medidas
 			CALCULATE(
 			    [Suma Horas Asignado],
 			    FactAssigneeHistory[Ticket Resuelto] = TRUE(),
-			    FactAssigneeHistory[Responsable] <> "Sin asignar"
+			    KEEPFILTERS(FactAssigneeHistory[Responsable] <> "Sin asignar")
 			)
 		formatString: #,##0.00
 		displayFolder: Time in Assignee
@@ -242,7 +242,7 @@ table _Medidas
 			CALCULATE(
 			    DISTINCTCOUNT(FactAssigneeHistory[Key]),
 			    FactAssigneeHistory[Ticket Resuelto] = TRUE(),
-			    FactAssigneeHistory[Responsable] <> "Sin asignar"
+			    KEEPFILTERS(FactAssigneeHistory[Responsable] <> "Sin asignar")
 			)
 		formatString: #,##0
 		displayFolder: Time in Assignee
@@ -259,7 +259,7 @@ table _Medidas
 			CALCULATE(
 			    MEDIANX(VALUES(FactAssigneeHistory[Key]), CALCULATE([Suma Horas Asignado])),
 			    FactAssigneeHistory[Ticket Resuelto] = TRUE(),
-			    FactAssigneeHistory[Responsable] <> "Sin asignar"
+			    KEEPFILTERS(FactAssigneeHistory[Responsable] <> "Sin asignar")
 			)
 		formatString: #,##0.00
 		displayFolder: Time in Assignee
