@@ -129,6 +129,16 @@ table FactStatusHistory
 
 		annotation SummarizationSetBy = Automatic
 
+	/// Horas del tramo dentro del horario laboral de la mesa (L-V 6:00-23:00, Sáb 9:00-19:00). Ver función HorasLaborales.
+	column 'Horas Hábiles'
+		dataType: double
+		formatString: #,##0.00
+		lineageTag: 1b2c3d4e-5f60-4b7c-9d8e-0f1a2b3c4d5e
+		summarizeBy: none
+		sourceColumn: Horas Hábiles
+
+		annotation SummarizationSetBy = Automatic
+
 	partition FactStatusHistory = m
 		mode: import
 		source =
@@ -268,6 +278,7 @@ table FactStatusHistory
 				                            Inicio = s[InicioTramo],
 				                            Fin = FinTramo,
 				                            Horas = Duration.TotalHours(FinTramo - s[InicioTramo]),
+				                            #"Horas Hábiles" = HorasLaborales(s[InicioTramo], FinTramo),
 				                            #"Es Actual" = IsLast,
 				                            #"Hora Inicio" = Duration.TotalHours(s[InicioTramo] - CreatedAt),
 				                            #"Hora Fin" = Duration.TotalHours(FinTramo - CreatedAt)
@@ -285,6 +296,7 @@ table FactStatusHistory
 				                Inicio = datetime,
 				                Fin = datetime,
 				                Horas = number,
+				                #"Horas Hábiles" = number,
 				                #"Es Actual" = logical,
 				                #"Hora Inicio" = number,
 				                #"Hora Fin" = number
@@ -318,7 +330,7 @@ table FactStatusHistory
 				            WithFinal,
 				            {
 				                "Key", "Flujo", "Estado", "Orden Estado", "Categoría Estado", "Es Estado Final",
-				                "Visita", "Inicio", "Fin", "Horas", "Es Actual", "Hora Inicio", "Hora Fin"
+				                "Visita", "Inicio", "Fin", "Horas", "Horas Hábiles", "Es Actual", "Hora Inicio", "Hora Fin"
 				            }
 				        )
 								in

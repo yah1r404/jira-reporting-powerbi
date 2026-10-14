@@ -172,3 +172,49 @@ expression Jira_MDSC_Issues =
 
 	annotation PBI_ResultType = List
 
+/// Horas laborales entre dos fechas según el horario de la mesa: lunes a viernes 6:00-23:00, sábado 9:00-19:00, domingo sin horario.
+/// Para cambiar el horario, editar la función Ventana.
+expression HorasLaborales =
+		(Inicio as nullable datetime, Fin as nullable datetime) as number =>
+		    if Inicio = null or Fin = null or Fin <= Inicio then 0
+		    else
+		        let
+		            // Horas de inicio y fin de cada día (Date.DayOfWeek con lunes = 0)
+		            Ventana = (Dia as date) as nullable list =>
+		                let
+		                    DiaSemana = Date.DayOfWeek(Dia, Day.Monday)
+		                in
+		                    if DiaSemana <= 4 then {6, 23}
+		                    else if DiaSemana = 5 then {9, 19}
+		                    else null,
+		
+		            Dias =
+		                List.Dates(
+		                    Date.From(Inicio),
+		                    Duration.Days(Date.From(Fin) - Date.From(Inicio)) + 1,
+		                    #duration(1, 0, 0, 0)
+		                ),
+		
+		            HorasPorDia =
+		                List.Transform(
+		                    Dias,
+		                    (Dia) =>
+		                        let
+		                            W = Ventana(Dia)
+		                        in
+		                            if W = null then 0
+		                            else
+		                                let
+		                                    Abre = Dia & #time(W{0}, 0, 0),
+		                                    Cierra = Dia & #time(W{1}, 0, 0),
+		                                    Desde = if Inicio > Abre then Inicio else Abre,
+		                                    Hasta = if Fin < Cierra then Fin else Cierra
+		                                in
+		                                    if Hasta > Desde then Duration.TotalHours(Hasta - Desde) else 0
+		                )
+		        in
+		            List.Sum(HorasPorDia)
+	lineageTag: 0a1b2c3d-4e5f-4a6b-8c7d-9e0f1a2b3c4d
+
+	annotation PBI_ResultType = Function
+

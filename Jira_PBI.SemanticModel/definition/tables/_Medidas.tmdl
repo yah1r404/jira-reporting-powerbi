@@ -189,7 +189,7 @@ table _Medidas
 		lineageTag: 7d40af31-9e52-4b1d-8a46-8fa2e3c15d94
 
 	/// Horas totales en estados no finales (excluye Resuelta/Cerrada).
-	measure 'Horas en Estado' = CALCULATE(SUM(FactStatusHistory[Horas]), FactStatusHistory[Es Estado Final] = FALSE())
+	measure 'Horas en Estado' = CALCULATE([Suma Horas Estado], FactStatusHistory[Es Estado Final] = FALSE())
 		formatString: #,##0.00
 		displayFolder: Time in Status
 		lineageTag: 8e51b042-af63-4c2e-9b57-90b3f4d26ea5
@@ -209,7 +209,7 @@ table _Medidas
 	/// Mediana por ticket de las horas en el estado.
 	measure 'Mediana Horas en Estado' =
 			CALCULATE(
-			    MEDIANX(VALUES(FactStatusHistory[Key]), CALCULATE(SUM(FactStatusHistory[Horas]))),
+			    MEDIANX(VALUES(FactStatusHistory[Key]), CALCULATE([Suma Horas Estado])),
 			    FactStatusHistory[Es Estado Final] = FALSE()
 			)
 		formatString: #,##0.00
@@ -219,7 +219,7 @@ table _Medidas
 	/// Percentil 90 por ticket de las horas en el estado.
 	measure 'P90 Horas en Estado' =
 			CALCULATE(
-			    PERCENTILEX.INC(VALUES(FactStatusHistory[Key]), CALCULATE(SUM(FactStatusHistory[Horas])), 0.90),
+			    PERCENTILEX.INC(VALUES(FactStatusHistory[Key]), CALCULATE([Suma Horas Estado]), 0.90),
 			    FactStatusHistory[Es Estado Final] = FALSE()
 			)
 		formatString: #,##0.00
@@ -229,7 +229,7 @@ table _Medidas
 	/// Horas que las personas tuvieron asignados tickets ya resueltos, hasta su resolución. Excluye "Sin asignar" y tickets abiertos.
 	measure 'Horas Asignado' =
 			CALCULATE(
-			    SUM(FactAssigneeHistory[Horas]),
+			    [Suma Horas Asignado],
 			    FactAssigneeHistory[Ticket Resuelto] = TRUE(),
 			    FactAssigneeHistory[Responsable] <> "Sin asignar"
 			)
@@ -257,7 +257,7 @@ table _Medidas
 	/// Mediana por ticket de las horas asignado a la persona (tickets resueltos, sin "Sin asignar"). Menos sensible a casos extremos que el promedio.
 	measure 'Mediana Horas Asignado' =
 			CALCULATE(
-			    MEDIANX(VALUES(FactAssigneeHistory[Key]), CALCULATE(SUM(FactAssigneeHistory[Horas]))),
+			    MEDIANX(VALUES(FactAssigneeHistory[Key]), CALCULATE([Suma Horas Asignado])),
 			    FactAssigneeHistory[Ticket Resuelto] = TRUE(),
 			    FactAssigneeHistory[Responsable] <> "Sin asignar"
 			)
@@ -476,7 +476,7 @@ table _Medidas
 	/// Horas promedio que los tickets resueltos pasaron sin responsable.
 	measure 'Prom Horas Sin Asignar' =
 			CALCULATE(
-			    DIVIDE(SUM(FactAssigneeHistory[Horas]), DISTINCTCOUNT(FactAssigneeHistory[Key])),
+			    DIVIDE([Suma Horas Asignado], DISTINCTCOUNT(FactAssigneeHistory[Key])),
 			    FactAssigneeHistory[Ticket Resuelto] = TRUE(),
 			    FactAssigneeHistory[Responsable] = "Sin asignar"
 			)
@@ -602,7 +602,7 @@ table _Medidas
 			        ISFILTERED(SLA_Tickets[SLA Resolución Estado]),
 			        "Estado SLA: " & CONCATENATEX(VALUES(SLA_Tickets[SLA Resolución Estado]), SLA_Tickets[SLA Resolución Estado], ", ")
 			    )
-			VAR Status =
+			VAR EstadoActual =
 			    IF(
 			        ISFILTERED(SLA_Tickets[Status]),
 			        "Estado actual: " & CONCATENATEX(VALUES(SLA_Tickets[Status]), SLA_Tickets[Status], ", ")
@@ -617,7 +617,8 @@ table _Medidas
 			                CONCATENATEX(VALUES(SLA_Tickets[Assignee]), SLA_Tickets[Assignee], ", ")
 			            )
 			    )
-			VAR Partes = { Periodo, Org, Flujo, RT, Prio, Tipo, EstadoSla, Status, Resp }
+			VAR Horario = "Horas: " & IF([Usa Horario Laboral], "horario laboral (L-V 6-23, Sáb 9-19)", "24/7")
+			VAR Partes = { Periodo, Org, Flujo, RT, Prio, Tipo, EstadoSla, EstadoActual, Resp, Horario }
 			VAR Texto =
 			    CONCATENATEX(FILTER(Partes, NOT ISBLANK([Value])), [Value], "   ·   ")
 			RETURN
@@ -689,6 +690,25 @@ table _Medidas
 	measure 'Color Alerta' = "#C8382E"
 		displayFolder: Colores
 		lineageTag: f2a3b4c5-d6e7-4f80-8192-a3b4c5d6e7f8
+
+	/// TRUE si las horas se calculan en horario laboral (L-V 6:00-23:00, Sáb 9:00-19:00). Es el valor predeterminado.
+	measure 'Usa Horario Laboral' = SELECTEDVALUE('Horario Cálculo'[Clave], "laboral") = "laboral"
+		displayFolder: Horario
+		lineageTag: 718293a4-b5c6-41d2-9d4e-6f708192a3b4
+
+	/// Suma de horas en estado según el horario de cálculo (laboral o 24/7).
+	measure 'Suma Horas Estado' = IF([Usa Horario Laboral], SUM(FactStatusHistory[Horas Hábiles]), SUM(FactStatusHistory[Horas]))
+		formatString: #,##0.00
+		isHidden
+		displayFolder: Horario
+		lineageTag: 8293a4b5-c6d7-42e3-8e5f-708192a3b4c5
+
+	/// Suma de horas asignado según el horario de cálculo (laboral o 24/7).
+	measure 'Suma Horas Asignado' = IF([Usa Horario Laboral], SUM(FactAssigneeHistory[Horas Hábiles]), SUM(FactAssigneeHistory[Horas]))
+		formatString: #,##0.00
+		isHidden
+		displayFolder: Horario
+		lineageTag: 93a4b5c6-d7e8-43f4-9f60-8192a3b4c5d6
 
 	partition _Medidas = m
 		mode: import

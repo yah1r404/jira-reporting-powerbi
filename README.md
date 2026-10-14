@@ -85,8 +85,9 @@ Todas las relaciones son de uno a muchos y en una sola dirección. `DimFecha` es
   - *En curso*
   - *Sin SLA*
 - **Estados vigentes**: solo se muestran los estados que tiene hoy el flujo de cada ticket en Jira. El tiempo en estados de flujos anteriores se descarta. Los estados se identifican por su ID y se muestran con su nombre actual.
-- **Time in Status** está en horas de reloj y no incluye estados finales (Resuelta, Cerrada). Si un ticket sigue en un estado, su tramo cuenta hasta la hora del último refresh.
-- **Time in Assignee** está en horas de reloj, desde la creación hasta la resolución, y **solo cuenta tickets resueltos**. El tiempo sin responsable no se atribuye a nadie (se ve aparte en *Prom Horas Sin Asignar*).
+- **Horario de cálculo** (selector en Time in Status, Time in Assignee y Filtros avanzados; sincronizado): **horario laboral** (lunes a viernes 6:00-23:00 y sábado 9:00-19:00; domingo no cuenta), que es el predeterminado, o **24/7** (horas de reloj). Se define en la función `HorasLaborales` y se guarda en la columna `Horas Hábiles` de cada historial. No cambia el % de SLA, que usa el calendario del SLA en Jira, ni la línea de tiempo, que va hora por hora.
+- **Time in Status** está en horas y no incluye estados finales (Resuelta, Cerrada). Si un ticket sigue en un estado, su tramo cuenta hasta la hora del último refresh.
+- **Time in Assignee** está en horas según el horario de cálculo, desde la creación hasta la resolución, y **solo cuenta tickets resueltos**. El tiempo sin responsable no se atribuye a nadie (se ve aparte en *Prom Horas Sin Asignar*).
 - **Reasignaciones**: cambios de responsable, sin contar la primera asignación.
 - **SLA objetivo (filtro)**: cada ticket se compara contra las horas elegidas en el filtro *SLA objetivo*; con "Meta de Jira" se usa la meta de JSM de cada ticket. Las horas comparadas (`Horas SLA Base`) son el tiempo de SLA de resolución de JSM, que respeta pausas y horario; si el ticket no tiene SLA en JSM, se usan las horas de reloj. Un ticket abierto que ya pasó la meta cuenta como incumplido.
 - **Fechas** en hora de Mérida (UTC-6).
@@ -151,4 +152,4 @@ Todas las páginas comparten la misma estructura: barra lateral con el logo y el
 - Confirmar las metas reales de % SLA para el semáforo.
 - Validar los números contra Jira después del primer refresh completo.
 - Definir si las páginas de la vista clásica (08 a 11) se mantienen: ahora usan los mismos tickets que las páginas 01 a 07.
-- Definir si Time in Status y Time in Assignee se calculan en horas hábiles.
+
