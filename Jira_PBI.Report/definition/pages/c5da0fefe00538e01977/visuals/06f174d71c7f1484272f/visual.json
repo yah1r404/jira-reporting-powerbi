@@ -61,7 +61,7 @@
             "text": {
               "expr": {
                 "Literal": {
-                  "Value": "'Flujo de trabajo'"
+                  "Value": "'Tipo de Servicio'"
                 }
               }
             },
