@@ -207,24 +207,24 @@ table Jira_Tickets
 		mode: import
 		source =
 				let
-
+				
 				    // ========================================
 				    // FUENTE COMPARTIDA
 				    // ========================================
-
+				
 				    // Mismo alcance que el tablero de SLA: se reutiliza Jira_MDSC_Issues (una sola llamada a la
 				    // API para toda la mesa MDSC) en vez de volver a consultar Jira con el mismo JQL. Esta tabla
 				    // no usa el changelog que trae Jira_MDSC_Issues, solo los campos planos del ticket.
 				    Issues = Jira_MDSC_Issues,
-
+				
 				    NameOf = (r as any, f as text) as any =>
 				        if r is record then Record.FieldOrDefault(r, f, null) else null,
-
-
+				
+				
 				    // ========================================
 				    // UN RENGLÓN POR TICKET
 				    // ========================================
-
+				
 				    Rows =
 				        List.Transform(
 				            Issues,
@@ -263,7 +263,7 @@ table Jira_Tickets
 				                            else null
 				                    ]
 				        ),
-
+				
 				    CleanTecnicos =
 				        Table.FromRecords(
 				            Rows,

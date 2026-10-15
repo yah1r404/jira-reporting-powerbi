@@ -10,8 +10,8 @@
       "nodes": [
         {
           "location": {
-            "x": 0,
-            "y": 0
+            "x": 1938.3830500146937,
+            "y": 33.211174489961138
           },
           "nodeIndex": "Jira_Tickets",
           "nodeLineageTag": "958c4a1c-a95c-43b8-91fa-596ea5902f25",
@@ -23,13 +23,104 @@
         },
         {
           "location": {
-            "x": 414,
-            "y": 45
+            "x": 2352.3830500146937,
+            "y": 78.211174489961138
           },
           "nodeIndex": "DimFecha",
           "nodeLineageTag": "47396195-fcb0-4e36-9c60-f98726d86dc2",
           "size": {
             "height": 200,
+            "width": 234
+          },
+          "zIndex": 0
+        },
+        {
+          "location": {
+            "x": 852.38305001469359,
+            "y": 25
+          },
+          "nodeIndex": "_Medidas",
+          "nodeLineageTag": "0cdf12bc-8e55-4227-a993-f259e17d333d",
+          "size": {
+            "height": 300,
+            "width": 234
+          },
+          "zIndex": 0
+        },
+        {
+          "location": {
+            "x": 618.38305001469359,
+            "y": -41.422348979922305
+          },
+          "nodeIndex": "FactAssigneeHistory",
+          "nodeLineageTag": "3fa6a01b-bd87-4a02-a7dc-15bbab7fdadb",
+          "size": {
+            "height": 300,
+            "width": 234
+          },
+          "zIndex": 0
+        },
+        {
+          "location": {
+            "x": 50,
+            "y": -11.4372382003248
+          },
+          "nodeIndex": "FactStatusHistory",
+          "nodeLineageTag": "98b96567-1c90-433a-9f47-84369430b6cd",
+          "size": {
+            "height": 300,
+            "width": 234
+          },
+          "zIndex": 0
+        },
+        {
+          "location": {
+            "x": 1136.3830500146937,
+            "y": 99
+          },
+          "nodeIndex": "Horario Cálculo",
+          "nodeLineageTag": "3d4e5f60-7182-4d9e-9f0a-2b3c4d5e6f70",
+          "size": {
+            "height": 152,
+            "width": 234
+          },
+          "zIndex": 0
+        },
+        {
+          "location": {
+            "x": 1420.3830500146937,
+            "y": 111
+          },
+          "nodeIndex": "Línea de Tiempo",
+          "nodeLineageTag": "ab5d6e7f-8f90-4a12-951c-6d7e8f90a1b2",
+          "size": {
+            "height": 128,
+            "width": 234
+          },
+          "zIndex": 0
+        },
+        {
+          "location": {
+            "x": 1704.3830500146937,
+            "y": 99
+          },
+          "nodeIndex": "SLA Objetivo",
+          "nodeLineageTag": "0b3c4d5e-6f70-4a81-9b2c-3d4e5f607182",
+          "size": {
+            "height": 152,
+            "width": 234
+          },
+          "zIndex": 0
+        },
+        {
+          "location": {
+            "x": 334.20156119318511,
+            "y": -8.5776510200776386
+          },
+          "nodeIndex": "SLA_Tickets",
+          "nodeLineageTag": "7a90439c-e813-4ab4-8071-a89ee466fed7",
+          "size": {
+            "height": 300,
             "width": 234
           },
           "zIndex": 0
