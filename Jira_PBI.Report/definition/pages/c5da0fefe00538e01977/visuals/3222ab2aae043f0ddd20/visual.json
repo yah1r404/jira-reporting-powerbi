@@ -61,7 +61,7 @@
             "text": {
               "expr": {
                 "Literal": {
-                  "Value": "'Request type'"
+                  "Value": "'Tipo de Solicitud'"
                 }
               }
             },
