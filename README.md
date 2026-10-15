@@ -114,7 +114,7 @@ Todas las páginas comparten la misma estructura: barra lateral con el logo y el
 
 | Tipo | Filtros | Dónde aplican |
 |---|---|---|
-| **Globales sincronizados** | Periodo (fecha de creación), Organización, Flujo de trabajo, Request type, Prioridad | Todas las páginas. Al cambiar de página se conservan. |
+| **Globales sincronizados** | Periodo (fecha de creación), Cliente (organización), Tipo de Servicio (flujo), Tipo de Solicitud (request type) | Todas las páginas. Al cambiar de página se conservan. |
 | **Adicionales** (en «Filtros avanzados») | Tipo de ticket, Estado del SLA de resolución, Estado actual, Responsable actual | Todas las páginas, sincronizados de forma oculta |
 | **Propios de la página** | Responsable (06), Técnico de campo (07), Ticket (08). El **SLA objetivo** está en 01 y 08 y se sincroniza entre ambas; el **Estado del ticket** de la 07 es el mismo filtro de Filtros avanzados | Solo en su página; no modifican los globales |
 

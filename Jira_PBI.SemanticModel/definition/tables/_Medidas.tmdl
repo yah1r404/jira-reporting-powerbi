@@ -468,7 +468,7 @@ table _Medidas
 			VAR Org =
 			    IF(
 			        ISFILTERED(SLA_Tickets[Organización]),
-			        "Organización: "
+			        "Cliente: "
 			            & IF(
 			                COUNTROWS(VALUES(SLA_Tickets[Organización])) > 2,
 			                COUNTROWS(VALUES(SLA_Tickets[Organización])) & " seleccionadas",
@@ -478,12 +478,12 @@ table _Medidas
 			VAR Flujo =
 			    IF(
 			        ISFILTERED(SLA_Tickets[Flujo]),
-			        "Flujo: " & CONCATENATEX(VALUES(SLA_Tickets[Flujo]), SLA_Tickets[Flujo], ", ")
+			        "Tipo de Servicio: " & CONCATENATEX(VALUES(SLA_Tickets[Flujo]), SLA_Tickets[Flujo], ", ")
 			    )
 			VAR RT =
 			    IF(
 			        ISFILTERED(SLA_Tickets[Request Type]),
-			        "Request type: "
+			        "Tipo de Solicitud: "
 			            & IF(
 			                COUNTROWS(VALUES(SLA_Tickets[Request Type])) > 2,
 			                COUNTROWS(VALUES(SLA_Tickets[Request Type])) & " seleccionados",
