@@ -1,18 +1,37 @@
 {
-  "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/visualContainer/2.12.0/schema.json",
+  "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/visualContainer/2.13.0/schema.json",
   "name": "16efa5757a0a9aadf4d8",
   "position": {
     "x": 1090,
-    "y": 632,
-    "z": 23000,
-    "height": 428,
+    "y": 997,
+    "z": 33000,
+    "height": 787,
     "width": 810,
-    "tabOrder": 23
+    "tabOrder": 19000
   },
   "visual": {
     "visualType": "pivotTable",
     "query": {
       "queryState": {
+        "Columns": {
+          "projections": [
+            {
+              "field": {
+                "Column": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "SLA_Tickets"
+                    }
+                  },
+                  "Property": "Request Type"
+                }
+              },
+              "queryRef": "SLA_Tickets.Request Type",
+              "nativeQueryRef": "Request Type",
+              "active": true
+            }
+          ]
+        },
         "Rows": {
           "projections": [
             {
@@ -47,25 +66,6 @@
               },
               "queryRef": "_Medidas.Prom Horas Asignado por Ticket",
               "nativeQueryRef": "Prom Horas Asignado por Ticket"
-            }
-          ]
-        },
-        "Columns": {
-          "projections": [
-            {
-              "field": {
-                "Column": {
-                  "Expression": {
-                    "SourceRef": {
-                      "Entity": "SLA_Tickets"
-                    }
-                  },
-                  "Property": "Request Type"
-                }
-              },
-              "queryRef": "SLA_Tickets.Request Type",
-              "nativeQueryRef": "Request Type",
-              "active": true
             }
           ]
         }

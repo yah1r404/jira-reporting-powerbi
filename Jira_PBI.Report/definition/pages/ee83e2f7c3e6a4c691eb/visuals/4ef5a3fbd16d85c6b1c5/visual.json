@@ -4,10 +4,10 @@
   "position": {
     "x": 880,
     "y": 716,
-    "z": 29000,
+    "z": 38000,
     "height": 344,
     "width": 1020,
-    "tabOrder": 29
+    "tabOrder": 25000
   },
   "visual": {
     "visualType": "pivotTable",
@@ -125,28 +125,6 @@
         ]
       }
     },
-    "visualContainerObjects": {
-      "title": [
-        {
-          "properties": {
-            "show": {
-              "expr": {
-                "Literal": {
-                  "Value": "true"
-                }
-              }
-            },
-            "text": {
-              "expr": {
-                "Literal": {
-                  "Value": "'Resumen por request type'"
-                }
-              }
-            }
-          }
-        }
-      ]
-    },
     "objects": {
       "values": [
         {
@@ -237,6 +215,28 @@
               }
             ],
             "metadata": "_Medidas.SLA Resolución Incumplidos"
+          }
+        }
+      ]
+    },
+    "visualContainerObjects": {
+      "title": [
+        {
+          "properties": {
+            "show": {
+              "expr": {
+                "Literal": {
+                  "Value": "true"
+                }
+              }
+            },
+            "text": {
+              "expr": {
+                "Literal": {
+                  "Value": "'Resumen por request type'"
+                }
+              }
+            }
           }
         }
       ]

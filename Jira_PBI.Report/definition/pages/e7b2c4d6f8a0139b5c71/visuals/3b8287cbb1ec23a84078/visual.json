@@ -1,18 +1,37 @@
 {
-  "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/visualContainer/2.12.0/schema.json",
+  "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/visualContainer/2.13.0/schema.json",
   "name": "3b8287cbb1ec23a84078",
   "position": {
     "x": 264,
     "y": 382,
-    "z": 24000,
+    "z": 31000,
     "height": 350,
     "width": 1636,
-    "tabOrder": 24
+    "tabOrder": 17000
   },
   "visual": {
     "visualType": "pivotTable",
     "query": {
       "queryState": {
+        "Columns": {
+          "projections": [
+            {
+              "field": {
+                "Column": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "Línea de Tiempo"
+                    }
+                  },
+                  "Property": "Hora desde creación"
+                }
+              },
+              "queryRef": "Línea de Tiempo.Hora desde creación",
+              "nativeQueryRef": "Hora desde creación",
+              "active": true
+            }
+          ]
+        },
         "Rows": {
           "projections": [
             {
@@ -43,25 +62,6 @@
               },
               "queryRef": "FactAssigneeHistory.Responsable",
               "nativeQueryRef": "Responsable",
-              "active": true
-            }
-          ]
-        },
-        "Columns": {
-          "projections": [
-            {
-              "field": {
-                "Column": {
-                  "Expression": {
-                    "SourceRef": {
-                      "Entity": "Línea de Tiempo"
-                    }
-                  },
-                  "Property": "Hora desde creación"
-                }
-              },
-              "queryRef": "Línea de Tiempo.Hora desde creación",
-              "nativeQueryRef": "Hora desde creación",
               "active": true
             }
           ]

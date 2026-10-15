@@ -599,6 +599,171 @@ table _Medidas
 		displayFolder: Horario
 		lineageTag: 93a4b5c6-d7e8-43f4-9f60-8192a3b4c5d6
 
+	/// Tickets únicos con al menos un técnico de campo. Un ticket con varios técnicos cuenta una vez.
+	measure 'Tickets con Técnico' = DISTINCTCOUNT(FactTecnicos[Key])
+		formatString: #,##0
+		displayFolder: Técnicos de Campo
+		lineageTag: 0b1c2d3e-4f50-4a61-9b72-c3d4e5f60811
+
+	/// Participaciones: cada par ticket × técnico. Un ticket con 3 técnicos suma 3.
+	measure 'Participaciones Técnicos' = COUNTROWS(FactTecnicos)
+		formatString: #,##0
+		displayFolder: Técnicos de Campo
+		lineageTag: 1c2d3e4f-5061-4b72-8c83-d4e5f6081922
+
+	/// Técnicos de campo distintos que participaron.
+	measure 'Técnicos Involucrados' = DISTINCTCOUNT(FactTecnicos[Técnico])
+		formatString: #,##0
+		displayFolder: Técnicos de Campo
+		lineageTag: 2d3e4f50-6172-4c83-9d94-e5f608192a33
+
+	/// Promedio de tickets en los que participa cada técnico.
+	measure 'Tickets por Técnico' = DIVIDE([Participaciones Técnicos], [Técnicos Involucrados])
+		formatString: #,##0.0
+		displayFolder: Técnicos de Campo
+		lineageTag: 3e4f5061-7283-4d94-8ea5-f608192a3b44
+
+	/// Promedio de técnicos que participan en cada ticket.
+	measure 'Técnicos por Ticket' = DIVIDE([Participaciones Técnicos], [Tickets con Técnico])
+		formatString: #,##0.0
+		displayFolder: Técnicos de Campo
+		lineageTag: 4f506172-8394-4ea5-9fb6-08192a3b4c55
+
+	/// Tickets con técnico ya resueltos (tienen fecha de resolución).
+	measure 'Tickets Técnico Resueltos' = CALCULATE([Tickets con Técnico], NOT ISBLANK(SLA_Tickets[Resolution Date]))
+		formatString: #,##0
+		displayFolder: Técnicos de Campo
+		lineageTag: 5061728a-94a5-4fb6-80c7-192a3b4c5d66
+
+	/// Tickets con técnico sin resolver que ya están en atención (categoría de estado "En curso").
+	measure 'Tickets Técnico En Proceso' =
+			CALCULATE(
+			    [Tickets con Técnico],
+			    ISBLANK(SLA_Tickets[Resolution Date]),
+			    SLA_Tickets[Status Category] <> "Por hacer"
+			)
+		formatString: #,##0
+		displayFolder: Técnicos de Campo
+		lineageTag: 61728a9b-a5b6-40c7-91d8-2a3b4c5d6e77
+
+	/// Tickets con técnico sin resolver que todavía no se atienden (categoría de estado "Por hacer").
+	measure 'Tickets Técnico Abiertos' =
+			CALCULATE(
+			    [Tickets con Técnico],
+			    ISBLANK(SLA_Tickets[Resolution Date]),
+			    SLA_Tickets[Status Category] = "Por hacer"
+			)
+		formatString: #,##0
+		displayFolder: Técnicos de Campo
+		lineageTag: 728a9bac-b6c7-41d8-a2e9-3b4c5d6e7f88
+
+	/// % de los tickets con técnico en los que participó el técnico (o técnicos) del contexto.
+	/// La suma por técnico puede pasar de 100% porque un ticket puede tener varios técnicos.
+	measure '% Participación Técnico' =
+			DIVIDE(
+			    [Tickets con Técnico],
+			    CALCULATE([Tickets con Técnico], REMOVEFILTERS(FactTecnicos[Técnico], FactTecnicos[Técnico Account ID]))
+			)
+		formatString: 0.0%;-0.0%;0.0%
+		displayFolder: Técnicos de Campo
+		lineageTag: 8a9bacbd-c7d8-42e9-b3fa-4c5d6e7f8099
+
+	/// % SLA de resolución (metas de Jira) de los tickets en los que participó el técnico.
+	/// Se atribuye por participación, no por responsabilidad (el responsable es el Assignee).
+	measure '% SLA Resolución Técnico' = CALCULATE([% SLA Resolución], TREATAS(VALUES(FactTecnicos[Key]), SLA_Tickets[Key]))
+		formatString: 0.0%;-0.0%;0.0%
+		displayFolder: Técnicos de Campo
+		lineageTag: 9bacbdce-d8e9-43fa-84ab-5d6e7f8091aa
+
+	/// Color de semáforo del % SLA de resolución de los tickets del técnico.
+	measure 'Color % SLA Resolución Técnico' =
+			VAR v = [% SLA Resolución Técnico]
+			RETURN
+			    SWITCH(
+			        TRUE(),
+			        ISBLANK(v), "#5B6B7F",
+			        v >= [Meta % SLA], "#06519A",
+			        v >= [Umbral Alerta % SLA], "#C98A00",
+			        "#C8382E"
+			    )
+		displayFolder: Técnicos de Campo
+		lineageTag: acbdcedf-e9fa-44ab-95bc-6e7f8091a2bb
+
+	/// Tickets del técnico que incumplieron el SLA de resolución.
+	measure 'Tickets Técnico Incumplidos' = CALCULATE([Tickets con Técnico], SLA_Tickets[SLA Resolución Estado] = "Incumplido")
+		formatString: #,##0
+		displayFolder: Técnicos de Campo
+		lineageTag: bdcedfe0-fa0b-45bc-a6cd-7f8091a2b3cc
+
+	/// Horas promedio de SLA de resolución (JSM) de los tickets en los que participó el técnico.
+	measure 'Prom Horas SLA Técnico' = CALCULATE([Prom Horas SLA Resolución], TREATAS(VALUES(FactTecnicos[Key]), SLA_Tickets[Key]))
+		formatString: #,##0.00
+		displayFolder: Técnicos de Campo
+		lineageTag: cedfe0f1-0b1c-46cd-b7de-8091a2b3c4dd
+
+	/// Mediana de horas calendario de resolución de los tickets en los que participó el técnico.
+	measure 'Mediana Horas Resolución Técnico' = CALCULATE([Mediana Horas Resolución Calendario], TREATAS(VALUES(FactTecnicos[Key]), SLA_Tickets[Key]))
+		formatString: #,##0.00
+		displayFolder: Técnicos de Campo
+		lineageTag: dfe0f102-1c2d-47de-88ef-91a2b3c4d5ee
+
+	/// En el detalle: cuántos técnicos participaron en el ticket del renglón (en blanco si el técnico no participó).
+	measure 'Técnicos en el Ticket' =
+			IF(
+			    NOT ISEMPTY(FactTecnicos),
+			    CALCULATE(
+			        DISTINCTCOUNT(FactTecnicos[Técnico]),
+			        REMOVEFILTERS(FactTecnicos[Técnico], FactTecnicos[Técnico Account ID])
+			    )
+			)
+		formatString: 0
+		displayFolder: Técnicos de Campo
+		lineageTag: e0f10213-2d3e-48ef-990a-a2b3c4d5e6ff
+
+	/// Meta de SLA en horas: la del selector "SLA objetivo" si se eligió una; si no, la meta de resolución de Jira
+	/// (por ticket, o el promedio cuando hay varios tickets).
+	measure 'Meta SLA Ticket' =
+			VAR Sel = [Meta SLA Seleccionada]
+			RETURN IF(NOT ISBLANK(Sel), Sel, AVERAGE(SLA_Tickets[SLA Resolución Meta Horas]))
+		formatString: #,##0.00
+		displayFolder: Consumo del SLA
+		lineageTag: f1021324-3e4f-490a-8a1b-b3c4d5e6f710
+
+	/// Horas promedio por ticket en cada estado, dividiendo entre TODOS los tickets del grupo (no solo los que pasaron
+	/// por el estado). Así las barras apiladas suman el tiempo promedio total de un ticket y se comparan con la meta.
+	measure 'Horas en Estado por Ticket' = DIVIDE([Horas en Estado], [Tickets])
+		formatString: #,##0.00
+		displayFolder: Consumo del SLA
+		lineageTag: 02132435-4f50-4a1b-9b2c-c4d5e6f71821
+
+	/// % de la meta del SLA que consumió el tiempo en estados (por ticket o promedio del grupo).
+	measure 'Consumo SLA %' = DIVIDE([Horas en Estado por Ticket], [Meta SLA Ticket])
+		formatString: 0.0%;-0.0%;0.0%
+		displayFolder: Consumo del SLA
+		lineageTag: 13243546-5061-4b2c-8c3d-d5e6f7182932
+
+	/// Horas por encima de la meta del SLA (suma por ticket; en blanco si no se excedió).
+	measure 'Excedente SLA Horas' =
+			VAR Total =
+			    SUMX(
+			        VALUES(SLA_Tickets[Key]),
+			        VAR H = CALCULATE([Horas en Estado], REMOVEFILTERS(FactStatusHistory[Estado]))
+			        VAR M = [Meta SLA Ticket]
+			        RETURN IF(NOT ISBLANK(M) && H > M, H - M)
+			    )
+			RETURN IF(Total > 0, Total)
+		formatString: #,##0.00
+		displayFolder: Consumo del SLA
+		lineageTag: 24354657-6172-4c3d-9d4e-e6f718293a43
+
+	/// Color del consumo del SLA: azul hasta 75%, ámbar hasta 100%, rojo si se excedió.
+	measure 'Color Consumo SLA' =
+			VAR C = [Consumo SLA %]
+			RETURN
+			    SWITCH(TRUE(), ISBLANK(C), "#5B6B7F", C > 1, "#C8382E", C > 0.75, "#8A6100", "#06519A")
+		displayFolder: Consumo del SLA
+		lineageTag: 35465768-7283-4d4e-8e5f-f718293a4b54
+
 	partition _Medidas = m
 		mode: import
 		source =

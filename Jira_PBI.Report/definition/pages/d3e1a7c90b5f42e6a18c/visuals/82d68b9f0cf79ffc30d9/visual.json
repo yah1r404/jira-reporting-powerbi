@@ -1,13 +1,13 @@
 {
-  "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/visualContainer/2.12.0/schema.json",
+  "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/visualContainer/2.13.0/schema.json",
   "name": "82d68b9f0cf79ffc30d9",
   "position": {
     "x": 264,
     "y": 686,
-    "z": 28000,
+    "z": 37000,
     "height": 374,
     "width": 900,
-    "tabOrder": 28
+    "tabOrder": 23000
   },
   "visual": {
     "visualType": "tableEx",
@@ -131,28 +131,6 @@
         }
       }
     },
-    "visualContainerObjects": {
-      "title": [
-        {
-          "properties": {
-            "show": {
-              "expr": {
-                "Literal": {
-                  "Value": "true"
-                }
-              }
-            },
-            "text": {
-              "expr": {
-                "Literal": {
-                  "Value": "'Tickets que no cumplieron el SLA objetivo'"
-                }
-              }
-            }
-          }
-        }
-      ]
-    },
     "objects": {
       "values": [
         {
@@ -213,6 +191,28 @@
               }
             ],
             "metadata": "_Medidas.Horas Excedidas SLA"
+          }
+        }
+      ]
+    },
+    "visualContainerObjects": {
+      "title": [
+        {
+          "properties": {
+            "show": {
+              "expr": {
+                "Literal": {
+                  "Value": "true"
+                }
+              }
+            },
+            "text": {
+              "expr": {
+                "Literal": {
+                  "Value": "'Tickets que no cumplieron el SLA objetivo'"
+                }
+              }
+            }
           }
         }
       ]

@@ -25,6 +25,7 @@ Para abrirlo, abre `Jira_PBI.pbip` con Power BI Desktop.
 | `SLA_Tickets` | Un renglón por ticket: flujo, request type, tipo de ticket, **organización**, prioridad, estado, responsable, fechas y los **SLA de Jira Service Management**. | Sí |
 | `SLA Objetivo` | Tabla calculada con las opciones del filtro de SLA del cliente: Meta de Jira, 4, 6, 15 y 18 hrs. No tiene relaciones. | Sí |
 | `FactStatusHistory` | Un renglón por cada tramo que un ticket pasó en un estado (**Time in Status**). | Sí |
+| `FactTecnicos` | Un renglón por ticket y **técnico de campo** (campo *Técnico(s) asignado(s)*). Excluye cuentas de equipo (*Servicios Equipo…*) y agrupa por nombre (una persona puede tener dos cuentas). | Sí |
 | `FactAssigneeHistory` | Un renglón por cada tramo que un ticket estuvo asignado a una persona (**Time in Assignee**). | Sí |
 
 ### Campos de Jira usados
@@ -53,6 +54,7 @@ Los dos flujos comparten "Esperando por el cliente", "Escalado" y "Reabierta". E
 DimFecha ──1:*──> SLA_Tickets             (Created Date)
 SLA_Tickets ──1:*──> FactStatusHistory    (Key)
 SLA_Tickets ──1:*──> FactAssigneeHistory  (Key)
+SLA_Tickets ──1:*──> FactTecnicos         (Key)
 ```
 
 Todas las relaciones son de uno a muchos y en una sola dirección. `DimFecha` es un calendario calculado que cubre las fechas de `SLA_Tickets`.
@@ -69,6 +71,7 @@ Todas las relaciones son de uno a muchos y en una sola dirección. `DimFecha` es
 | Time in Status | Horas en Estado, Tickets en Estado, Prom / Mediana / P90 Horas en Estado |
 | SLA Seleccionado | Meta SLA Seleccionada, Meta SLA Aplicada, Cumplen / Incumplen / Evaluados SLA Seleccionado, **% SLA Seleccionado**, Horas Ticket Incumplido, Meta Ticket Incumplido, Horas Excedidas SLA, Horas en Estado Incumplidos |
 | Filtros | Filtros Activos (texto de los filtros aplicados) |
+| Técnicos de Campo | Tickets con Técnico (únicos), Participaciones Técnicos, Técnicos Involucrados, Tickets por Técnico, Técnicos por Ticket, Abiertos / En Proceso / Resueltos / Incumplidos, % Participación Técnico, % SLA Resolución Técnico, Prom Horas SLA Técnico, Mediana Horas Resolución Técnico, Técnicos en el Ticket |
 | Time in Assignee | Horas Asignado, Tickets Atendidos, Prom Horas Asignado por Ticket, Mediana Horas Asignado, Personas por Ticket, Prom Horas Sin Asignar, Total Reasignaciones, % SLA Resolución Tickets Atendidos |
 | Línea de Tiempo | Gantt Responsable, Gantt Estado y sus colores (tabla auxiliar `Línea de Tiempo`, horas 0 a 48+) |
 
@@ -84,6 +87,7 @@ Todas las relaciones son de uno a muchos y en una sola dirección. `DimFecha` es
 - **Estados vigentes**: solo se muestran los estados que tiene hoy el flujo de cada ticket en Jira. El tiempo en estados de flujos anteriores se descarta. Los estados se identifican por su ID y se muestran con su nombre actual.
 - **Horario de cálculo** (selector en Time in Status, Time in Assignee y Filtros avanzados; sincronizado): **horario laboral** (lunes a viernes 6:00-23:00 y sábado 9:00-19:00; domingo no cuenta), que es el predeterminado, o **24/7** (horas de reloj). Se define en la función `HorasLaborales` y se guarda en la columna `Horas Hábiles` de cada historial. No cambia el % de SLA, que usa el calendario del SLA en Jira, ni la línea de tiempo, que va hora por hora.
 - **Time in Status** está en horas y no incluye estados finales (Resuelta, Cerrada). Si un ticket sigue en un estado, su tramo cuenta hasta la hora del último refresh.
+- **Técnicos de campo**: un ticket con varios técnicos cuenta **una vez por técnico** (participaciones) y **una sola vez** en *Tickets con Técnico* (únicos). El SLA y los tiempos se **atribuyen por participación**, no por responsabilidad (el responsable es el Assignee). Abiertos = categoría *Por hacer*; en proceso = sin resolver y ya en atención; resueltos = con fecha de resolución.
 - **Time in Assignee** está en horas según el horario de cálculo, desde la creación hasta la resolución, y **solo cuenta tickets resueltos**. El tiempo sin responsable no se atribuye a nadie (se ve aparte en *Prom Horas Sin Asignar*).
 - **Reasignaciones**: cambios de responsable, sin contar la primera asignación.
 - **SLA objetivo (filtro)**: cada ticket se compara contra las horas elegidas en el filtro *SLA objetivo*; con "Meta de Jira" se usa la meta de JSM de cada ticket. Las horas comparadas (`Horas SLA Base`) son el tiempo de SLA de resolución de JSM, que respeta pausas y horario; si el ticket no tiene SLA en JSM, se usan las horas de reloj. Un ticket abierto que ya pasó la meta cuenta como incumplido.
@@ -100,7 +104,8 @@ Todas las relaciones son de uno a muchos y en una sola dirección. `DimFecha` es
 | **04 - Detalle SLA** | Mesa MDSC | Tabla ticket por ticket con estado de SLA y link a Jira |
 | **05 - Time in Status** | Mesa MDSC | Horas promedio por estado vigente, comparando los dos flujos, con mediana y P90 |
 | **06 - Time in Assignee** | Mesa MDSC | Horas promedio asignado por ticket resuelto y tickets atendidos por persona. Filtro propio: responsable |
-| **07 - Línea de Tiempo** | Mesa MDSC | Diagrama tipo Gantt por ticket, hora por hora desde la creación (0h a 48h+): quién lo tuvo y en qué estado estuvo. Filtro propio: ticket |
+| **07 - Técnicos de Campo** | Mesa MDSC | Participación individual de los técnicos de campo según *Técnicos asignados* (complementa a Time in Assignee, que mide por Assignee): KPIs, tickets por técnico, abiertos/en proceso/resueltos, tipo de trabajo por request type, tendencia mensual, SLA y tiempos de sus tickets y detalle de tickets por técnico. Filtros propios: técnico de campo y estado del ticket. Página más alta (1800 px, con scroll) |
+| **08 - Línea de Tiempo** | Mesa MDSC | Diagrama tipo Gantt por ticket, hora por hora desde la creación (0h a 48h+): quién lo tuvo y en qué estado estuvo. Filtro propio: ticket |
 | Filtros avanzados *(oculta en el menú)* | Mesa MDSC | Panel de filtros en modo borrador: se abre con el botón «Filtros avanzados» |
 
 Todas las páginas comparten la misma estructura: barra lateral con el logo y el menú (página activa en amarillo), encabezado con título y descripción, barra de filtros y una línea con los **filtros activos**.
@@ -109,9 +114,9 @@ Todas las páginas comparten la misma estructura: barra lateral con el logo y el
 
 | Tipo | Filtros | Dónde aplican |
 |---|---|---|
-| **Globales sincronizados** | Periodo (fecha de creación), Organización, Flujo de trabajo, Request type, Prioridad | Las 7 páginas. Al cambiar de página se conservan. |
+| **Globales sincronizados** | Periodo (fecha de creación), Organización, Flujo de trabajo, Request type, Prioridad | Todas las páginas. Al cambiar de página se conservan. |
 | **Adicionales** (en «Filtros avanzados») | Tipo de ticket, Estado del SLA de resolución, Estado actual, Responsable actual | Todas las páginas, sincronizados de forma oculta |
-| **Propios de la página** | SLA objetivo (01), Responsable (06), Ticket (07) | Solo en su página; no modifican los globales |
+| **Propios de la página** | Responsable (06), Técnico de campo (07), Ticket (08). El **SLA objetivo** está en 01 y 08 y se sincroniza entre ambas; el **Estado del ticket** de la 07 es el mismo filtro de Filtros avanzados | Solo en su página; no modifican los globales |
 
 - **Limpiar filtros** quita todos los filtros de la página y, por la sincronía, los globales en todas las páginas. Para quitar uno solo, usa el borrador del encabezado de ese filtro.
 - **Filtros avanzados**: los cambios no se aplican hasta pulsar **Aplicar filtros**. **Cancelar** regresa a la página anterior sin aplicarlos.

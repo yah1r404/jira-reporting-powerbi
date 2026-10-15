@@ -2,7 +2,7 @@
   "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/page/2.1.0/schema.json",
   "name": "942505e70c927febe7e5",
   "displayName": "06 - Time in Assignee",
-  "displayOption": "FitToPage",
-  "height": 1080,
+  "displayOption": "FitToWidth",
+  "height": 1800,
   "width": 1920
 }

@@ -1,18 +1,37 @@
 {
-  "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/visualContainer/2.12.0/schema.json",
+  "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/visualContainer/2.13.0/schema.json",
   "name": "f078aa75aef1fb6b5047",
   "position": {
     "x": 1180,
     "y": 686,
-    "z": 29000,
+    "z": 38000,
     "height": 374,
     "width": 720,
-    "tabOrder": 29
+    "tabOrder": 24000
   },
   "visual": {
     "visualType": "pivotTable",
     "query": {
       "queryState": {
+        "Columns": {
+          "projections": [
+            {
+              "field": {
+                "Column": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "FactStatusHistory"
+                    }
+                  },
+                  "Property": "Estado"
+                }
+              },
+              "queryRef": "FactStatusHistory.Estado",
+              "nativeQueryRef": "Estado",
+              "active": true
+            }
+          ]
+        },
         "Rows": {
           "projections": [
             {
@@ -62,25 +81,6 @@
               },
               "queryRef": "_Medidas.Horas en Estado Incumplidos",
               "nativeQueryRef": "Horas en Estado Incumplidos"
-            }
-          ]
-        },
-        "Columns": {
-          "projections": [
-            {
-              "field": {
-                "Column": {
-                  "Expression": {
-                    "SourceRef": {
-                      "Entity": "FactStatusHistory"
-                    }
-                  },
-                  "Property": "Estado"
-                }
-              },
-              "queryRef": "FactStatusHistory.Estado",
-              "nativeQueryRef": "Estado",
-              "active": true
             }
           ]
         }

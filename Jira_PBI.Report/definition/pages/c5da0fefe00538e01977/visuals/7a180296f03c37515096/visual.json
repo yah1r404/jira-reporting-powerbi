@@ -1,13 +1,13 @@
 {
-  "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/visualContainer/2.12.0/schema.json",
+  "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/visualContainer/2.13.0/schema.json",
   "name": "7a180296f03c37515096",
   "position": {
     "x": 264,
     "y": 196,
-    "z": 20000,
-    "height": 420,
+    "z": 29000,
+    "height": 772,
     "width": 1636,
-    "tabOrder": 20
+    "tabOrder": 14000
   },
   "visual": {
     "visualType": "clusteredColumnChart",
@@ -32,24 +32,6 @@
             }
           ]
         },
-        "Y": {
-          "projections": [
-            {
-              "field": {
-                "Measure": {
-                  "Expression": {
-                    "SourceRef": {
-                      "Entity": "_Medidas"
-                    }
-                  },
-                  "Property": "Prom Horas en Estado"
-                }
-              },
-              "queryRef": "_Medidas.Prom Horas en Estado",
-              "nativeQueryRef": "Prom Horas en Estado"
-            }
-          ]
-        },
         "Series": {
           "projections": [
             {
@@ -65,6 +47,24 @@
               },
               "queryRef": "FactStatusHistory.Flujo",
               "nativeQueryRef": "Flujo"
+            }
+          ]
+        },
+        "Y": {
+          "projections": [
+            {
+              "field": {
+                "Measure": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "_Medidas"
+                    }
+                  },
+                  "Property": "Prom Horas en Estado"
+                }
+              },
+              "queryRef": "_Medidas.Prom Horas en Estado",
+              "nativeQueryRef": "Prom Horas en Estado"
             }
           ]
         }

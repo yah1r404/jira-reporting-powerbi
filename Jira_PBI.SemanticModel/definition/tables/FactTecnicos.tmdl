@@ -1,0 +1,111 @@
+/// Un renglón por ticket y técnico de campo, según el campo "Técnico(s) asignado(s)" (customfield_11042).
+/// Un ticket con varios técnicos aparece una vez por técnico. Se excluyen cuentas de equipo, de aplicación y vacías.
+table FactTecnicos
+	lineageTag: a4b5c6d7-e8f9-4a01-9b12-c3d4e5f60718
+
+	column Key
+		dataType: string
+		lineageTag: b5c6d7e8-f90a-4b12-8c23-d4e5f6071829
+		summarizeBy: none
+		sourceColumn: Key
+
+		annotation SummarizationSetBy = Automatic
+
+	/// Nombre del técnico de campo (cuenta personal en Jira).
+	column Técnico
+		dataType: string
+		lineageTag: c6d7e8f9-0a1b-4c23-9d34-e5f60718293a
+		summarizeBy: none
+		sourceColumn: Técnico
+
+		annotation SummarizationSetBy = Automatic
+
+	/// ID de la cuenta de Jira del técnico (si una persona tiene dos cuentas, se conserva una por ticket).
+	column 'Técnico Account ID'
+		dataType: string
+		isHidden
+		lineageTag: d7e8f90a-1b2c-4d34-8e45-f60718293a4b
+		summarizeBy: none
+		sourceColumn: Técnico Account ID
+
+		annotation SummarizationSetBy = Automatic
+
+	/// FALSE si la cuenta del técnico está desactivada en Jira.
+	column Activo
+		dataType: boolean
+		formatString: """TRUE"";""TRUE"";""FALSE"""
+		lineageTag: e8f90a1b-2c3d-4e45-9f56-0718293a4b5c
+		summarizeBy: none
+		sourceColumn: Activo
+
+		annotation SummarizationSetBy = Automatic
+
+	partition FactTecnicos = m
+		mode: import
+		source =
+				let
+				
+				    Issues = Jira_MDSC_Issues,
+				
+				    // Cuentas de equipo que no representan a un técnico individual. En Jira aparecen como
+				    // "Servicios_Equipo1", "Servicios Equipo2", etc.: se excluye todo lo que empiece con este prefijo.
+				    PrefijosEquipo = {"servicios equipo"},
+				    Normalizar = (Nombre as text) as text => Text.Lower(Text.Trim(Text.Replace(Nombre, "_", " "))),
+				
+				    Filas =
+				        List.Combine(
+				            List.Transform(
+				                Issues,
+				                (i) =>
+				                    let
+				                        Valor = Record.FieldOrDefault(i[fields], "customfield_11042", null),
+				                        Usuarios = if Valor is list then Valor else {}
+				                    in
+				                        List.Transform(
+				                            List.Select(Usuarios, each _ is record),
+				                            (u) => [
+				                                Key = i[key],
+				                                #"Técnico" = Record.FieldOrDefault(u, "displayName", null),
+				                                #"Técnico Account ID" = Record.FieldOrDefault(u, "accountId", null),
+				                                TipoCuenta = Record.FieldOrDefault(u, "accountType", null),
+				                                Activo = Record.FieldOrDefault(u, "active", true)
+				                            ]
+				                        )
+				            )
+				        ),
+				
+				    // Solo cuentas personales: con ID y nombre, tipo "atlassian" (no apps ni clientes) y que no sean de equipo
+				    Validas =
+				        List.Select(
+				            Filas,
+				            each
+				                [#"Técnico Account ID"] <> null
+				                and [#"Técnico"] <> null
+				                and Text.Trim([#"Técnico"]) <> ""
+				                and ([TipoCuenta] = null or [TipoCuenta] = "atlassian")
+				                and not List.AnyTrue(List.Transform(PrefijosEquipo, (Prefijo) => Text.StartsWith(Normalizar([#"Técnico"]), Prefijo)))
+				        ),
+				
+				    Tabla =
+				        Table.FromRecords(
+				            Validas,
+				            type table [
+				                Key = text,
+				                #"Técnico" = text,
+				                #"Técnico Account ID" = text,
+				                TipoCuenta = nullable text,
+				                Activo = logical
+				            ]
+				        ),
+				
+				    // Un técnico cuenta una sola vez por ticket. Se agrupa por nombre porque una misma persona
+				    // puede tener dos cuentas en Jira (caso detectado: Esner Augusto Cel Cardenas).
+				    Unicos = Table.Distinct(Tabla, {"Key", "Técnico"}),
+				
+				    Result = Table.RemoveColumns(Unicos, {"TipoCuenta"})
+				
+				in
+				    Result
+
+	annotation PBI_ResultType = Table
+

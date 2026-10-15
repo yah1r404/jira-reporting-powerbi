@@ -4,10 +4,10 @@
   "position": {
     "x": 1560,
     "y": 16,
-    "z": 102,
+    "z": 18000,
     "height": 72,
     "width": 340,
-    "tabOrder": 102
+    "tabOrder": 27000
   },
   "visual": {
     "visualType": "slicer",
@@ -61,7 +61,7 @@
             "text": {
               "expr": {
                 "Literal": {
-                  "Value": "'SLA objetivo del cliente · solo esta página'"
+                  "Value": "'SLA objetivo del cliente'"
                 }
               }
             },
@@ -186,6 +186,11 @@
           }
         }
       ]
+    },
+    "syncGroup": {
+      "groupName": "Global_SLAObjetivo",
+      "fieldChanges": true,
+      "filterChanges": true
     }
   }
 }

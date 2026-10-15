@@ -1,0 +1,254 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/visualContainer/2.13.0/schema.json",
+  "name": "f7a17ba069826f83ba5a",
+  "position": {
+    "x": 264,
+    "y": 1124,
+    "z": 42000,
+    "height": 300,
+    "width": 1636,
+    "tabOrder": 42000
+  },
+  "visual": {
+    "visualType": "pivotTable",
+    "query": {
+      "queryState": {
+        "Rows": {
+          "projections": [
+            {
+              "field": {
+                "Column": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "FactTecnicos"
+                    }
+                  },
+                  "Property": "Técnico"
+                }
+              },
+              "queryRef": "FactTecnicos.Técnico",
+              "nativeQueryRef": "Técnico",
+              "active": true
+            }
+          ]
+        },
+        "Values": {
+          "projections": [
+            {
+              "field": {
+                "Measure": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "_Medidas"
+                    }
+                  },
+                  "Property": "Tickets con Técnico"
+                }
+              },
+              "queryRef": "_Medidas.Tickets con Técnico",
+              "nativeQueryRef": "Tickets con Técnico"
+            },
+            {
+              "field": {
+                "Measure": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "_Medidas"
+                    }
+                  },
+                  "Property": "% Participación Técnico"
+                }
+              },
+              "queryRef": "_Medidas.% Participación Técnico",
+              "nativeQueryRef": "% Participación Técnico"
+            },
+            {
+              "field": {
+                "Measure": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "_Medidas"
+                    }
+                  },
+                  "Property": "Tickets Técnico Abiertos"
+                }
+              },
+              "queryRef": "_Medidas.Tickets Técnico Abiertos",
+              "nativeQueryRef": "Tickets Técnico Abiertos"
+            },
+            {
+              "field": {
+                "Measure": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "_Medidas"
+                    }
+                  },
+                  "Property": "Tickets Técnico En Proceso"
+                }
+              },
+              "queryRef": "_Medidas.Tickets Técnico En Proceso",
+              "nativeQueryRef": "Tickets Técnico En Proceso"
+            },
+            {
+              "field": {
+                "Measure": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "_Medidas"
+                    }
+                  },
+                  "Property": "Tickets Técnico Resueltos"
+                }
+              },
+              "queryRef": "_Medidas.Tickets Técnico Resueltos",
+              "nativeQueryRef": "Tickets Técnico Resueltos"
+            },
+            {
+              "field": {
+                "Measure": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "_Medidas"
+                    }
+                  },
+                  "Property": "Tickets Técnico Incumplidos"
+                }
+              },
+              "queryRef": "_Medidas.Tickets Técnico Incumplidos",
+              "nativeQueryRef": "Tickets Técnico Incumplidos"
+            },
+            {
+              "field": {
+                "Measure": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "_Medidas"
+                    }
+                  },
+                  "Property": "% SLA Resolución Técnico"
+                }
+              },
+              "queryRef": "_Medidas.% SLA Resolución Técnico",
+              "nativeQueryRef": "% SLA Resolución Técnico"
+            },
+            {
+              "field": {
+                "Measure": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "_Medidas"
+                    }
+                  },
+                  "Property": "Prom Horas SLA Técnico"
+                }
+              },
+              "queryRef": "_Medidas.Prom Horas SLA Técnico",
+              "nativeQueryRef": "Prom Horas SLA Técnico"
+            },
+            {
+              "field": {
+                "Measure": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "_Medidas"
+                    }
+                  },
+                  "Property": "Mediana Horas Resolución Técnico"
+                }
+              },
+              "queryRef": "_Medidas.Mediana Horas Resolución Técnico",
+              "nativeQueryRef": "Mediana Horas Resolución Técnico"
+            }
+          ]
+        }
+      }
+    },
+    "objects": {
+      "values": [
+        {
+          "properties": {
+            "fontColor": {
+              "solid": {
+                "color": {
+                  "expr": {
+                    "Measure": {
+                      "Expression": {
+                        "SourceRef": {
+                          "Entity": "_Medidas"
+                        }
+                      },
+                      "Property": "Color Alerta"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "selector": {
+            "data": [
+              {
+                "dataViewWildcard": {
+                  "matchingOption": 1
+                }
+              }
+            ],
+            "metadata": "_Medidas.Tickets Técnico Incumplidos"
+          }
+        },
+        {
+          "properties": {
+            "fontColor": {
+              "solid": {
+                "color": {
+                  "expr": {
+                    "Measure": {
+                      "Expression": {
+                        "SourceRef": {
+                          "Entity": "_Medidas"
+                        }
+                      },
+                      "Property": "Color % SLA Resolución Técnico"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "selector": {
+            "data": [
+              {
+                "dataViewWildcard": {
+                  "matchingOption": 1
+                }
+              }
+            ],
+            "metadata": "_Medidas.% SLA Resolución Técnico"
+          }
+        }
+      ]
+    },
+    "visualContainerObjects": {
+      "title": [
+        {
+          "properties": {
+            "show": {
+              "expr": {
+                "Literal": {
+                  "Value": "true"
+                }
+              }
+            },
+            "text": {
+              "expr": {
+                "Literal": {
+                  "Value": "'Eficiencia por técnico: SLA y tiempos de los tickets en los que participa'"
+                }
+              }
+            }
+          }
+        }
+      ]
+    }
+  }
+}

@@ -1,18 +1,37 @@
 {
-  "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/visualContainer/2.12.0/schema.json",
+  "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/visualContainer/2.13.0/schema.json",
   "name": "54de31b28cbb1a4d407e",
   "position": {
     "x": 264,
     "y": 196,
-    "z": 20000,
+    "z": 30000,
     "height": 420,
     "width": 1010,
-    "tabOrder": 20
+    "tabOrder": 15000
   },
   "visual": {
     "visualType": "pivotTable",
     "query": {
       "queryState": {
+        "Columns": {
+          "projections": [
+            {
+              "field": {
+                "Column": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "SLA_Tickets"
+                    }
+                  },
+                  "Property": "Priority"
+                }
+              },
+              "queryRef": "SLA_Tickets.Priority",
+              "nativeQueryRef": "Priority",
+              "active": true
+            }
+          ]
+        },
         "Rows": {
           "projections": [
             {
@@ -64,49 +83,8 @@
               "nativeQueryRef": "% SLA Resolución"
             }
           ]
-        },
-        "Columns": {
-          "projections": [
-            {
-              "field": {
-                "Column": {
-                  "Expression": {
-                    "SourceRef": {
-                      "Entity": "SLA_Tickets"
-                    }
-                  },
-                  "Property": "Priority"
-                }
-              },
-              "queryRef": "SLA_Tickets.Priority",
-              "nativeQueryRef": "Priority",
-              "active": true
-            }
-          ]
         }
       }
-    },
-    "visualContainerObjects": {
-      "title": [
-        {
-          "properties": {
-            "show": {
-              "expr": {
-                "Literal": {
-                  "Value": "true"
-                }
-              }
-            },
-            "text": {
-              "expr": {
-                "Literal": {
-                  "Value": "'% SLA de resolución por flujo, request type y prioridad'"
-                }
-              }
-            }
-          }
-        }
-      ]
     },
     "objects": {
       "values": [
@@ -168,6 +146,28 @@
               }
             ],
             "metadata": "SLA_Tickets.Priority"
+          }
+        }
+      ]
+    },
+    "visualContainerObjects": {
+      "title": [
+        {
+          "properties": {
+            "show": {
+              "expr": {
+                "Literal": {
+                  "Value": "true"
+                }
+              }
+            },
+            "text": {
+              "expr": {
+                "Literal": {
+                  "Value": "'% SLA de resolución por flujo, request type y prioridad'"
+                }
+              }
+            }
           }
         }
       ]
