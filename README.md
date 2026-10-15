@@ -15,7 +15,11 @@ Para abrirlo, abre `Jira_PBI.pbip` con Power BI Desktop.
   - contraseña: tu **API token** de Atlassian (https://id.atlassian.com/manage-profile/security/api-tokens)
 - Las credenciales las guarda Power BI en tu equipo. **No están en el proyecto ni en Git.**
 - Nivel de privacidad del origen: **Organizational**.
-- En **Inicio → Actualizar** se vuelven a bajar los datos. Como se lee el historial (changelog) de cada ticket, la actualización tarda varios minutos.
+- En **Inicio → Actualizar** se vuelven a bajar los datos.
+- **Llamadas a Jira optimizadas:**
+  - La búsqueda de tickets es ligera: pide solo los campos que usa el modelo, sin historial y con páginas de hasta 1000 tickets.
+  - El historial de **estado y responsable** se pide aparte con `POST /rest/api/3/changelog/bulkfetch`: hasta 1000 tickets por llamada, filtrado a esos dos campos. Solo lo calculan `FactStatusHistory` y `FactAssigneeHistory`.
+  - Si ese endpoint fallara, la consulta vuelve sola al método anterior (búsqueda con historial y llamadas por ticket).
 
 ## 2. Datos (Power Query)
 
@@ -90,6 +94,7 @@ Todas las relaciones son de uno a muchos y en una sola dirección. `DimFecha` es
 - **Técnicos de campo**: un ticket con varios técnicos cuenta **una vez por técnico** (participaciones) y **una sola vez** en *Tickets con Técnico* (únicos). El SLA y los tiempos se **atribuyen por participación**, no por responsabilidad (el responsable es el Assignee). Abiertos = categoría *Por hacer*; en proceso = sin resolver y ya en atención; resueltos = con fecha de resolución.
 - **Time in Assignee** está en horas según el horario de cálculo, desde la creación hasta la resolución, y **solo cuenta tickets resueltos**. El tiempo sin responsable no se atribuye a nadie (se ve aparte en *Prom Horas Sin Asignar*).
 - **Reasignaciones**: cambios de responsable, sin contar la primera asignación.
+- **Vista Ejecutiva consistente con el resto:** con *SLA objetivo* = "Según cada ticket" (predeterminado), cumple/no cumple es el **mismo estado del SLA de Jira** que usan las demás páginas, así que los números coinciden. Solo al elegir una meta del cliente (4, 6, 15 o 18 h) se recalcula contra esas horas.
 - **SLA objetivo (filtro)**: cada ticket se compara contra las horas elegidas en el filtro *SLA objetivo*; con "Según cada ticket" se usa la meta en horas de cada ticket (ej. 15 h o 24 h), y la tarjeta muestra esas horas. Las horas comparadas (`Horas SLA Base`) son el tiempo de SLA de resolución de JSM, que respeta pausas y horario; si el ticket no tiene SLA en JSM, se usan las horas de reloj. Un ticket abierto que ya pasó la meta cuenta como incumplido.
 - **Fechas** en hora de Mérida (UTC-6).
 - El **semáforo** (verde ≥ 95%, ámbar ≥ 85%, rojo debajo) usa metas provisionales. Se ajustan en las medidas `Meta % SLA` y `Umbral Alerta % SLA`.
