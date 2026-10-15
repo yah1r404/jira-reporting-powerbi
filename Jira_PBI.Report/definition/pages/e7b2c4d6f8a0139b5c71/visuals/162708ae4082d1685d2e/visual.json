@@ -4,10 +4,10 @@
   "position": {
     "x": 1280,
     "y": 1422,
-    "z": 502,
+    "z": 4000,
     "height": 362,
     "width": 620,
-    "tabOrder": 502
+    "tabOrder": 4000
   },
   "visual": {
     "visualType": "tableEx",
@@ -42,7 +42,8 @@
                 }
               },
               "queryRef": "_Medidas.Meta SLA Ticket",
-              "nativeQueryRef": "Meta SLA Ticket"
+              "nativeQueryRef": "Meta SLA Ticket",
+              "active": false
             },
             {
               "field": {
@@ -56,7 +57,8 @@
                 }
               },
               "queryRef": "_Medidas.Horas en Estado",
-              "nativeQueryRef": "Horas en Estado"
+              "nativeQueryRef": "Horas en Estado",
+              "active": false
             },
             {
               "field": {
@@ -70,7 +72,8 @@
                 }
               },
               "queryRef": "_Medidas.Consumo SLA %",
-              "nativeQueryRef": "Consumo SLA %"
+              "nativeQueryRef": "Consumo SLA %",
+              "active": false
             },
             {
               "field": {
@@ -84,7 +87,8 @@
                 }
               },
               "queryRef": "_Medidas.Excedente SLA Horas",
-              "nativeQueryRef": "Excedente SLA Horas"
+              "nativeQueryRef": "Excedente SLA Horas",
+              "active": false
             },
             {
               "field": {

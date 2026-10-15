@@ -62,14 +62,6 @@ table SLA_Tickets
 
 		annotation SummarizationSetBy = Automatic
 
-	column Priority
-		dataType: string
-		lineageTag: a903b2cc-7dab-42b7-ad75-d7c7a02e19d7
-		summarizeBy: none
-		sourceColumn: Priority
-
-		annotation SummarizationSetBy = Automatic
-
 	column Status
 		dataType: string
 		lineageTag: 21799827-4e65-47ed-8d25-7be09d265e65
@@ -349,7 +341,6 @@ table SLA_Tickets
 				                        Flujo = if IssueType = "IEP INCIDENT" then "IEP Incident" else "Mesa de Servicio - Clientes",
 				                        #"Request Type" = if RequestType = null then "Sin request type" else RequestType,
 				                        #"Tipo de Ticket" = if Tipo = null then "Sin tipo" else Tipo,
-				                        Priority = NameOf(Record.FieldOrDefault(f, "priority", null), "name"),
 				                        Status = NameOf(StatusRec, "name"),
 				                        #"Status Category" = NameOf(NameOf(StatusRec, "statusCategory"), "name"),
 				                        Assignee = if AssigneeName = null then "Sin asignar" else AssigneeName,
@@ -386,7 +377,6 @@ table SLA_Tickets
 				                Flujo = text,
 				                #"Request Type" = text,
 				                #"Tipo de Ticket" = text,
-				                Priority = nullable text,
 				                Status = nullable text,
 				                #"Status Category" = nullable text,
 				                Assignee = text,

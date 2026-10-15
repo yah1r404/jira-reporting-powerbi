@@ -2,7 +2,7 @@
   "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/page/2.1.0/schema.json",
   "name": "a7ebf0f9b92961faf591",
   "displayName": "03 - SLA por Tipo de Ticket",
-  "displayOption": "FitToPage",
-  "height": 1080,
+  "displayOption": "FitToWidth",
+  "height": 1800,
   "width": 1920
 }

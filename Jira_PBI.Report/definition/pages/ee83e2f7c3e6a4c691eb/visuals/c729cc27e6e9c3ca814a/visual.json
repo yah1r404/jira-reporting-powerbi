@@ -5,9 +5,9 @@
     "x": 1290,
     "y": 340,
     "z": 36000,
-    "height": 360,
+    "height": 722,
     "width": 610,
-    "tabOrder": 23000
+    "tabOrder": 24000
   },
   "visual": {
     "visualType": "clusteredBarChart",

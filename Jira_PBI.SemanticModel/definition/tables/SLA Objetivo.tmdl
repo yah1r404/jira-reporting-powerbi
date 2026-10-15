@@ -1,5 +1,5 @@
 /// Opciones del filtro "SLA objetivo". Sin relaciones: las medidas de "SLA Seleccionado" leen la opción elegida.
-/// Horas = 0 significa usar la meta de Jira de cada ticket. Para agregar otra meta, agregar un renglón al DATATABLE.
+/// Horas = 0 ("Según cada ticket") usa la meta en horas de cada ticket. Para agregar otra meta, agregar un renglón al DATATABLE.
 table 'SLA Objetivo'
 	lineageTag: 0b3c4d5e-6f70-4a81-9b2c-3d4e5f607182
 
@@ -42,7 +42,7 @@ table 'SLA Objetivo'
 				    "Horas", DOUBLE,
 				    "Orden", INTEGER,
 				    {
-				        { "Meta de Jira", 0, 0 },
+				        { "Según cada ticket", 0, 0 },
 				        { "4 hrs", 4, 1 },
 				        { "6 hrs", 6, 2 },
 				        { "15 hrs", 15, 3 },

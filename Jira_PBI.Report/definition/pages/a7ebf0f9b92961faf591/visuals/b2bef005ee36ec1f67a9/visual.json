@@ -19,7 +19,7 @@
               {
                 "textRuns": [
                   {
-                    "value": "Cada request type tiene su propio SLA: compara cumplimiento y tiempos por flujo y prioridad.",
+                    "value": "Cada tipo de solicitud tiene su propio SLA en horas: compara cumplimiento y tiempos por tipo de servicio.",
                     "textStyle": {
                       "fontFamily": "Segoe UI",
                       "fontSize": "11pt",

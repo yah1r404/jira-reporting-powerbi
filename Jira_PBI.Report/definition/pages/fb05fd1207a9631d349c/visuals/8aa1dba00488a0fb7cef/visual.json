@@ -5,7 +5,7 @@
     "x": 264,
     "y": 196,
     "z": 29000,
-    "height": 864,
+    "height": 1588,
     "width": 1636,
     "tabOrder": 15000
   },
@@ -70,20 +70,6 @@
               },
               "queryRef": "SLA_Tickets.Request Type",
               "nativeQueryRef": "Request Type"
-            },
-            {
-              "field": {
-                "Column": {
-                  "Expression": {
-                    "SourceRef": {
-                      "Entity": "SLA_Tickets"
-                    }
-                  },
-                  "Property": "Priority"
-                }
-              },
-              "queryRef": "SLA_Tickets.Priority",
-              "nativeQueryRef": "Priority"
             },
             {
               "field": {
@@ -231,36 +217,6 @@
     },
     "objects": {
       "values": [
-        {
-          "properties": {
-            "fontColor": {
-              "solid": {
-                "color": {
-                  "expr": {
-                    "Measure": {
-                      "Expression": {
-                        "SourceRef": {
-                          "Entity": "_Medidas"
-                        }
-                      },
-                      "Property": "Color Prioridad"
-                    }
-                  }
-                }
-              }
-            }
-          },
-          "selector": {
-            "data": [
-              {
-                "dataViewWildcard": {
-                  "matchingOption": 1
-                }
-              }
-            ],
-            "metadata": "SLA_Tickets.Priority"
-          }
-        },
         {
           "properties": {
             "fontColor": {

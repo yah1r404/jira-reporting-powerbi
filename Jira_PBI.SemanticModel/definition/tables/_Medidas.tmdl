@@ -230,7 +230,7 @@ table _Medidas
 		displayFolder: SLA
 		lineageTag: 7de50618-92a3-4ebf-80d1-425c6e7f8091
 
-	/// Horas del SLA objetivo elegido en el filtro. En blanco = meta de Jira de cada ticket.
+	/// Horas del SLA objetivo elegido en el filtro. En blanco = meta en horas de cada ticket.
 	measure 'Meta SLA Seleccionada' =
 			VAR Sel = SELECTEDVALUE('SLA Objetivo'[Horas])
 			RETURN IF(Sel > 0, Sel)
@@ -238,10 +238,19 @@ table _Medidas
 		displayFolder: SLA Seleccionado
 		lineageTag: 4f708192-a3b4-4ec5-9f60-718293a4b5c6
 
-	/// Texto de la meta aplicada, para mostrar en tarjetas.
+	/// Horas de la meta aplicada: las del SLA objetivo elegido o, si no se eligió, las metas de los tickets (ej. 15 h / 24 h).
 	measure 'Meta SLA Aplicada' =
 			VAR Meta = [Meta SLA Seleccionada]
-			RETURN IF(ISBLANK(Meta), "Meta de Jira", FORMAT(Meta, "0.##") & " hrs")
+			RETURN
+			    IF(
+			        ISBLANK(Meta),
+			        CONCATENATEX(
+			            FILTER(VALUES(SLA_Tickets[SLA Resolución Meta Horas]), NOT ISBLANK(SLA_Tickets[SLA Resolución Meta Horas])),
+			            FORMAT(SLA_Tickets[SLA Resolución Meta Horas], "0.##") & " h",
+			            " / ", SLA_Tickets[SLA Resolución Meta Horas], ASC
+			        ),
+			        FORMAT(Meta, "0.##") & " h"
+			    )
 		displayFolder: SLA Seleccionado
 		lineageTag: 508192a3-b4c5-4fd6-8071-8293a4b5c6d7
 
@@ -490,11 +499,6 @@ table _Medidas
 			                CONCATENATEX(VALUES(SLA_Tickets[Request Type]), SLA_Tickets[Request Type], ", ")
 			            )
 			    )
-			VAR Prio =
-			    IF(
-			        ISFILTERED(SLA_Tickets[Priority]),
-			        "Prioridad: " & CONCATENATEX(VALUES(SLA_Tickets[Priority]), SLA_Tickets[Priority], ", ")
-			    )
 			VAR Tipo =
 			    IF(
 			        ISFILTERED(SLA_Tickets[Tipo de Ticket]),
@@ -521,7 +525,7 @@ table _Medidas
 			            )
 			    )
 			VAR Horario = "Horas: " & IF([Usa Horario Laboral], "horario laboral (L-V 6-23, Sáb 9-19)", "24/7")
-			VAR Partes = { Periodo, Org, Flujo, RT, Prio, Tipo, EstadoSla, EstadoActual, Resp, Horario }
+			VAR Partes = { Periodo, Org, Flujo, RT, Tipo, EstadoSla, EstadoActual, Resp, Horario }
 			VAR Texto =
 			    CONCATENATEX(FILTER(Partes, NOT ISBLANK([Value])), [Value], "   ·   ")
 			RETURN
@@ -558,22 +562,6 @@ table _Medidas
 			)
 		displayFolder: Colores
 		lineageTag: d08192a3-b4c5-4d6e-8f70-8192a3b4c5d6
-
-	/// Color de texto para la prioridad: rojo alta, ámbar media, azul baja.
-	measure 'Color Prioridad' =
-			VAR P = SELECTEDVALUE(SLA_Tickets[Priority])
-			RETURN
-			    SWITCH(
-			        TRUE(),
-			        P IN { "Highest", "Muy alta", "Crítica", "Critical", "Blocker" }, "#8E1B14",
-			        P IN { "High", "Alta" }, "#C8382E",
-			        P IN { "Medium", "Media" }, "#8A6100",
-			        P IN { "Low", "Baja" }, "#2F76C2",
-			        P IN { "Lowest", "Muy baja" }, "#06519A",
-			        "#5B6B7F"
-			    )
-		displayFolder: Colores
-		lineageTag: e192a3b4-c5d6-4e7f-9081-92a3b4c5d6e7
 
 	/// Color de texto para valores que indican incumplimiento (siempre rojo).
 	measure 'Color Alerta' = "#C8382E"
@@ -763,6 +751,30 @@ table _Medidas
 			    SWITCH(TRUE(), ISBLANK(C), "#5B6B7F", C > 1, "#C8382E", C > 0.75, "#8A6100", "#06519A")
 		displayFolder: Consumo del SLA
 		lineageTag: 35465768-7283-4d4e-8e5f-f718293a4b54
+
+	/// Subtítulo con las horas de las metas de SLA de los tickets filtrados (primera respuesta y resolución).
+	measure 'Metas SLA Texto' =
+			VAR Resp =
+			    CONCATENATEX(
+			        FILTER(VALUES(SLA_Tickets[SLA Respuesta Meta Horas]), NOT ISBLANK(SLA_Tickets[SLA Respuesta Meta Horas])),
+			        IF(
+			            SLA_Tickets[SLA Respuesta Meta Horas] < 1,
+			            FORMAT(SLA_Tickets[SLA Respuesta Meta Horas] * 60, "0") & " min",
+			            FORMAT(SLA_Tickets[SLA Respuesta Meta Horas], "0.##") & " h"
+			        ),
+			        " / ", SLA_Tickets[SLA Respuesta Meta Horas], ASC
+			    )
+			VAR Res =
+			    CONCATENATEX(
+			        FILTER(VALUES(SLA_Tickets[SLA Resolución Meta Horas]), NOT ISBLANK(SLA_Tickets[SLA Resolución Meta Horas])),
+			        FORMAT(SLA_Tickets[SLA Resolución Meta Horas], "0.##") & " h",
+			        " / ", SLA_Tickets[SLA Resolución Meta Horas], ASC
+			    )
+			RETURN
+			    "Horas del SLA · Primera respuesta: " & IF(Resp = "", "sin meta", Resp)
+			        & "   ·   Resolución: " & IF(Res = "", "sin meta", Res) & " (según el tipo de ticket)"
+		displayFolder: SLA
+		lineageTag: 4657687a-8394-4e5f-9f60-0718293a4b65
 
 	partition _Medidas = m
 		mode: import

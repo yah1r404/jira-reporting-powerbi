@@ -7,7 +7,7 @@
     "z": 16000,
     "height": 42,
     "width": 1270,
-    "tabOrder": 26000
+    "tabOrder": 27000
   },
   "visual": {
     "visualType": "textbox",
@@ -19,7 +19,7 @@
               {
                 "textRuns": [
                   {
-                    "value": "Resumen de SLA (metas de Jira)",
+                    "value": "Resumen de SLA",
                     "textStyle": {
                       "fontFamily": "Segoe UI Semibold",
                       "fontSize": "22pt",

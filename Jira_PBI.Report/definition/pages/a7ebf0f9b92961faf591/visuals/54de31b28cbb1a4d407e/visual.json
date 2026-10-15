@@ -5,7 +5,7 @@
     "x": 264,
     "y": 196,
     "z": 30000,
-    "height": 420,
+    "height": 772,
     "width": 1010,
     "tabOrder": 15000
   },
@@ -13,25 +13,6 @@
     "visualType": "pivotTable",
     "query": {
       "queryState": {
-        "Columns": {
-          "projections": [
-            {
-              "field": {
-                "Column": {
-                  "Expression": {
-                    "SourceRef": {
-                      "Entity": "SLA_Tickets"
-                    }
-                  },
-                  "Property": "Priority"
-                }
-              },
-              "queryRef": "SLA_Tickets.Priority",
-              "nativeQueryRef": "Priority",
-              "active": true
-            }
-          ]
-        },
         "Rows": {
           "projections": [
             {
@@ -117,36 +98,6 @@
             ],
             "metadata": "_Medidas.% SLA Resolución"
           }
-        },
-        {
-          "properties": {
-            "fontColor": {
-              "solid": {
-                "color": {
-                  "expr": {
-                    "Measure": {
-                      "Expression": {
-                        "SourceRef": {
-                          "Entity": "_Medidas"
-                        }
-                      },
-                      "Property": "Color Prioridad"
-                    }
-                  }
-                }
-              }
-            }
-          },
-          "selector": {
-            "data": [
-              {
-                "dataViewWildcard": {
-                  "matchingOption": 1
-                }
-              }
-            ],
-            "metadata": "SLA_Tickets.Priority"
-          }
         }
       ]
     },
@@ -164,7 +115,7 @@
             "text": {
               "expr": {
                 "Literal": {
-                  "Value": "'% SLA de resolución por flujo, request type y prioridad'"
+                  "Value": "'% SLA de resolución por tipo de servicio y tipo de solicitud'"
                 }
               }
             }
