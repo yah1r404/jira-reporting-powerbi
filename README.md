@@ -21,7 +21,6 @@ Para abrirlo, abre `Jira_PBI.pbip` con Power BI Desktop.
 
 | Consulta | Qué trae | ¿Se carga al modelo? |
 |---|---|---|
-| `Jira_Tickets` | Consulta original del proyecto (vista clásica). Usa **el mismo alcance que el tablero de SLA**: mesa MDSC, últimos 6 meses, sin Emailed request ni tickets en Cerrada, con JQL directo y sin filtros guardados. | Sí |
 | `Jira_MDSC_Issues` | Tickets de **MDSC creados en los últimos 6 meses**, **sin Emailed request y sin tickets en estado Cerrada** (`project = MDSC AND issuetype != "Emailed request" AND status != Closed AND created >= startOfMonth(-5)`), con sus campos y su changelog completo. Las tres tablas de abajo salen de aquí. | No |
 | `SLA_Tickets` | Un renglón por ticket: flujo, request type, tipo de ticket, **organización**, prioridad, estado, responsable, fechas y los **SLA de Jira Service Management**. | Sí |
 | `SLA Objetivo` | Tabla calculada con las opciones del filtro de SLA del cliente: Meta de Jira, 4, 6, 15 y 18 hrs. No tiene relaciones. | Sí |
@@ -51,19 +50,17 @@ Los dos flujos comparten "Esperando por el cliente", "Escalado" y "Reabierta". E
 ## 3. Modelo
 
 ```
-DimFecha ──1:*──> Jira_Tickets            (Created Date)
 DimFecha ──1:*──> SLA_Tickets             (Created Date)
 SLA_Tickets ──1:*──> FactStatusHistory    (Key)
 SLA_Tickets ──1:*──> FactAssigneeHistory  (Key)
 ```
 
-Todas las relaciones son de uno a muchos y en una sola dirección. `DimFecha` es un calendario calculado que cubre las fechas de `Jira_Tickets` y de `SLA_Tickets`.
+Todas las relaciones son de uno a muchos y en una sola dirección. `DimFecha` es un calendario calculado que cubre las fechas de `SLA_Tickets`.
 
 ### Medidas (tabla `_Medidas`)
 
 | Carpeta | Medidas |
 |---|---|
-| *(raíz)* | Medidas originales sobre `Jira_Tickets`: Total Tickets, promedios, mediana y percentiles de resolución, rangos de horas |
 | SLA | Tickets, Tickets Resueltos, Tickets Abiertos, Última Actualización |
 | SLA \ Resolución | SLA Resolución Cumplidos / Incumplidos / En Riesgo, **% SLA Resolución**, Prom Horas SLA Resolución |
 | SLA \ Primera Respuesta | SLA Respuesta Cumplidos / Incumplidos, **% SLA Primera Respuesta**, Prom Horas SLA Respuesta |
@@ -71,7 +68,7 @@ Todas las relaciones son de uno a muchos y en una sola dirección. `DimFecha` es
 | SLA \ Semáforo | Meta % SLA (95%), Umbral Alerta % SLA (85%), colores de semáforo |
 | Time in Status | Horas en Estado, Tickets en Estado, Prom / Mediana / P90 Horas en Estado |
 | SLA Seleccionado | Meta SLA Seleccionada, Meta SLA Aplicada, Cumplen / Incumplen / Evaluados SLA Seleccionado, **% SLA Seleccionado**, Horas Ticket Incumplido, Meta Ticket Incumplido, Horas Excedidas SLA, Horas en Estado Incumplidos |
-| Filtros | Filtros Activos, Filtros Activos Jira (texto de los filtros aplicados) |
+| Filtros | Filtros Activos (texto de los filtros aplicados) |
 | Time in Assignee | Horas Asignado, Tickets Atendidos, Prom Horas Asignado por Ticket, Mediana Horas Asignado, Personas por Ticket, Prom Horas Sin Asignar, Total Reasignaciones, % SLA Resolución Tickets Atendidos |
 | Línea de Tiempo | Gantt Responsable, Gantt Estado y sus colores (tabla auxiliar `Línea de Tiempo`, horas 0 a 48+) |
 
@@ -104,10 +101,6 @@ Todas las relaciones son de uno a muchos y en una sola dirección. `DimFecha` es
 | **05 - Time in Status** | Mesa MDSC | Horas promedio por estado vigente, comparando los dos flujos, con mediana y P90 |
 | **06 - Time in Assignee** | Mesa MDSC | Horas promedio asignado por ticket resuelto y tickets atendidos por persona. Filtro propio: responsable |
 | **07 - Línea de Tiempo** | Mesa MDSC | Diagrama tipo Gantt por ticket, hora por hora desde la creación (0h a 48h+): quién lo tuvo y en qué estado estuvo. Filtro propio: ticket |
-| 08 - Resumen (vista clásica) | `Jira_Tickets` | Total y promedio de resolución, tickets por día, por responsable y por prioridad. Filtros propios: responsable, prioridad y reportó |
-| 09 - Tiempos de Resolución (vista clásica) | `Jira_Tickets` | Promedio, mediana, P90, P95 y máximo de horas de resolución; tendencia y rangos de horas |
-| 10 - Responsables (vista clásica) | `Jira_Tickets` | Volumen y tiempos por responsable (incluye máximo) y dispersión volumen vs. horas |
-| 11 - Detalle de Tickets (vista clásica) | `Jira_Tickets` | Tabla de tickets con link a Jira |
 | Filtros avanzados *(oculta en el menú)* | Mesa MDSC | Panel de filtros en modo borrador: se abre con el botón «Filtros avanzados» |
 
 Todas las páginas comparten la misma estructura: barra lateral con el logo y el menú (página activa en amarillo), encabezado con título y descripción, barra de filtros y una línea con los **filtros activos**.
@@ -116,9 +109,9 @@ Todas las páginas comparten la misma estructura: barra lateral con el logo y el
 
 | Tipo | Filtros | Dónde aplican |
 |---|---|---|
-| **Globales sincronizados** | Periodo (fecha de creación), Organización, Flujo de trabajo, Request type, Prioridad | El periodo aplica en las 11 páginas. Los demás aplican en las páginas 01 a 07 (no existen en `Jira_Tickets`). Al cambiar de página se conservan. |
-| **Adicionales** (en «Filtros avanzados») | Tipo de ticket, Estado del SLA de resolución, Estado actual, Responsable actual | Páginas 01 a 07, sincronizados de forma oculta |
-| **Propios de la página** | SLA objetivo (01), Responsable (06), Ticket (07), Responsable / Prioridad / Reportó (08) | Solo en su página; no modifican los globales |
+| **Globales sincronizados** | Periodo (fecha de creación), Organización, Flujo de trabajo, Request type, Prioridad | Las 7 páginas. Al cambiar de página se conservan. |
+| **Adicionales** (en «Filtros avanzados») | Tipo de ticket, Estado del SLA de resolución, Estado actual, Responsable actual | Todas las páginas, sincronizados de forma oculta |
+| **Propios de la página** | SLA objetivo (01), Responsable (06), Ticket (07) | Solo en su página; no modifican los globales |
 
 - **Limpiar filtros** quita todos los filtros de la página y, por la sincronía, los globales en todas las páginas. Para quitar uno solo, usa el borrador del encabezado de ese filtro.
 - **Filtros avanzados**: los cambios no se aplican hasta pulsar **Aplicar filtros**. **Cancelar** regresa a la página anterior sin aplicarlos.
@@ -151,5 +144,4 @@ Todas las páginas comparten la misma estructura: barra lateral con el logo y el
 
 - Confirmar las metas reales de % SLA para el semáforo.
 - Validar los números contra Jira después del primer refresh completo.
-- Definir si las páginas de la vista clásica (08 a 11) se mantienen: ahora usan los mismos tickets que las páginas 01 a 07.
 

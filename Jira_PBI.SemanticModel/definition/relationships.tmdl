@@ -1,7 +1,3 @@
-relationship 0a6e0f07-c1bc-eb98-29e1-8c51871267ca
-	fromColumn: Jira_Tickets.'Created Date'
-	toColumn: DimFecha.Date
-
 relationship f54c3968-306a-4dd6-acb8-19e916fa6b09
 	fromColumn: SLA_Tickets.'Created Date'
 	toColumn: DimFecha.Date

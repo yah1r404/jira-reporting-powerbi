@@ -70,7 +70,7 @@ table DimFecha
 
 	partition DimFecha = calculated
 		mode: import
-		source = CALENDAR(MIN(MIN('Jira_Tickets'[Created Date]), MIN('SLA_Tickets'[Created Date])), MAX(MAX('Jira_Tickets'[Created Date]), MAX('SLA_Tickets'[Created Date])))
+		source = CALENDAR(MIN('SLA_Tickets'[Created Date]), MAX('SLA_Tickets'[Created Date]))
 
 	annotation PBI_Id = DimFecha_CalendarioPrincipal
 

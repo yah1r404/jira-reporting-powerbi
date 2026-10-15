@@ -1,103 +1,6 @@
 table _Medidas
 	lineageTag: 0cdf12bc-8e55-4227-a993-f259e17d333d
 
-	/// Número total de tickets de la vista clásica (Jira_Tickets: mesa MDSC, últimos 6 meses) en el contexto actual.
-	measure 'Total Tickets' =
-			
-			COUNTROWS(Jira_Tickets)
-		formatString: 0
-		lineageTag: 9d760918-6cb7-4458-a303-df7264d93e78
-
-	/// Promedio de horas CALENDARIO (no SLA contractual) entre creación y resolución del ticket.
-	measure 'Promedio Resolucion Horas' =
-			
-			AVERAGE(Jira_Tickets[Resolution Hours])
-		formatString: #,##0.00
-		lineageTag: 77920873-a0f9-40d7-bd9d-d402857c1d50
-
-		annotation PBI_FormatHint = {"isGeneralNumber":true}
-
-	/// Valor central de horas calendario de resolución; menos sensible a outliers que el promedio.
-	measure 'Mediana Resolucion Horas' =
-			
-			MEDIAN(Jira_Tickets[Resolution Hours])
-		formatString: #,##0.00
-		lineageTag: bfacaa17-a9ce-494b-8780-e27580710710
-
-		annotation PBI_FormatHint = {"isGeneralNumber":true}
-
-	/// Percentil 90 de horas calendario de resolución: el 90% de los tickets se resolvieron en este tiempo o menos.
-	measure 'P90 Resolucion Horas' =
-			
-			PERCENTILEX.INC(
-			    Jira_Tickets,
-			    Jira_Tickets[Resolution Hours],
-			    0.90
-			)
-		formatString: #,##0.00
-		lineageTag: 7e02592c-9652-4e29-a931-c3168a72e71a
-
-		annotation PBI_FormatHint = {"isGeneralNumber":true}
-
-	/// Tiempo calendario de resolución más alto registrado en el periodo filtrado.
-	measure 'Max Resolucion Horas' =
-			
-			MAX(Jira_Tickets[Resolution Hours])
-		formatString: #,##0.00
-		lineageTag: d313fa96-eade-4271-b134-d848b163259b
-
-		annotation PBI_FormatHint = {"isGeneralNumber":true}
-
-	/// Percentil 75 de horas calendario de resolución: el 75% de los tickets se resolvieron en este tiempo o menos.
-	measure 'P75 Resolucion Horas' = PERCENTILEX.INC(Jira_Tickets, Jira_Tickets[Resolution Hours], 0.75)
-		formatString: #,##0.00
-		lineageTag: 4203a94a-77e5-4da1-9f5e-8dc9427d56fd
-
-	/// Percentil 95 de horas calendario de resolución; útil para identificar outliers extremos.
-	measure 'P95 Resolucion Horas' = PERCENTILEX.INC(Jira_Tickets, Jira_Tickets[Resolution Hours], 0.95)
-		formatString: #,##0.00
-		lineageTag: 9a61fcb8-099f-48ac-a9cb-04889a7dc873
-
-	/// Tiempo calendario de resolución más bajo registrado en el periodo filtrado.
-	measure 'Min Resolucion Horas' = MIN(Jira_Tickets[Resolution Hours])
-		formatString: #,##0.00
-		lineageTag: 1c539063-b9ae-4f3e-a2fd-8d5e788f03cd
-
-	/// Total de tickets dividido entre el número de días distintos con al menos un ticket creado.
-	measure 'Promedio Tickets por Dia' = DIVIDE([Total Tickets], DISTINCTCOUNT(Jira_Tickets[Created Date]))
-		formatString: #,##0.00
-		lineageTag: 160c46bd-25fb-4c67-ba97-cc66869e2981
-
-	/// Tickets resueltos en menos de 1 hora calendario.
-	measure 'Tickets con Resolucion < 1h' = CALCULATE([Total Tickets], Jira_Tickets[Rango Resolucion] = "< 1 hora")
-		formatString: #,##0
-		lineageTag: 08b8a58e-3136-4234-91e0-78036c227ad0
-
-	/// Tickets resueltos entre 1 y 4 horas calendario.
-	measure 'Tickets con Resolucion 1-4h' = CALCULATE([Total Tickets], Jira_Tickets[Rango Resolucion] = "1 - 4 horas")
-		formatString: #,##0
-		lineageTag: 4ce22eb7-5269-4100-a974-44acf0888f5f
-
-	/// Tickets resueltos entre 4 y 8 horas calendario.
-	measure 'Tickets con Resolucion 4-8h' = CALCULATE([Total Tickets], Jira_Tickets[Rango Resolucion] = "4 - 8 horas")
-		formatString: #,##0
-		lineageTag: ed4aba63-3557-40e6-b0b6-b35c7df9c4f4
-
-	/// Tickets resueltos entre 8 y 24 horas calendario.
-	measure 'Tickets con Resolucion 8-24h' = CALCULATE([Total Tickets], Jira_Tickets[Rango Resolucion] = "8 - 24 horas")
-		formatString: #,##0
-		lineageTag: a2c2ced7-cd14-4ee6-bee9-69a1b05a81ff
-
-	/// Tickets resueltos entre 24 y 48 horas calendario.
-	measure 'Tickets con Resolucion 24-48h' = CALCULATE([Total Tickets], Jira_Tickets[Rango Resolucion] = "24 - 48 horas")
-		formatString: #,##0
-		lineageTag: f8acb2f0-04b4-4885-8ce0-14ab9bce557b
-
-	/// Tickets que tardaron 48 horas calendario o más en resolverse.
-	measure 'Tickets con Resolucion 48h+' = CALCULATE([Total Tickets], Jira_Tickets[Rango Resolucion] = "48+ horas")
-		formatString: #,##0
-		lineageTag: 14dc21dd-72e3-4e83-bc6d-9b079ae6536d
-
 	/// Tickets de la mesa MDSC en el contexto actual.
 	measure Tickets = COUNTROWS(SLA_Tickets)
 		formatString: #,##0
@@ -630,20 +533,6 @@ table _Medidas
 		displayFolder: Filtros
 		lineageTag: ad5e6f70-8192-4a3b-9c4d-5e6f708192a3
 
-	/// Texto con los filtros aplicados en las páginas de la vista clásica (tabla Jira_Tickets). Solo aplica el periodo global.
-	measure 'Filtros Activos Jira' =
-			VAR Periodo =
-			    IF(
-			        ISFILTERED(DimFecha[Date]),
-			        "Periodo: " & FORMAT(MIN(DimFecha[Date]), "dd/mm/yyyy") & " – " & FORMAT(MAX(DimFecha[Date]), "dd/mm/yyyy"),
-			        "Periodo: todo"
-			    )
-			RETURN
-			    "Filtros activos:   " & Periodo
-			        & "   ·   Vista clásica (Jira_Tickets): organización, flujo y request type no aplican aquí"
-		displayFolder: Filtros
-		lineageTag: be6f7081-92a3-4b4c-8d5e-6f708192a3b4
-
 	/// Color de texto para el estado del SLA de resolución: rojo incumplido, ámbar en riesgo, azul cumplido.
 	measure 'Color Estado SLA Resolución' =
 			SWITCH(
@@ -672,7 +561,7 @@ table _Medidas
 
 	/// Color de texto para la prioridad: rojo alta, ámbar media, azul baja.
 	measure 'Color Prioridad' =
-			VAR P = COALESCE(SELECTEDVALUE(SLA_Tickets[Priority]), SELECTEDVALUE(Jira_Tickets[Priority]))
+			VAR P = SELECTEDVALUE(SLA_Tickets[Priority])
 			RETURN
 			    SWITCH(
 			        TRUE(),
