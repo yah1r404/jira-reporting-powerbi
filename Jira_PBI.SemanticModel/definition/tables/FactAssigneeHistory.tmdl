@@ -105,7 +105,7 @@ table FactAssigneeHistory
 		source =
 				let
 				
-				    Issues = Jira_MDSC_Issues,
+				    Issues = Table.ToRecords(Jira_MDSC_Issues_Staging),
 				
 				
 				    // ========================================

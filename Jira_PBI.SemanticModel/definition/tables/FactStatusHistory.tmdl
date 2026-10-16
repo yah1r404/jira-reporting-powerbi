@@ -145,7 +145,7 @@ table FactStatusHistory
 				let
 				
 				    JiraBaseUrl = "https://secureopsmx.atlassian.net",
-				    Issues = Jira_MDSC_Issues,
+				    Issues = Table.ToRecords(Jira_MDSC_Issues_Staging),
 				
 				    // Orden de los estados de ambos flujos (IEP Incident y Mesa de Servicio - Clientes).
 				    // Un estado que no esté aquí se ordena al final.

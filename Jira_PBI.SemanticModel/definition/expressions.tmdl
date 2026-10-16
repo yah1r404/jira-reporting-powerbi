@@ -1,27 +1,27 @@
-/// Tickets de la mesa MDSC (últimos 6 meses, sin Emailed request ni tickets en Cerrada). Búsqueda ligera con solo los campos usados; el historial de estado y responsable se pide en bloque y solo lo calculan FactStatusHistory y FactAssigneeHistory. No se carga al modelo.
+/// Tickets de la mesa MDSC (últimos 6 meses, sin Emailed request ni tickets en Cerrada). Búsqueda ligera con solo los campos usados; el historial de estado y responsable se pide en bloque y solo lo calculan FactStatusHistory y FactAssigneeHistory. No se carga al modelo: la única que la referencia es Jira_MDSC_Issues_Staging, para que la búsqueda y el historial se pidan una sola vez por refresh en vez de una vez por cada tabla que los necesita.
 expression Jira_MDSC_Issues =
 		let
-
+		
 		    // ========================================
 		    // CONFIGURACIÓN
 		    // ========================================
-
+		
 		    JiraBaseUrl = "https://secureopsmx.atlassian.net",
 		    // Se excluyen los Emailed request y los tickets en estado Cerrada (en JQL: Closed)
 		    JQL = "project = MDSC AND issuetype != ""Emailed request"" AND status != Closed AND created >= startOfMonth(-5) ORDER BY created ASC",
-
+		
 		    // Tamaño de página de la búsqueda (Jira devuelve menos si la respuesta es grande; la paginación lo maneja)
 		    PageSize = "1000",
 		    // Tickets por llamada al historial en bloque (máximo de Jira: 1000)
 		    BulkSize = 1000,
 		    // Solo interesan los cambios de estado y de responsable
 		    CampoHistorial = {"status", "assignee"},
-
-
+		
+		
 		    // ========================================
 		    // CAMPOS
 		    // ========================================
-
+		
 		    // "tipo de ticket" (radio buttons) se busca por nombre para no fijar su ID
 		    AllFields =
 		        Json.Document(
@@ -33,7 +33,7 @@ expression Jira_MDSC_Issues =
 		                ]
 		            )
 		        ),
-
+		
 		    TipoTicketMatches =
 		        List.Select(
 		            AllFields,
@@ -44,10 +44,10 @@ expression Jira_MDSC_Issues =
 		                    "radiobuttons"
 		                )
 		        ),
-
+		
 		    TipoTicketFieldId =
 		        if List.IsEmpty(TipoTicketMatches) then null else TipoTicketMatches{0}[id],
-
+		
 		    // Solo los campos que usa el modelo:
 		    // customfield_10010 = Request Type
 		    // customfield_10936 = Tiempo hasta primera respuesta (SLA JSM)
@@ -59,18 +59,18 @@ expression Jira_MDSC_Issues =
 		        "customfield_10010", "customfield_10936", "customfield_10937", "customfield_11042",
 		        "customfield_10002"
 		    },
-
+		
 		    JiraFields =
 		        Text.Combine(
 		            if TipoTicketFieldId = null then BaseFields else BaseFields & {TipoTicketFieldId},
 		            ","
 		        ),
-
-
+		
+		
 		    // ========================================
 		    // BÚSQUEDA PAGINADA (ligera: sin historial)
 		    // ========================================
-
+		
 		    GetPage = (NextToken as nullable text, ConHistorial as logical) as record =>
 		        let
 		            BaseQuery = [jql = JQL, maxResults = PageSize, fields = JiraFields],
@@ -90,7 +90,7 @@ expression Jira_MDSC_Issues =
 		                    ]
 		                )
 		            ),
-
+		
 		    Search = (ConHistorial as logical) as list =>
 		        List.Combine(
 		            List.Generate(
@@ -104,14 +104,14 @@ expression Jira_MDSC_Issues =
 		                each [issues]
 		            )
 		        ),
-
+		
 		    RawIssues = Search(false),
-
-
+		
+		
 		    // ========================================
 		    // HISTORIAL EN BLOQUE (solo estado y responsable)
 		    // ========================================
-
+		
 		    // POST /rest/api/3/changelog/bulkfetch: hasta 1000 tickets por llamada, filtrado por campo
 		    BulkPage = (Ids as list, NextToken as nullable text) as record =>
 		        let
@@ -128,7 +128,7 @@ expression Jira_MDSC_Issues =
 		                    ]
 		                )
 		            ),
-
+		
 		    BulkLote = (Ids as list) as list =>
 		        List.Combine(
 		            List.Generate(
@@ -142,7 +142,7 @@ expression Jira_MDSC_Issues =
 		                each Record.FieldOrDefault(_, "issueChangeLogs", {})
 		            )
 		        ),
-
+		
 		    // Un registro {issueId: lista de cambios}; se arma una sola vez y solo si una tabla pide el historial
 		    HistorialEnBloque =
 		        let
@@ -163,7 +163,7 @@ expression Jira_MDSC_Issues =
 		                )
 		        in
 		            Record.FromList(Agrupado[Cambios], Agrupado[IssueId]),
-
+		
 		    // Si el historial en bloque no está disponible, se usa el método anterior (búsqueda con historial)
 		    HistorialAnterior =
 		        let
@@ -206,14 +206,14 @@ expression Jira_MDSC_Issues =
 		                List.Transform(ConHistorial, Completo),
 		                List.Transform(ConHistorial, each Text.From([id]))
 		            ),
-
+		
 		    Historial = try HistorialEnBloque otherwise HistorialAnterior,
-
-
+		
+		
 		    // ========================================
 		    // RESULTADO
 		    // ========================================
-
+		
 		    // "histories" se evalúa solo cuando una tabla lo usa (FactStatusHistory y FactAssigneeHistory);
 		    // SLA_Tickets y FactTecnicos solo hacen la búsqueda ligera.
 		    Issues =
@@ -227,7 +227,7 @@ expression Jira_MDSC_Issues =
 		                histories = Record.FieldOrDefault(Historial, Text.From([id]), {})
 		            ]
 		        )
-
+		
 		in
 		    Issues
 	lineageTag: 3f6a1c52-8d4e-4b7a-9e21-6c0d5b8a7f13
