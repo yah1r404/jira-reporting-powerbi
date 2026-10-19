@@ -10,8 +10,8 @@ expression Jira_MDSC_Issues =
 		    // Se excluyen los Emailed request y los tickets en estado Cerrada (en JQL: Closed)
 		    JQL = "project = MDSC AND issuetype != ""Emailed request"" AND status != Closed AND created >= startOfMonth(-5) ORDER BY created ASC",
 		
-		    // Tamaño de página de la búsqueda (Jira devuelve menos si la respuesta es grande; la paginación lo maneja)
-		    PageSize = "1000",
+		    // Tamaño de página de la búsqueda: Jira entrega como máximo 100 tickets por página con estos campos (medido)
+		    PageSize = "100",
 		    // Tickets por llamada al historial en bloque (máximo de Jira: 1000)
 		    BulkSize = 1000,
 		    // Solo interesan los cambios de estado y de responsable
@@ -105,7 +105,8 @@ expression Jira_MDSC_Issues =
 		            )
 		        ),
 		
-		    RawIssues = Search(false),
+		    // List.Buffer: la lista se guarda en memoria y no se vuelve a pedir a Jira al recorrerla otra vez
+		    RawIssues = List.Buffer(Search(false)),
 		
 		
 		    // ========================================
@@ -148,9 +149,10 @@ expression Jira_MDSC_Issues =
 		        let
 		            Ids = List.Transform(RawIssues, each Text.From([id])),
 		            Lotes = List.Split(Ids, BulkSize),
-		            Logs = List.Combine(List.Transform(Lotes, BulkLote)),
+		            // POST no se guarda en caché: se buffer-ea para no repetir llamadas al recorrerlo
+		            Logs = List.Buffer(List.Combine(List.Transform(Lotes, BulkLote))),
 		            Agrupado =
-		                Table.Group(
+		                Table.Buffer(Table.Group(
 		                    Table.FromRecords(
 		                        List.Transform(
 		                            Logs,
@@ -160,14 +162,14 @@ expression Jira_MDSC_Issues =
 		                    ),
 		                    {"IssueId"},
 		                    {{"Cambios", each List.Combine([Cambios]), type list}}
-		                )
+		                ))
 		        in
 		            Record.FromList(Agrupado[Cambios], Agrupado[IssueId]),
 		
 		    // Si el historial en bloque no está disponible, se usa el método anterior (búsqueda con historial)
 		    HistorialAnterior =
 		        let
-		            ConHistorial = Search(true),
+		            ConHistorial = List.Buffer(Search(true)),
 		            GetChangelogPage = (IssueKey as text, StartAt as number) as record =>
 		                Json.Document(
 		                    Web.Contents(
@@ -252,32 +254,54 @@ expression HorasLaborales =
 		                    else if DiaSemana = 5 then {9, 19}
 		                    else null,
 		
-		            Dias =
-		                List.Dates(
-		                    Date.From(Inicio),
-		                    Duration.Days(Date.From(Fin) - Date.From(Inicio)) + 1,
-		                    #duration(1, 0, 0, 0)
-		                ),
+		            // Horas laborales de una semana completa: 5 x 17 h + 10 h del sábado
+		            HorasSemana = 95,
 		
-		            HorasPorDia =
-		                List.Transform(
-		                    Dias,
-		                    (Dia) =>
+		            HorasEnDia = (Dia as date, Desde as datetime, Hasta as datetime) as number =>
+		                let
+		                    W = Ventana(Dia)
+		                in
+		                    if W = null then 0
+		                    else
 		                        let
-		                            W = Ventana(Dia)
+		                            Abre = Dia & #time(W{0}, 0, 0),
+		                            Cierra = Dia & #time(W{1}, 0, 0),
+		                            D = if Desde > Abre then Desde else Abre,
+		                            H = if Hasta < Cierra then Hasta else Cierra
 		                        in
-		                            if W = null then 0
-		                            else
-		                                let
-		                                    Abre = Dia & #time(W{0}, 0, 0),
-		                                    Cierra = Dia & #time(W{1}, 0, 0),
-		                                    Desde = if Inicio > Abre then Inicio else Abre,
-		                                    Hasta = if Fin < Cierra then Fin else Cierra
-		                                in
-		                                    if Hasta > Desde then Duration.TotalHours(Hasta - Desde) else 0
-		                )
+		                            if H > D then Duration.TotalHours(H - D) else 0,
+		
+		            Dia1 = Date.From(Inicio),
+		            DiaN = Date.From(Fin),
+		            TotalDias = Duration.Days(DiaN - Dia1) + 1
 		        in
-		            List.Sum(HorasPorDia)
+		            if TotalDias <= 14 then
+		                // Tramo corto: día por día
+		                List.Sum(
+		                    List.Transform(
+		                        List.Dates(Dia1, TotalDias, #duration(1, 0, 0, 0)),
+		                        (Dia) => HorasEnDia(Dia, Inicio, Fin)
+		                    )
+		                )
+		            else
+		                // Tramo largo: primer y último día parciales + semanas completas + días sueltos
+		                let
+		                    Intermedios = TotalDias - 2,
+		                    Semanas = Number.IntegerDivide(Intermedios, 7),
+		                    Sueltos = Number.Mod(Intermedios, 7),
+		                    DiasSueltos = List.Dates(Date.AddDays(Dia1, 1 + Semanas * 7), Sueltos, #duration(1, 0, 0, 0)),
+		                    HorasSueltos =
+		                        List.Sum(
+		                            List.Transform(
+		                                DiasSueltos,
+		                                (Dia) => HorasEnDia(Dia, Dia & #time(0, 0, 0), Date.AddDays(Dia, 1) & #time(0, 0, 0))
+		                            )
+		                        )
+		                in
+		                    HorasEnDia(Dia1, Inicio, Date.AddDays(Dia1, 1) & #time(0, 0, 0))
+		                        + Semanas * HorasSemana
+		                        + (if HorasSueltos = null then 0 else HorasSueltos)
+		                        + HorasEnDia(DiaN, DiaN & #time(0, 0, 0), Fin)
 	lineageTag: 0a1b2c3d-4e5f-4a6b-8c7d-9e0f1a2b3c4d
 
 	annotation PBI_ResultType = Function

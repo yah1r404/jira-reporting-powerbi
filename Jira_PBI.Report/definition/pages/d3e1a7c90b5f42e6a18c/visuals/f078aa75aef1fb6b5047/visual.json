@@ -80,7 +80,8 @@
                 }
               },
               "queryRef": "_Medidas.Horas en Estado Incumplidos",
-              "nativeQueryRef": "Horas en Estado Incumplidos"
+              "nativeQueryRef": "Horas en Estado Incumplidos",
+              "displayName": "Horas"
             }
           ]
         }
@@ -118,7 +119,27 @@
             "text": {
               "expr": {
                 "Literal": {
-                  "Value": "'¿Dónde se fue el tiempo en los incumplidos? Horas por estado, por flujo'"
+                  "Value": "'Tiempo en estado de los tickets incumplidos'"
+                }
+              }
+            }
+          }
+        }
+      ],
+      "subTitle": [
+        {
+          "properties": {
+            "show": {
+              "expr": {
+                "Literal": {
+                  "Value": "true"
+                }
+              }
+            },
+            "text": {
+              "expr": {
+                "Literal": {
+                  "Value": "'Horas en cada estado'"
                 }
               }
             }

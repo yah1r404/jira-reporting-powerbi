@@ -46,7 +46,8 @@
                 }
               },
               "queryRef": "_Medidas.% SLA Seleccionado",
-              "nativeQueryRef": "% SLA Seleccionado"
+              "nativeQueryRef": "% SLA Seleccionado",
+              "displayName": "% SLA Cumplido"
             }
           ]
         }
@@ -99,7 +100,7 @@
             "text": {
               "expr": {
                 "Literal": {
-                  "Value": "'Cumplimiento mensual contra el SLA objetivo'"
+                  "Value": "'Cumplimiento del SLA'"
                 }
               }
             }

@@ -23,11 +23,12 @@
                       "Entity": "_Medidas"
                     }
                   },
-                  "Property": "Evaluados SLA Seleccionado"
+                  "Property": "Tickets"
                 }
               },
-              "queryRef": "_Medidas.Evaluados SLA Seleccionado",
-              "nativeQueryRef": "Evaluados SLA Seleccionado"
+              "queryRef": "_Medidas.Tickets",
+              "nativeQueryRef": "Tickets",
+              "displayName": "Total de Tickets"
             }
           ]
         }

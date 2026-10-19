@@ -64,7 +64,8 @@
                 }
               },
               "queryRef": "_Medidas.Prom Horas en Estado",
-              "nativeQueryRef": "Prom Horas en Estado"
+              "nativeQueryRef": "Prom Horas en Estado",
+              "displayName": "Promedio en horas"
             }
           ]
         }
@@ -99,7 +100,27 @@
             "text": {
               "expr": {
                 "Literal": {
-                  "Value": "'¿En qué estado se va más tiempo? Horas promedio por ticket, por flujo'"
+                  "Value": "'Tiempo en estado'"
+                }
+              }
+            }
+          }
+        }
+      ],
+      "subTitle": [
+        {
+          "properties": {
+            "show": {
+              "expr": {
+                "Literal": {
+                  "Value": "true"
+                }
+              }
+            },
+            "text": {
+              "expr": {
+                "Literal": {
+                  "Value": "'Promedio en horas'"
                 }
               }
             }

@@ -27,7 +27,8 @@
                 }
               },
               "queryRef": "_Medidas.Cumplen SLA Seleccionado",
-              "nativeQueryRef": "Cumplen SLA Seleccionado"
+              "nativeQueryRef": "Cumplen SLA Seleccionado",
+              "displayName": "Cumplen SLA"
             }
           ]
         }
