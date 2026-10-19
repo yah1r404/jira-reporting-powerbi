@@ -45,7 +45,7 @@ table FactTecnicos
 		source =
 				let
 				
-				    Issues = Table.ToRecords(Jira_MDSC_Issues_Staging),
+				    Issues = Jira_MDSC_Issues,
 				
 				    // Cuentas de equipo que no representan a un técnico individual. En Jira aparecen como
 				    // "Servicios_Equipo1", "Servicios Equipo2", etc.: se excluye todo lo que empiece con este prefijo.

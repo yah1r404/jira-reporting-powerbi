@@ -11,11 +11,10 @@ annotation __PBI_TimeIntelligenceEnabled = 0
 
 annotation PBI_ProTooling = ["DevMode"]
 
-annotation PBI_QueryOrder = ["_Medidas","Jira_MDSC_Issues","Jira_MDSC_Issues_Staging","SLA_Tickets","FactStatusHistory","FactAssigneeHistory","HorasLaborales","FactTecnicos"]
+annotation PBI_QueryOrder = ["_Medidas","Jira_MDSC_Issues","SLA_Tickets","FactStatusHistory","FactAssigneeHistory","HorasLaborales","FactTecnicos"]
 
 ref table DimFecha
 ref table _Medidas
-ref table Jira_MDSC_Issues_Staging
 ref table SLA_Tickets
 ref table FactStatusHistory
 ref table FactAssigneeHistory

@@ -111,19 +111,6 @@
             "width": 234
           },
           "zIndex": 0
-        },
-        {
-          "location": {
-            "x": 2586.3830500146937,
-            "y": 95.211174489961138
-          },
-          "nodeIndex": "FactTecnicos",
-          "nodeLineageTag": "a4b5c6d7-e8f9-4a01-9b12-c3d4e5f60718",
-          "size": {
-            "height": 176,
-            "width": 234
-          },
-          "zIndex": 0
         }
       ],
       "name": "Todas las tablas",

@@ -252,7 +252,7 @@ table SLA_Tickets
 		source =
 				let
 				
-				    Issues = Table.ToRecords(Jira_MDSC_Issues_Staging),
+				    Issues = Jira_MDSC_Issues,
 				
 				
 				    // ========================================
