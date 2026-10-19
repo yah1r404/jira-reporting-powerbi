@@ -304,7 +304,8 @@ table FactStatusHistory
 				        ),
 				
 				    // Unión interna: solo se quedan los tramos en estados vigentes del flujo del ticket
-				    Joined = Table.NestedJoin(Base, {"Flujo", "EstadoId"}, Vigentes, {"Flujo", "EstadoId"}, "Vig", JoinKind.Inner),
+				    // Table.Buffer: los tramos (y sus horas laborales) se calculan una sola vez antes de la unión
+				    Joined = Table.NestedJoin(Table.Buffer(Base), {"Flujo", "EstadoId"}, Vigentes, {"Flujo", "EstadoId"}, "Vig", JoinKind.Inner),
 				    Expanded = Table.ExpandTableColumn(Joined, "Vig", {"EstadoNombre", "CategoriaNombre", "CategoriaKey"}),
 				
 				    WithEstado = Table.AddColumn(Expanded, "Estado", each [EstadoNombre], type text),

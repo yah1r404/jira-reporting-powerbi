@@ -27,7 +27,8 @@
                 }
               },
               "queryRef": "_Medidas.Meta SLA Aplicada",
-              "nativeQueryRef": "Meta SLA Aplicada"
+              "nativeQueryRef": "Meta SLA Aplicada",
+              "displayName": "Meta del SLA (horas)"
             }
           ]
         }
