@@ -47,7 +47,7 @@ table FactStatusHistory
 
 		annotation SummarizationSetBy = Automatic
 
-	/// Agrupa el estado para la línea de tiempo, solo para el flujo "IEP Incident": N1 (Nueva solicitud, N1, Reabierta), N2 RAM o N2 QCOM. El resto (Planta externa, Escalado y variantes, esperas, etc.) es tiempo que no se cuenta: queda vacío. Vacío también para el otro flujo.
+	/// Agrupa el estado para la línea de tiempo, solo para el flujo "IEP Incident": N1 (Nueva solicitud, N1, Reabierta), N2 RAM, N2 QCOM, y "Otro" para el resto (Planta externa, Escalado y variantes, esperas, etc.). Vacío solo para el otro flujo.
 	column 'Grupo N1 N2' =
 			IF(
 			    FactStatusHistory[Flujo] = "IEP Incident",
@@ -55,7 +55,8 @@ table FactStatusHistory
 			        TRUE(),
 			        FactStatusHistory[Estado] IN {"Nueva solicitud", "N1", "Reabierta"}, "N1",
 			        FactStatusHistory[Estado] = "N2 RAM", "N2 RAM",
-			        FactStatusHistory[Estado] = "N2 QCOM", "N2 QCOM"
+			        FactStatusHistory[Estado] = "N2 QCOM", "N2 QCOM",
+			        "Otro"
 			    )
 			)
 		dataType: string
