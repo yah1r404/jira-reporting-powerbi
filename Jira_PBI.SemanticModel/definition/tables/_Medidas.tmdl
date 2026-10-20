@@ -486,13 +486,13 @@ table _Medidas
 		displayFolder: Línea de Tiempo
 		lineageTag: 9a4c5d6e-7e8f-4901-840b-5c6d7e8f90a1
 
-	/// Color de la celda de la línea de tiempo agrupada (IEP Incident): azul para N1, naranja para N2.
+	/// Color de la celda de la línea de tiempo agrupada (IEP Incident): azul N1, naranja N2 RAM, rojo N2 QCOM.
 	measure 'Color Gantt N1 N2' =
 			VAR Grupo = SELECTEDVALUE(FactStatusHistory[Grupo N1 N2])
 			RETURN
 			    IF(
 			        NOT ISBLANK([Gantt Estado]),
-			        SWITCH(TRUE(), Grupo = "N1", "#06519A", Grupo = "N2", "#D9822B")
+			        SWITCH(TRUE(), Grupo = "N1", "#06519A", Grupo = "N2 RAM", "#D9822B", Grupo = "N2 QCOM", "#C0392B")
 			    )
 		displayFolder: Línea de Tiempo
 		lineageTag: 6071829a-3b4c-45d6-9e7f-8091a2b3c4d5

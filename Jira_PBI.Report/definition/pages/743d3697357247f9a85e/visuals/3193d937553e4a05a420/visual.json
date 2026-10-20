@@ -264,7 +264,7 @@
             "text": {
               "expr": {
                 "Literal": {
-                  "Value": "'N1 / N2 (IEP Incident): en qué horas desde la creación estuvo cada ticket en el equipo N1 o N2 (azul = N1, naranja = N2)'"
+                  "Value": "'N1 / N2 RAM / N2 QCOM (IEP Incident): en qué horas desde la creación estuvo cada ticket en cada grupo (azul = N1, naranja = N2 RAM, rojo = N2 QCOM). El resto del tiempo (Planta externa, Escalado, esperas, etc.) no se cuenta.'"
                 }
               }
             }
