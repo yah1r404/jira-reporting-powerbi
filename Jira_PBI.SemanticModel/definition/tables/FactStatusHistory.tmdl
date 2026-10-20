@@ -47,6 +47,27 @@ table FactStatusHistory
 
 		annotation SummarizationSetBy = Automatic
 
+	/// Agrupa el estado en N1 o N2 según qué equipo lo atiende, solo para el flujo "IEP Incident". N1: Nueva solicitud, N1, Reabierta. N2: Planta externa, N2 RAM, N2 QCOM y cualquier escalado. Vacío para el otro flujo o estados sin mapear (p. ej. esperas).
+	column 'Grupo N1 N2' =
+			IF(
+			    FactStatusHistory[Flujo] = "IEP Incident",
+			    SWITCH(
+			        TRUE(),
+			        FactStatusHistory[Estado] IN {"Nueva solicitud", "N1", "Reabierta"}, "N1",
+			        FactStatusHistory[Estado]
+			            IN {
+			                "Planta externa", "N2 RAM", "N2 QCOM",
+			                "Escalado", "Escalado a N2", "Escalado a N3", "Escalado QCOM"
+			            },
+			        "N2"
+			    )
+			)
+		dataType: string
+		lineageTag: 5f607182-93a4-4b5c-8d6e-7f8091a2b3c4
+		summarizeBy: none
+
+		annotation SummarizationSetBy = Automatic
+
 	/// TRUE si el estado es final (categoría "done": Resuelta, Cerrada). Se excluyen de las medidas de Time in Status.
 	column 'Es Estado Final'
 		dataType: boolean

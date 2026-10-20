@@ -1,7 +1,7 @@
 {
   "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/page/2.1.0/schema.json",
   "name": "743d3697357247f9a85e",
-  "displayName": "08b - Línea de Tiempo (equipo)",
+  "displayName": "08b - Línea de Tiempo (N1 / N2)",
   "displayOption": "FitToWidth",
   "height": 1800,
   "width": 1920

@@ -39,14 +39,29 @@
                 "Column": {
                   "Expression": {
                     "SourceRef": {
+                      "Entity": "SLA_Tickets"
+                    }
+                  },
+                  "Property": "Key"
+                }
+              },
+              "queryRef": "SLA_Tickets.Key",
+              "nativeQueryRef": "Key",
+              "active": true
+            },
+            {
+              "field": {
+                "Column": {
+                  "Expression": {
+                    "SourceRef": {
                       "Entity": "FactStatusHistory"
                     }
                   },
-                  "Property": "Estado"
+                  "Property": "Grupo N1 N2"
                 }
               },
-              "queryRef": "FactStatusHistory.Estado",
-              "nativeQueryRef": "Estado",
+              "queryRef": "FactStatusHistory.Grupo N1 N2",
+              "nativeQueryRef": "Grupo N1 N2",
               "active": true
             }
           ]
@@ -61,11 +76,11 @@
                       "Entity": "_Medidas"
                     }
                   },
-                  "Property": "Gantt Estado Equipo"
+                  "Property": "Gantt Estado"
                 }
               },
-              "queryRef": "_Medidas.Gantt Estado Equipo",
-              "nativeQueryRef": "Gantt Estado Equipo"
+              "queryRef": "_Medidas.Gantt Estado",
+              "nativeQueryRef": "Gantt Estado"
             }
           ]
         }
@@ -77,10 +92,23 @@
               "Column": {
                 "Expression": {
                   "SourceRef": {
+                    "Entity": "SLA_Tickets"
+                  }
+                },
+                "Property": "Key"
+              }
+            },
+            "direction": "Ascending"
+          },
+          {
+            "field": {
+              "Column": {
+                "Expression": {
+                  "SourceRef": {
                     "Entity": "FactStatusHistory"
                   }
                 },
-                "Property": "Estado"
+                "Property": "Grupo N1 N2"
               }
             },
             "direction": "Ascending"
@@ -102,7 +130,7 @@
                           "Entity": "_Medidas"
                         }
                       },
-                      "Property": "Color Gantt Estado"
+                      "Property": "Color Gantt N1 N2"
                     }
                   }
                 }
@@ -118,7 +146,7 @@
                           "Entity": "_Medidas"
                         }
                       },
-                      "Property": "Color Gantt Estado"
+                      "Property": "Color Gantt N1 N2"
                     }
                   }
                 }
@@ -140,7 +168,7 @@
                 }
               }
             ],
-            "metadata": "_Medidas.Gantt Estado Equipo"
+            "metadata": "_Medidas.Gantt Estado"
           }
         }
       ],
@@ -236,7 +264,7 @@
             "text": {
               "expr": {
                 "Literal": {
-                  "Value": "'Estados (equipo): cuántos tickets estaban en cada estado, por hora desde la creación (azul = en atención, amarillo = en espera, celeste = por hacer)'"
+                  "Value": "'N1 / N2 (IEP Incident): en qué horas desde la creación estuvo cada ticket en el equipo N1 o N2 (azul = N1, naranja = N2)'"
                 }
               }
             }
