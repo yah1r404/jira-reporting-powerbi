@@ -2,7 +2,7 @@
   "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/page/2.1.0/schema.json",
   "name": "d3e1a7c90b5f42e6a18c",
   "displayName": "01 - Vista Ejecutiva",
-  "displayOption": "FitToPage",
+  "displayOption": "FitToWidth",
   "height": 1800,
   "width": 1920
 }
