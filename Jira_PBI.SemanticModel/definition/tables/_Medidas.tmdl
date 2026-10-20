@@ -469,6 +469,25 @@ table _Medidas
 		displayFolder: Línea de Tiempo
 		lineageTag: 893b4c5d-6d7e-48f9-b30a-4b5c6d7e8f90
 
+	/// Línea de tiempo a nivel equipo: cuántos tickets estaban en ese estado durante esa hora desde su creación (sin desglosar por ticket). No incluye estados finales.
+	measure 'Gantt Estado Equipo' =
+			VAR H = SELECTEDVALUE('Línea de Tiempo'[Hora])
+			VAR Ultima = CALCULATE(MAX('Línea de Tiempo'[Hora]), ALL('Línea de Tiempo'))
+			VAR Tickets =
+			    COUNTROWS(
+			        FILTER(
+			            FactStatusHistory,
+			            FactStatusHistory[Es Estado Final] = FALSE()
+			                && FactStatusHistory[Hora Fin] > H
+			                && (H = Ultima || FactStatusHistory[Hora Inicio] < H + 1)
+			        )
+			    )
+			RETURN
+			    IF(NOT ISBLANK(H) && Tickets > 0, Tickets)
+		formatString: 0
+		displayFolder: Línea de Tiempo
+		lineageTag: 4dd47767-b2f0-4596-880f-9e780d040ab1
+
 	/// Color de la celda de la línea de tiempo de estados: amarillo en espera, azul en atención, gris por hacer.
 	measure 'Color Gantt Estado' =
 			VAR Estado = SELECTEDVALUE(FactStatusHistory[Estado])
