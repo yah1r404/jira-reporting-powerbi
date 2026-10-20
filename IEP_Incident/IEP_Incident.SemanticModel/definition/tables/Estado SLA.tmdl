@@ -1,0 +1,33 @@
+/// Estados posibles del SLA (según Jira), en orden de lectura. Sin relaciones.
+table 'Estado SLA'
+	lineageTag: b6da7fd6-f525-4c10-8778-b13c0033b6c0
+
+	column 'Estado del SLA'
+		dataType: string
+		lineageTag: b47498dc-91d2-4879-b79b-251eabde7713
+		summarizeBy: none
+		isNameInferred
+		sourceColumn: [Estado del SLA]
+		sortByColumn: 'Orden Estado SLA'
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Orden Estado SLA'
+		dataType: int64
+		isHidden
+		formatString: 0
+		lineageTag: 25373357-d5e7-42b5-bef6-f0ee41299370
+		summarizeBy: none
+		isNameInferred
+		sourceColumn: [Orden Estado SLA]
+
+		annotation SummarizationSetBy = Automatic
+
+	partition 'Estado SLA' = calculated
+		mode: import
+		source =
+				DATATABLE(
+				    "Estado del SLA", STRING, "Orden Estado SLA", INTEGER,
+				    { { "Cumplido", 1 }, { "Incumplido", 2 }, { "En curso", 3 }, { "En riesgo", 4 }, { "Pausado", 5 }, { "Sin SLA", 6 } }
+				)
+

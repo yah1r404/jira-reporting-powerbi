@@ -1,0 +1,138 @@
+TABLERO EJECUTIVO - INCIDENTES QUATTROCOM (IEP_Incident.pbip)
+Títulos, subtítulos y qué representa cada gráfica
+=====================================================================
+
+ALCANCE DE TODO EL TABLERO
+Tickets de Jira: proyecto MDSC, tipo IEP INCIDENT, Tipo de Ticket = "Incidente Qcom".
+Fechas y horas en hora de Mérida (UTC-6).
+
+REGLAS DE SLA (iguales para todos los tickets, también los viejos)
+- Primera respuesta: meta de 30 min, calendario de 24 horas.
+- Resolución: meta de 15 h, calendario de 24 horas.
+- Pausas del SLA de resolución: Esperando por el cliente, Planta externa y Cerrada.
+  El tiempo en esos estados no cuenta para las 15 h.
+- El SLA de resolución termina en la fecha Resolved de Jira. Todas las medidas de
+  resolución (resueltos, pendientes, tiempos) usan esa misma fecha.
+- % de cumplimiento = Cumplidos / (Cumplidos + Incumplidos).
+  Los tickets En curso, En riesgo o Pausados todavía no se evalúan.
+
+FILTROS (sincronizados en las 2 páginas)
+Sin subtítulos en gráficas ni páginas.
+- Fecha: rango de fechas de creación del ticket.
+- Tipo de falla: campo "Causa" de Jira (un ticket puede tener varias fallas).
+- Botón "Limpiar filtros": quita todos los filtros.
+- La línea "Filtros activos" debajo de los filtros muestra qué se está filtrando.
+
+
+=====================================================================
+PÁGINA 1 - RESUMEN EJECUTIVO
+Título de la página: Resumen ejecutivo · Incidentes QuattroCom
+=====================================================================
+
+TARJETAS (fila superior)
+
+1. Total de incidentes
+   Incidentes creados en el rango de fechas seleccionado.
+
+2. Resueltos
+   Incidentes con fecha Resolved dentro del rango de fechas
+   (incluye tickets creados antes del rango que se resolvieron dentro de él).
+   Debajo: % que representan del total de incidentes del periodo.
+
+3. Pendientes
+   Incidentes creados en el rango de fechas que hoy siguen sin resolver.
+   Debajo: % que representan del total de incidentes.
+
+4. Tiempo promedio a primera respuesta
+   Tiempo promedio desde que se crea el ticket hasta la primera respuesta,
+   en formato legible (ej. 32 min, 3 h 42 min). Si Jira no tiene la hora de
+   primera respuesta, se usa el primer cambio de estado del ticket.
+
+5. Tiempo promedio a resolución
+   Tiempo promedio desde que se crea el ticket hasta su fecha Resolved,
+   en formato legible (ej. 3 h 42 min, 2 días 0 h 15 min).
+
+TARJETAS DE SLA (segunda fila, una sección por cada SLA)
+
+6. Cumplimiento SLA primera respuesta
+   Título de la tarjeta: "Meta: 30 min".
+   % de tickets que tuvieron primera respuesta dentro de 30 minutos.
+   Junto a ella: Cumplidos (en tiempo) e Incumplidos (fuera de tiempo), cada uno
+   con el % que representa del total de incidentes debajo del número.
+
+7. Cumplimiento SLA resolución
+   Título de la tarjeta: "Meta: 15 h".
+   % de tickets resueltos dentro de 15 horas de SLA (descontando el tiempo en pausa).
+   Junto a ella: Cumplidos e Incumplidos, con el % del total debajo del número.
+
+GRÁFICAS
+
+8. Cumplimiento de los SLA
+   Barras apiladas al 100%, una por SLA (Primera respuesta y Resolución), con el
+   % de incidentes en cada estado: Cumplido (verde), Incumplido (azul), En curso,
+   En riesgo, Pausado. El tooltip muestra la cantidad de incidentes. Permite comparar los dos SLA de un vistazo.
+
+9. Cumplimiento mensual de los SLA
+   Líneas con el % de cumplimiento de cada mes, una para Primera respuesta y
+   otra para Resolución. El tooltip muestra cuántos tickets se evaluaron y
+   cuántos no cumplieron en cada mes.
+
+10. Incidentes creados vs. resueltos por mes
+    Columnas agrupadas por mes: cuántos incidentes se crearon y cuántos se
+    resolvieron. Si los resueltos quedan por debajo de los creados, los
+    pendientes van en aumento.
+
+11. Incidentes por hora de creación
+    Cantidad de incidentes según la hora del día en que se crearon (00:00 a
+    23:00). Muestra en qué horas se concentra la carga de trabajo.
+
+12. Incidentes por día de la semana
+    Cantidad de incidentes creados cada día, de lunes a domingo. Muestra qué
+    días concentran más incidentes.
+
+
+=====================================================================
+PÁGINA 2 - ANÁLISIS Y DETALLE
+Título de la página: Análisis y detalle de incidentes
+=====================================================================
+
+1. Incidentes por tipo de falla
+   Cantidad de incidentes por cada tipo de falla registrado en Jira (campo Causa),
+   de mayor a menor. La falla más frecuente aparece en rojo. "Sin clasificar"
+   agrupa los tickets sin falla capturada. El tooltip muestra el % sobre el total.
+
+2. Planta externa (tarjeta)
+   % de los tickets que pasaron por Planta externa y, debajo, cuántos son
+   (ej. "9 de 37 tickets"). Se basa en el historial de estados de cada ticket.
+
+3. Detalle de tickets
+   Tabla con todos los tickets (cumplidos, vencidos y pendientes). El Tiempo SLA
+   aparece en rojo si venció las 15 h y en verde si cumplió. Columnas:
+   - Ticket: clave de Jira (ej. MDSC-1234).
+   - Resumen: título del ticket.
+   - Tipo de incidente y Tipo de falla.
+   - SLA target: 15 h (igual para todos).
+   - Tiempo SLA (sin pausas): de la creación a la fecha Resolved (o hasta el
+     último refresh si sigue abierto), menos el tiempo en pausa.
+   - Una columna por estado: Nueva solicitud, N1, N2 (N2 RAM + N2 QCOM),
+     Esperando por el cliente y Planta externa, con el tiempo que el ticket pasó
+     en cada uno hasta la fecha Resolved (todas las visitas sumadas). Vacío = no
+     pasó por ese estado. "Otros estados" junta cualquier otro estado (ej.
+     Reabierta).
+   - Situación: "Resuelto en SLA", "Resuelto fuera de SLA", "Pendiente · en SLA",
+     "Pendiente · en pausa" o "Pendiente · fuera de SLA" (este último en rojo).
+   - Creación y Resuelto: fecha y hora de creación y fecha Resolved de Jira
+     (Resuelto queda vacío si sigue pendiente).
+   - Vida total: tiempo natural de la creación a la fecha Resolved, sin descontar
+     pausas (si sigue abierto, hasta el último refresh).
+   - Jira: ícono con el enlace al ticket.
+
+
+=====================================================================
+PANEL LATERAL (en las 2 páginas)
+- Logos de RAM y QuattroCom.
+- "Incidentes QuattroCom" · "IEP INCIDENT · Incidente Qcom".
+- Botones para ir a Resumen ejecutivo y Análisis y detalle
+  (el de la página actual aparece en rojo).
+- "Actualizado:" fecha y hora del último refresh de los datos.
+- Fuente: Jira Cloud (solo lectura).

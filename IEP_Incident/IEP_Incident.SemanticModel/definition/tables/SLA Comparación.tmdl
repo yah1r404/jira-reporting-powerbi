@@ -1,0 +1,29 @@
+/// Ejes para comparar los dos SLA y sus estados en un mismo gráfico. Sin relaciones.
+table 'SLA Comparación'
+	lineageTag: 138a5738-7660-4ed7-87e0-748c234d2e56
+
+	column SLA
+		dataType: string
+		lineageTag: dd5a0900-9357-4552-9241-ef1aa3b23410
+		summarizeBy: none
+		isNameInferred
+		sourceColumn: [SLA]
+		sortByColumn: 'Orden SLA'
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Orden SLA'
+		dataType: int64
+		isHidden
+		formatString: 0
+		lineageTag: 64590123-917f-4aef-8179-40e798b942ef
+		summarizeBy: none
+		isNameInferred
+		sourceColumn: [Orden SLA]
+
+		annotation SummarizationSetBy = Automatic
+
+	partition 'SLA Comparación' = calculated
+		mode: import
+		source = DATATABLE("SLA", STRING, "Orden SLA", INTEGER, { { "Primera respuesta", 1 }, { "Resolución", 2 } })
+

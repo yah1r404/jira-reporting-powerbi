@@ -1,0 +1,18 @@
+relationship 5a6b7c8d-9e0f-4a1b-8c2d-3e4f5a6b7c8d
+	fromColumn: IEP_Tickets.'Created Date'
+	toColumn: DimFecha.Date
+
+relationship 6b7c8d9e-0f1a-4b2c-9d3e-4f5a6b7c8d9e
+	fromColumn: FactStatusHistory.Key
+	toColumn: IEP_Tickets.Key
+
+relationship 7c8d9e0f-1a2b-4c3d-8e4f-5a6b7c8d9e0f
+	crossFilteringBehavior: bothDirections
+	fromColumn: FactCausas.Key
+	toColumn: IEP_Tickets.Key
+
+relationship 199e4584-98ef-4de9-b9c7-69ae3fac28c4
+	isActive: false
+	fromColumn: IEP_Tickets.'Resolution Date Only'
+	toColumn: DimFecha.Date
+

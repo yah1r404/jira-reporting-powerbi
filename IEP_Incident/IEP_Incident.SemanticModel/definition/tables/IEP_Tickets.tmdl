@@ -1,0 +1,1080 @@
+/// Un renglón por ticket IEP INCIDENT (todo el historial, sin tickets en Cerrada), con sus campos de IEP y los SLA de JSM.
+table IEP_Tickets
+	lineageTag: 5a1b2c3d-4e5f-4061-8728-394a5b6c7d81
+
+	column Key
+		dataType: string
+		isKey
+		lineageTag: 6b2c3d4e-5f60-4172-9839-4a5b6c7d8e92
+		summarizeBy: none
+		sourceColumn: Key
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Issue ID'
+		dataType: string
+		isHidden
+		lineageTag: 7c3d4e5f-6071-4283-8a4a-5b6c7d8e9fa3
+		summarizeBy: none
+		sourceColumn: Issue ID
+
+		annotation SummarizationSetBy = Automatic
+
+	column Summary
+		dataType: string
+		lineageTag: 8d4e5f60-7182-4394-9b5b-6c7d8e9fa0b4
+		summarizeBy: none
+		sourceColumn: Summary
+
+		annotation SummarizationSetBy = Automatic
+
+	column Status
+		dataType: string
+		lineageTag: 9e5f6071-8293-44a5-8c6c-7d8e9fa0b1c5
+		summarizeBy: none
+		sourceColumn: Status
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Status Category'
+		dataType: string
+		lineageTag: af607182-93a4-45b6-9d7d-8e9fa0b1c2d6
+		summarizeBy: none
+		sourceColumn: Status Category
+
+		annotation SummarizationSetBy = Automatic
+
+	column Assignee
+		dataType: string
+		lineageTag: b0718293-a4b5-46c7-8e8e-9fa0b1c2d3e7
+		summarizeBy: none
+		sourceColumn: Assignee
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Técnicos Asignados'
+		dataType: string
+		lineageTag: c18293a4-b5c6-47d8-9f9f-a0b1c2d3e4f8
+		summarizeBy: none
+		sourceColumn: Técnicos Asignados
+
+		annotation SummarizationSetBy = Automatic
+
+	column Organización
+		dataType: string
+		lineageTag: d293a4b5-c6d7-48e9-80a0-b1c2d3e4f509
+		summarizeBy: none
+		sourceColumn: Organización
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Request Type'
+		dataType: string
+		lineageTag: e3a4b5c6-d7e8-49fa-91b1-c2d3e4f5061a
+		summarizeBy: none
+		sourceColumn: Request Type
+
+		annotation SummarizationSetBy = Automatic
+
+	/// Campo "Tipo de Ticket" (customfield_10894): Incidente, Incidente Qcom, Problema, Servicio.
+	column 'Tipo de Ticket'
+		dataType: string
+		lineageTag: f4b5c6d7-e8f9-4a0b-a2c2-d3e4f506172b
+		summarizeBy: none
+		sourceColumn: Tipo de Ticket
+
+		annotation SummarizationSetBy = Automatic
+
+	/// Proveedor de internet (customfield_10323).
+	column ISP
+		dataType: string
+		lineageTag: 05c6d7e8-f90a-4b1c-b3d3-e4f50617283c
+		summarizeBy: none
+		sourceColumn: ISP
+
+		annotation SummarizationSetBy = Automatic
+
+	/// Campo "Tipo de incidente IEP" (customfield_10896).
+	column 'Tipo de Incidente'
+		dataType: string
+		lineageTag: 16d7e8f9-0a1b-4c2d-84e4-f5061728394d
+		summarizeBy: none
+		sourceColumn: Tipo de Incidente
+
+		annotation SummarizationSetBy = Automatic
+
+	/// Causas del ticket separadas por comas (un ticket puede tener varias). Para contar por causa usar FactCausas.
+	column Causas
+		dataType: string
+		lineageTag: 27e8f90a-1b2c-4d3e-95f5-06172839405e
+		summarizeBy: none
+		sourceColumn: Causas
+
+		annotation SummarizationSetBy = Automatic
+
+	/// Causas separadas por "|" para construir FactCausas con funciones PATH.
+	column 'Causas Ruta'
+		dataType: string
+		isHidden
+		lineageTag: 38f90a1b-2c3d-4e4f-a606-17283940516f
+		summarizeBy: none
+		sourceColumn: Causas Ruta
+
+		annotation SummarizationSetBy = Automatic
+
+	/// Access Point (customfield_10256) sin espacios sobrantes.
+	column 'Access Point'
+		dataType: string
+		lineageTag: 490a1b2c-3d4e-4f50-b717-283940516270
+		summarizeBy: none
+		sourceColumn: Access Point
+
+		annotation SummarizationSetBy = Automatic
+
+	/// Código del Access Point (parte antes de " - ", p. ej. PB3022). En blanco si el texto no tiene ese formato.
+	column 'AP Código'
+		dataType: string
+		lineageTag: 5a1b2c3d-4e5f-4061-8828-394051627381
+		summarizeBy: none
+		sourceColumn: AP Código
+
+		annotation SummarizationSetBy = Automatic
+
+	/// Fecha y hora de creación en hora de Mérida (UTC-6).
+	column Created
+		dataType: dateTime
+		formatString: General Date
+		lineageTag: 6b2c3d4e-5f60-4172-9939-405162738492
+		summarizeBy: none
+		sourceColumn: Created
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Created Date'
+		dataType: dateTime
+		formatString: Short Date
+		lineageTag: 7c3d4e5f-6071-4283-8a4a-5162738495a3
+		summarizeBy: none
+		sourceColumn: Created Date
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation UnderlyingDateTimeDataType = Date
+
+	column 'Resolution Date'
+		dataType: dateTime
+		formatString: General Date
+		lineageTag: 8d4e5f60-7182-4394-9b5b-62738495a6b4
+		summarizeBy: none
+		sourceColumn: Resolution Date
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Resolution Date Only'
+		dataType: dateTime
+		formatString: Short Date
+		lineageTag: 9e5f6071-8293-44a5-8c6c-738495a6b7c5
+		summarizeBy: none
+		sourceColumn: Resolution Date Only
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation UnderlyingDateTimeDataType = Date
+
+	/// Horas CALENDARIO entre creación y resolución (no es el tiempo de SLA).
+	column 'Resolution Hours'
+		dataType: double
+		formatString: #,##0.00
+		lineageTag: af607182-93a4-45b6-9d7d-8495a6b7c8d6
+		summarizeBy: none
+		sourceColumn: Resolution Hours
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'JSM Respuesta Meta Horas'
+		dataType: double
+		isHidden
+		formatString: #,##0.00
+		lineageTag: b0718293-a4b5-46c7-8e8e-95a6b7c8d9e7
+		summarizeBy: none
+		sourceColumn: JSM Respuesta Meta Horas
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'JSM Respuesta Horas'
+		dataType: double
+		isHidden
+		formatString: #,##0.00
+		lineageTag: c18293a4-b5c6-47d8-9f9f-a6b7c8d9eaf8
+		summarizeBy: none
+		sourceColumn: JSM Respuesta Horas
+
+		annotation SummarizationSetBy = Automatic
+
+	/// Estado oficial del SLA según Jira: Cumplido / Incumplido / En curso / En riesgo / Pausado / Sin SLA.
+	column 'JSM Respuesta Estado'
+		dataType: string
+		isHidden
+		lineageTag: d293a4b5-c6d7-48e9-80a0-b7c8d9eafb09
+		summarizeBy: none
+		sourceColumn: JSM Respuesta Estado
+
+		annotation SummarizationSetBy = Automatic
+
+	/// Meta del SLA "Tiempo hasta resolución" de JSM, en horas (15 h o 24 h según el ticket).
+	column 'JSM Resolución Meta Horas'
+		dataType: double
+		isHidden
+		formatString: #,##0.00
+		lineageTag: e3a4b5c6-d7e8-49fa-91b1-c8d9eafb0c1a
+		summarizeBy: none
+		sourceColumn: JSM Resolución Meta Horas
+
+		annotation SummarizationSetBy = Automatic
+
+	/// Tiempo transcurrido del SLA de resolución según JSM (respeta pausas y calendario del SLA).
+	column 'JSM Resolución Horas'
+		dataType: double
+		isHidden
+		formatString: #,##0.00
+		lineageTag: f4b5c6d7-e8f9-4a0b-a2c2-d9eafb0c1d2b
+		summarizeBy: none
+		sourceColumn: JSM Resolución Horas
+
+		annotation SummarizationSetBy = Automatic
+
+	/// Estado oficial del SLA según Jira: Cumplido / Incumplido / En curso / En riesgo (queda 25% o menos) / Pausado / Sin SLA.
+	column 'JSM Resolución Estado'
+		dataType: string
+		isHidden
+		lineageTag: 05c6d7e8-f90a-4b1c-b3d3-eafb0c1d2e3c
+		summarizeBy: none
+		sourceColumn: JSM Resolución Estado
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Jira Link' = "https://secureopsmx.atlassian.net/browse/" & IEP_Tickets[Key]
+		dataType: string
+		lineageTag: 16d7e8f9-0a1b-4c2d-84e4-fb0c1d2e3f4d
+		dataCategory: WebUrl
+		summarizeBy: none
+
+		annotation SummarizationSetBy = Automatic
+
+	/// Hora real de la primera respuesta (fin del primer ciclo del SLA de primera respuesta, según Jira).
+	column 'Primera Respuesta'
+		dataType: dateTime
+		formatString: General Date
+		lineageTag: a6b5a546-431e-443e-92e8-aac7a6ba91ba
+		summarizeBy: none
+		sourceColumn: Primera Respuesta
+
+		annotation SummarizationSetBy = Automatic
+
+	/// Horas NATURALES desde la creación hasta la primera respuesta (no es tiempo de SLA).
+	column 'JSM Horas a Primera Respuesta'
+		dataType: double
+		isHidden
+		formatString: #,##0.00
+		lineageTag: bc8139ac-c3e9-48e5-bf0e-39479dd07cf2
+		summarizeBy: none
+		sourceColumn: JSM Horas a Primera Respuesta
+
+		annotation SummarizationSetBy = Automatic
+
+	/// Hora en que el ticket entró a Resuelta (fin del SLA de resolución, según Jira).
+	column 'Entrada a Resuelta'
+		dataType: dateTime
+		formatString: General Date
+		lineageTag: 6b6836cc-1001-4027-af72-a17580d7d6c2
+		summarizeBy: none
+		sourceColumn: Entrada a Resuelta
+
+		annotation SummarizationSetBy = Automatic
+
+	/// Horas NATURALES desde la creación hasta la entrada a Resuelta (no es tiempo de SLA).
+	column 'JSM Horas a Resolución'
+		dataType: double
+		isHidden
+		formatString: #,##0.00
+		lineageTag: 788fdfd8-bb10-4794-9a3a-4deea13428ae
+		summarizeBy: none
+		sourceColumn: JSM Horas a Resolución
+
+		annotation SummarizationSetBy = Automatic
+
+	/// Hora del día (0 a 23) en que se creó el ticket, hora de Mérida.
+	column 'Hora Creación'
+		dataType: int64
+		formatString: 0
+		lineageTag: 98b7f7d6-018f-439d-96b5-d31201bfd375
+		summarizeBy: none
+		sourceColumn: Hora Creación
+
+		annotation SummarizationSetBy = Automatic
+
+	/// 1 = lunes … 7 = domingo.
+	column 'Día Semana Num'
+		dataType: int64
+		isHidden
+		formatString: 0
+		lineageTag: b73b44cf-08f3-42f3-baa6-b073ab615951
+		summarizeBy: none
+		sourceColumn: Día Semana Num
+
+		annotation SummarizationSetBy = Automatic
+
+	/// Día de la semana en que se creó el ticket.
+	column 'Día Semana' = SWITCH(IEP_Tickets[Día Semana Num], 1, "Lunes", 2, "Martes", 3, "Miércoles", 4, "Jueves", 5, "Viernes", 6, "Sábado", "Domingo")
+		dataType: string
+		lineageTag: 49833183-df0c-4231-b20b-aebe3c2e8275
+		summarizeBy: none
+		sortByColumn: 'Día Semana Num'
+
+		annotation SummarizationSetBy = Automatic
+
+	/// Hora de creación como 00:00 … 23:00.
+	column 'Hora Creación Texto' = FORMAT(IEP_Tickets[Hora Creación], "00") & ":00"
+		dataType: string
+		lineageTag: d8841528-dc4c-47b5-844b-ec82c81ec640
+		summarizeBy: none
+		sortByColumn: 'Hora Creación'
+
+		annotation SummarizationSetBy = Automatic
+
+	/// Minutos de SLA de resolución (15 h, calendario 24 h, sin pausas).
+	column 'Tiempo SLA Min' = ROUND(IEP_Tickets[SLA Resolución Horas] * 60, 0)
+		dataType: int64
+		isHidden
+		formatString: 0
+		lineageTag: 5e7a6ee3-cf60-4ff3-8aea-74bc01c31ea8
+		summarizeBy: none
+
+		annotation SummarizationSetBy = Automatic
+
+	/// Minutos de la meta del SLA de resolución configurada en Jira.
+	column 'Meta SLA Min' = ROUND(IEP_Tickets[SLA Resolución Meta Horas] * 60, 0)
+		dataType: int64
+		isHidden
+		formatString: 0
+		lineageTag: 51c76a73-07bd-4dc0-bcc1-1dfe7e94ea6c
+		summarizeBy: none
+
+		annotation SummarizationSetBy = Automatic
+
+	/// Minutos de SLA por encima de la meta (solo tickets que excedieron el SLA de resolución).
+	column 'Exceso SLA Min' = IF(IEP_Tickets[SLA Resolución Estado] = "Incumplido" && NOT ISBLANK(IEP_Tickets[Tiempo SLA Min]) && NOT ISBLANK(IEP_Tickets[Meta SLA Min]), MAX(0, IEP_Tickets[Tiempo SLA Min] - IEP_Tickets[Meta SLA Min]))
+		dataType: int64
+		isHidden
+		formatString: 0
+		lineageTag: fb2d4674-3c25-443e-868f-c9061364f86a
+		summarizeBy: none
+
+		annotation SummarizationSetBy = Automatic
+
+	/// Tiempo de resolución contabilizado por el SLA (estados activos, sin pausas; no es tiempo natural).
+	column 'Tiempo SLA Resolución' = VAR M = IEP_Tickets[Tiempo SLA Min] VAR D = INT(M / 1440) VAR H = INT(MOD(M, 1440) / 60) VAR Mi = MOD(M, 60) RETURN IF(ISBLANK(M), BLANK(), IF(D > 0, D & IF(D = 1, " día ", " días ") & H & " h " & FORMAT(Mi, "00") & " min", IF(H > 0, H & " h " & FORMAT(Mi, "00") & " min", Mi & " min")))
+		dataType: string
+		lineageTag: 3d31c36e-e3ea-4edd-a700-554892d1c3d3
+		summarizeBy: none
+		sortByColumn: 'Tiempo SLA Min'
+
+		annotation SummarizationSetBy = Automatic
+
+	/// Meta del SLA de resolución: 15 h.
+	column 'Meta SLA Resolución' = VAR M = IEP_Tickets[Meta SLA Min] VAR D = INT(M / 1440) VAR H = INT(MOD(M, 1440) / 60) VAR Mi = MOD(M, 60) RETURN IF(ISBLANK(M), BLANK(), IF(D > 0, D & IF(D = 1, " día ", " días ") & H & " h " & FORMAT(Mi, "00") & " min", IF(H > 0, H & " h " & FORMAT(Mi, "00") & " min", Mi & " min")))
+		dataType: string
+		lineageTag: 130f3e79-4199-433f-9d3a-b6a21d0b0fae
+		summarizeBy: none
+		sortByColumn: 'Meta SLA Min'
+
+		annotation SummarizationSetBy = Automatic
+
+	/// Tiempo de SLA por encima de la meta.
+	column 'Exceso SLA' = VAR M = IEP_Tickets[Exceso SLA Min] VAR D = INT(M / 1440) VAR H = INT(MOD(M, 1440) / 60) VAR Mi = MOD(M, 60) RETURN IF(ISBLANK(M), BLANK(), IF(D > 0, D & IF(D = 1, " día ", " días ") & H & " h " & FORMAT(Mi, "00") & " min", IF(H > 0, H & " h " & FORMAT(Mi, "00") & " min", Mi & " min")))
+		dataType: string
+		lineageTag: 2f2bf3d7-f989-4214-a72e-8a912c1b03f9
+		summarizeBy: none
+		sortByColumn: 'Exceso SLA Min'
+
+		annotation SummarizationSetBy = Automatic
+
+	/// Situación del ticket frente al SLA de resolución: dentro o fuera de SLA, resuelto o pendiente.
+	column 'Situación SLA' = VAR Est = IEP_Tickets[SLA Resolución Estado] VAR Resuelto = NOT ISBLANK(IEP_Tickets[Fecha Resuelta]) RETURN SWITCH(TRUE(), Est = "Incumplido" && Resuelto, "Resuelto fuera de SLA", Est = "Incumplido", "Pendiente · fuera de SLA", Est = "Cumplido", "Resuelto en SLA", Est = "Pausado", "Pendiente · en pausa", "Pendiente · en SLA")
+		dataType: string
+		lineageTag: 7e1e4f97-e928-4bbe-a725-df981ebe2c96
+		summarizeBy: none
+
+		annotation SummarizationSetBy = Automatic
+
+	/// Meta del SLA de primera respuesta para todos los Incidente IEP: 30 min (calendario 24 h).
+	column 'SLA Respuesta Meta Horas' = 0.5
+		dataType: double
+		formatString: #,##0.00
+		lineageTag: 6e909948-b2fe-4480-824f-d8d8b295f947
+		summarizeBy: none
+
+		annotation SummarizationSetBy = Automatic
+
+	/// Meta del SLA de resolución para todos los Incidente IEP: 15 h (calendario 24 h).
+	column 'SLA Resolución Meta Horas' = 15
+		dataType: double
+		formatString: #,##0.00
+		lineageTag: 1bce2f30-38f0-4cd4-9318-e923ede61e78
+		summarizeBy: none
+
+		annotation SummarizationSetBy = Automatic
+
+	/// Hora del primer cambio de estado después de crear el ticket (se usa como primera respuesta si Jira no la tiene).
+	column 'Primer Cambio de Estado' = MINX(FILTER(RELATEDTABLE(FactStatusHistory), FactStatusHistory[Visita] > 1), FactStatusHistory[Inicio])
+		dataType: dateTime
+		isHidden
+		formatString: General Date
+		lineageTag: 81c9b292-5663-4c16-9bb5-36020dcdc3e1
+		summarizeBy: none
+
+		annotation SummarizationSetBy = Automatic
+
+	/// Primera entrada al estado Resuelta según el historial.
+	column 'Entrada a Resuelta Historial' = MINX(FILTER(RELATEDTABLE(FactStatusHistory), FactStatusHistory[Estado] = "Resuelta"), FactStatusHistory[Inicio])
+		dataType: dateTime
+		isHidden
+		formatString: General Date
+		lineageTag: 31c7c866-5dc4-4dde-a84d-21fce5bbc868
+		summarizeBy: none
+
+		annotation SummarizationSetBy = Automatic
+
+	/// Horas naturales hasta la primera respuesta: dato de Jira si existe; si no, el primer cambio de estado.
+	column 'Horas a Primera Respuesta' =
+			VAR Jsm = IEP_Tickets[JSM Horas a Primera Respuesta]
+			VAR Cambio = IEP_Tickets[Primer Cambio de Estado]
+			RETURN IF(NOT ISBLANK(Jsm), Jsm, IF(NOT ISBLANK(Cambio), DATEDIFF(IEP_Tickets[Created], Cambio, MINUTE) / 60))
+		dataType: double
+		formatString: #,##0.00
+		lineageTag: a715acc5-f04b-47fd-aa4e-a69f50dc1638
+		summarizeBy: none
+
+		annotation SummarizationSetBy = Automatic
+
+	/// Horas naturales de la creación a la fecha Resolved.
+	column 'Horas a Resolución' =
+			VAR Entrada = IEP_Tickets[Fecha Resuelta]
+			RETURN IF(NOT ISBLANK(Entrada), DATEDIFF(IEP_Tickets[Created], Entrada, MINUTE) / 60)
+		dataType: double
+		formatString: #,##0.00
+		lineageTag: d7100cb5-c7fb-4e18-8b7b-0386184a63cc
+		summarizeBy: none
+
+		annotation SummarizationSetBy = Automatic
+
+	/// Tiempo del SLA de primera respuesta (calendario 24 h). Si aún no hay respuesta, corre hasta el último refresh.
+	column 'SLA Respuesta Horas' =
+			VAR H = IEP_Tickets[Horas a Primera Respuesta]
+			RETURN IF(NOT ISBLANK(H), H, DATEDIFF(IEP_Tickets[Created], (UTCNOW() - TIME(6, 0, 0)), MINUTE) / 60)
+		dataType: double
+		formatString: #,##0.00
+		lineageTag: 131d07ab-7ecd-421a-b104-d38464b64593
+		summarizeBy: none
+
+		annotation SummarizationSetBy = Automatic
+
+	/// Tiempo del SLA de resolución (calendario 24 h): de la creación a la fecha Resolved (o al último refresh si sigue abierto), menos el tiempo en pausa (Esperando por el cliente, Planta externa y Cerrada).
+	column 'SLA Resolución Horas' =
+			VAR Fin = COALESCE(IEP_Tickets[Fecha Resuelta], (UTCNOW() - TIME(6, 0, 0)))
+			VAR Total = DATEDIFF(IEP_Tickets[Created], Fin, MINUTE) / 60
+			RETURN MAX(0, Total - IEP_Tickets[Horas en Pausa])
+		dataType: double
+		formatString: #,##0.00
+		lineageTag: b35e3da8-ed7c-412b-83c3-37e2402b31ec
+		summarizeBy: none
+
+		annotation SummarizationSetBy = Automatic
+
+	/// Estado del SLA de primera respuesta con la meta de 30 min.
+	column 'SLA Respuesta Estado' =
+			VAR H = IEP_Tickets[SLA Respuesta Horas]
+			VAR Respondido = NOT ISBLANK(IEP_Tickets[Horas a Primera Respuesta])
+			RETURN
+			    SWITCH(TRUE(),
+			        H > IEP_Tickets[SLA Respuesta Meta Horas], "Incumplido",
+			        Respondido, "Cumplido",
+			        H >= IEP_Tickets[SLA Respuesta Meta Horas] * 0.75, "En riesgo",
+			        "En curso")
+		dataType: string
+		lineageTag: 42ae1479-425a-4b8d-a910-44550c624d1a
+		summarizeBy: none
+
+		annotation SummarizationSetBy = Automatic
+
+	/// Estado del SLA de resolución con la meta de 15 h: Cumplido, Incumplido, En curso, En riesgo (75% o más) o Pausado.
+	column 'SLA Resolución Estado' =
+			VAR H = IEP_Tickets[SLA Resolución Horas]
+			VAR Meta = IEP_Tickets[SLA Resolución Meta Horas]
+			VAR Resuelto = NOT ISBLANK(IEP_Tickets[Fecha Resuelta])
+			VAR EnPausa = IEP_Tickets[Status] IN {"Esperando por el cliente", "Planta externa", "Cerrada"}
+			RETURN
+			    SWITCH(TRUE(),
+			        H > Meta, "Incumplido",
+			        Resuelto, "Cumplido",
+			        EnPausa, "Pausado",
+			        H >= Meta * 0.75, "En riesgo",
+			        "En curso")
+		dataType: string
+		lineageTag: 76495ad6-a8dc-4656-87e4-c603786daca8
+		summarizeBy: none
+
+		annotation SummarizationSetBy = Automatic
+
+	/// Minutos de vida del ticket: de la creación a la fecha Resolved (o al último refresh si sigue abierto).
+	column 'Vida Total Min' = DATEDIFF(IEP_Tickets[Created], COALESCE(IEP_Tickets[Fecha Resuelta], (UTCNOW() - TIME(6, 0, 0))), MINUTE)
+		dataType: int64
+		isHidden
+		formatString: 0
+		lineageTag: cf2b3890-3a10-4c2a-be88-5e05ce16c1a6
+		summarizeBy: none
+
+		annotation SummarizationSetBy = Automatic
+
+	/// Vida total del ticket en tiempo natural (sin descontar pausas): de la creación a la fecha Resolved, o hasta hoy si sigue abierto.
+	column 'Vida Total' = VAR M = IEP_Tickets[Vida Total Min] VAR D = INT(M / 1440) VAR H = INT(MOD(M, 1440) / 60) VAR Mi = MOD(M, 60) RETURN IF(ISBLANK(M), BLANK(), IF(D > 0, D & IF(D = 1, " día ", " días ") & H & " h " & FORMAT(Mi, "00") & " min", IF(H > 0, H & " h " & FORMAT(Mi, "00") & " min", Mi & " min")))
+		dataType: string
+		lineageTag: 70062547-8d12-4fbe-99c4-ad5e13157f69
+		summarizeBy: none
+		sortByColumn: 'Vida Total Min'
+
+		annotation SummarizationSetBy = Automatic
+
+	/// Indica si el ticket estuvo al menos una vez en el estado Planta externa (según el historial de estados).
+	column 'Planta Externa' = IF(ISEMPTY(FILTER(RELATEDTABLE(FactStatusHistory), FactStatusHistory[Estado] = "Planta externa")), "No pasó por Planta externa", "Pasó por Planta externa")
+		dataType: string
+		lineageTag: 78e5e595-f4cd-4a37-9223-123fe89c763f
+		summarizeBy: none
+
+		annotation SummarizationSetBy = Automatic
+
+	/// Fecha y hora de resolución del ticket: campo Resolved de Jira; si un ticket en Resuelta no lo tiene, la entrada a Resuelta. Todas las medidas de resolución y de SLA usan esta fecha.
+	column 'Fecha Resuelta' = COALESCE(IEP_Tickets[Resolution Date], IEP_Tickets[Entrada a Resuelta Historial], IEP_Tickets[Entrada a Resuelta])
+		dataType: dateTime
+		formatString: General Date
+		lineageTag: 2de9fa15-69ba-4339-8768-3870c685e8c0
+		summarizeBy: none
+
+		annotation SummarizationSetBy = Automatic
+
+	/// Día de resolución (Resolved) para contar los resueltos por periodo.
+	column 'Fecha Resuelta Día' = IF(ISBLANK(IEP_Tickets[Fecha Resuelta]), BLANK(), DATE(YEAR(IEP_Tickets[Fecha Resuelta]), MONTH(IEP_Tickets[Fecha Resuelta]), DAY(IEP_Tickets[Fecha Resuelta])))
+		dataType: dateTime
+		isHidden
+		formatString: Short Date
+		lineageTag: 802eeef6-712e-4a4f-a790-2e31b56ea6eb
+		summarizeBy: none
+
+		annotation SummarizationSetBy = Automatic
+
+	/// Horas en pausa del SLA de resolución (Esperando por el cliente, Planta externa y Cerrada) hasta la fecha Resolved.
+	column 'Horas en Pausa' =
+			VAR Fin = COALESCE(IEP_Tickets[Fecha Resuelta], (UTCNOW() - TIME(6, 0, 0)))
+			RETURN
+			    SUMX(
+			        FILTER(RELATEDTABLE(FactStatusHistory), FactStatusHistory[Estado] IN {"Esperando por el cliente", "Planta externa", "Cerrada"} && FactStatusHistory[Inicio] < Fin),
+			        VAR FinTramo = IF(FactStatusHistory[Fin] < Fin, FactStatusHistory[Fin], Fin)
+			        RETURN DATEDIFF(FactStatusHistory[Inicio], FinTramo, MINUTE) / 60
+			    ) + 0
+		dataType: double
+		isHidden
+		formatString: #,##0.00
+		lineageTag: bfdddec8-4711-44f6-a69d-f580b6a401cf
+		summarizeBy: none
+
+		annotation SummarizationSetBy = Automatic
+
+	/// Minutos en pausa del SLA de resolución.
+	column 'Tiempo en Pausa Min' = ROUND(IEP_Tickets[Horas en Pausa] * 60, 0)
+		dataType: int64
+		isHidden
+		formatString: 0
+		lineageTag: c773e5a1-93d3-48c2-bcdb-08e15f260633
+		summarizeBy: none
+
+		annotation SummarizationSetBy = Automatic
+
+	/// Tiempo en pausa del SLA de resolución, en formato legible.
+	column 'Tiempo en Pausa' = VAR M = IEP_Tickets[Tiempo en Pausa Min] VAR D = INT(M / 1440) VAR H = INT(MOD(M, 1440) / 60) VAR Mi = MOD(M, 60) RETURN IF(ISBLANK(M), BLANK(), IF(D > 0, D & IF(D = 1, " día ", " días ") & H & " h " & FORMAT(Mi, "00") & " min", IF(H > 0, H & " h " & FORMAT(Mi, "00") & " min", Mi & " min")))
+		dataType: string
+		lineageTag: 1194019d-32a0-434d-8eb2-8cb05af0452c
+		summarizeBy: none
+		sortByColumn: 'Tiempo en Pausa Min'
+
+		annotation SummarizationSetBy = Automatic
+
+	/// Tiempo total que el ticket pasó en cada estado antes de resolverse (todas las visitas sumadas), en el orden del flujo.
+	column 'Tiempo por Estado' =
+			VAR Tramos = FILTER(RELATEDTABLE(FactStatusHistory), FactStatusHistory[Es Estado Final] = FALSE())
+			VAR PorEstado =
+			    GROUPBY(Tramos, FactStatusHistory[Estado], FactStatusHistory[Orden Estado], "Min", SUMX(CURRENTGROUP(), FactStatusHistory[Horas]) * 60)
+			RETURN
+			    CONCATENATEX(
+			        PorEstado,
+			        VAR M = ROUND([Min], 0)
+			        VAR D = INT(M / 1440)
+			        VAR H = INT(MOD(M, 1440) / 60)
+			        VAR Mi = MOD(M, 60)
+			        RETURN
+			            FactStatusHistory[Estado] & ": "
+			                & IF(D > 0, D & " d " & H & " h " & FORMAT(Mi, "00") & " min",
+			                    IF(H > 0, H & " h " & FORMAT(Mi, "00") & " min", Mi & " min")),
+			        " · ",
+			        FactStatusHistory[Orden Estado], ASC
+			    )
+		dataType: string
+		lineageTag: 523810d5-1e55-4f6e-95c3-375399347e40
+		summarizeBy: none
+
+		annotation SummarizationSetBy = Automatic
+
+	/// Minutos en Nueva solicitud hasta la fecha Resolved.
+	column 'Min Nueva solicitud' =
+			VAR Fin = COALESCE(IEP_Tickets[Fecha Resuelta], (UTCNOW() - TIME(6, 0, 0)))
+			RETURN
+			    SUMX(
+			        FILTER(RELATEDTABLE(FactStatusHistory), FactStatusHistory[Estado] = "Nueva solicitud" && FactStatusHistory[Inicio] < Fin),
+			        VAR FinTramo = IF(FactStatusHistory[Fin] < Fin, FactStatusHistory[Fin], Fin)
+			        RETURN DATEDIFF(FactStatusHistory[Inicio], FinTramo, MINUTE)
+			    )
+		dataType: int64
+		isHidden
+		formatString: 0
+		lineageTag: c31406ae-18dd-424d-bb5f-4f485288f8dd
+		summarizeBy: none
+
+		annotation SummarizationSetBy = Automatic
+
+	/// Tiempo en Nueva solicitud hasta la fecha Resolved (todas las visitas sumadas).
+	column 'Tiempo Nueva solicitud' = VAR M = IEP_Tickets[Min Nueva solicitud] VAR D = INT(M / 1440) VAR H = INT(MOD(M, 1440) / 60) VAR Mi = MOD(M, 60) RETURN IF(ISBLANK(M), BLANK(), IF(D > 0, D & IF(D = 1, " día ", " días ") & H & " h " & FORMAT(Mi, "00") & " min", IF(H > 0, H & " h " & FORMAT(Mi, "00") & " min", Mi & " min")))
+		dataType: string
+		lineageTag: 8c36ee02-4b3f-4839-9316-cc081ea2e1f5
+		summarizeBy: none
+		sortByColumn: 'Min Nueva solicitud'
+
+		annotation SummarizationSetBy = Automatic
+
+	/// Minutos en N1 (incluye N1 QCOM y N1 RAM del flujo anterior) hasta la fecha Resolved.
+	column 'Min N1' =
+			VAR Fin = COALESCE(IEP_Tickets[Fecha Resuelta], (UTCNOW() - TIME(6, 0, 0)))
+			RETURN
+			    SUMX(
+			        FILTER(RELATEDTABLE(FactStatusHistory), FactStatusHistory[Estado] IN {"N1", "N1 QCOM", "N1 RAM"} && FactStatusHistory[Inicio] < Fin),
+			        VAR FinTramo = IF(FactStatusHistory[Fin] < Fin, FactStatusHistory[Fin], Fin)
+			        RETURN DATEDIFF(FactStatusHistory[Inicio], FinTramo, MINUTE)
+			    )
+		dataType: int64
+		isHidden
+		formatString: 0
+		lineageTag: d7b6ac6a-e8ec-4be2-856b-f79271cc4a81
+		summarizeBy: none
+
+		annotation SummarizationSetBy = Automatic
+
+	/// Tiempo en N1 (incluye N1 QCOM y N1 RAM del flujo anterior) hasta la fecha Resolved (todas las visitas sumadas).
+	column 'Tiempo N1' = VAR M = IEP_Tickets[Min N1] VAR D = INT(M / 1440) VAR H = INT(MOD(M, 1440) / 60) VAR Mi = MOD(M, 60) RETURN IF(ISBLANK(M), BLANK(), IF(D > 0, D & IF(D = 1, " día ", " días ") & H & " h " & FORMAT(Mi, "00") & " min", IF(H > 0, H & " h " & FORMAT(Mi, "00") & " min", Mi & " min")))
+		dataType: string
+		lineageTag: a9aab9c4-f41b-4239-93fe-40fc2bd07a2a
+		summarizeBy: none
+		sortByColumn: 'Min N1'
+
+		annotation SummarizationSetBy = Automatic
+
+	/// Minutos en N2 RAM hasta la fecha Resolved.
+	column 'Min N2 RAM' =
+			VAR Fin = COALESCE(IEP_Tickets[Fecha Resuelta], (UTCNOW() - TIME(6, 0, 0)))
+			RETURN
+			    SUMX(
+			        FILTER(RELATEDTABLE(FactStatusHistory), FactStatusHistory[Estado] = "N2 RAM" && FactStatusHistory[Inicio] < Fin),
+			        VAR FinTramo = IF(FactStatusHistory[Fin] < Fin, FactStatusHistory[Fin], Fin)
+			        RETURN DATEDIFF(FactStatusHistory[Inicio], FinTramo, MINUTE)
+			    )
+		dataType: int64
+		isHidden
+		formatString: 0
+		lineageTag: b6f40bb6-1dc4-475e-97c8-2c1456b03dab
+		summarizeBy: none
+
+		annotation SummarizationSetBy = Automatic
+
+	/// Tiempo en N2 RAM hasta la fecha Resolved (todas las visitas sumadas).
+	column 'Tiempo N2 RAM' = VAR M = IEP_Tickets[Min N2 RAM] VAR D = INT(M / 1440) VAR H = INT(MOD(M, 1440) / 60) VAR Mi = MOD(M, 60) RETURN IF(ISBLANK(M), BLANK(), IF(D > 0, D & IF(D = 1, " día ", " días ") & H & " h " & FORMAT(Mi, "00") & " min", IF(H > 0, H & " h " & FORMAT(Mi, "00") & " min", Mi & " min")))
+		dataType: string
+		lineageTag: 8439fae5-513b-47c8-94be-0b7c4c31f2f3
+		summarizeBy: none
+		sortByColumn: 'Min N2 RAM'
+
+		annotation SummarizationSetBy = Automatic
+
+	/// Minutos en N2 QCOM hasta la fecha Resolved.
+	column 'Min N2 QCOM' =
+			VAR Fin = COALESCE(IEP_Tickets[Fecha Resuelta], (UTCNOW() - TIME(6, 0, 0)))
+			RETURN
+			    SUMX(
+			        FILTER(RELATEDTABLE(FactStatusHistory), FactStatusHistory[Estado] = "N2 QCOM" && FactStatusHistory[Inicio] < Fin),
+			        VAR FinTramo = IF(FactStatusHistory[Fin] < Fin, FactStatusHistory[Fin], Fin)
+			        RETURN DATEDIFF(FactStatusHistory[Inicio], FinTramo, MINUTE)
+			    )
+		dataType: int64
+		isHidden
+		formatString: 0
+		lineageTag: 51f5cb8d-eb19-42c0-839e-fb2c165d1cb5
+		summarizeBy: none
+
+		annotation SummarizationSetBy = Automatic
+
+	/// Tiempo en N2 QCOM hasta la fecha Resolved (todas las visitas sumadas).
+	column 'Tiempo N2 QCOM' = VAR M = IEP_Tickets[Min N2 QCOM] VAR D = INT(M / 1440) VAR H = INT(MOD(M, 1440) / 60) VAR Mi = MOD(M, 60) RETURN IF(ISBLANK(M), BLANK(), IF(D > 0, D & IF(D = 1, " día ", " días ") & H & " h " & FORMAT(Mi, "00") & " min", IF(H > 0, H & " h " & FORMAT(Mi, "00") & " min", Mi & " min")))
+		dataType: string
+		lineageTag: ef91a84a-a643-4342-8483-a812f7e6db72
+		summarizeBy: none
+		sortByColumn: 'Min N2 QCOM'
+
+		annotation SummarizationSetBy = Automatic
+
+	/// Minutos en Escalado QCOM hasta la fecha Resolved.
+	column 'Min Escalado QCOM' =
+			VAR Fin = COALESCE(IEP_Tickets[Fecha Resuelta], (UTCNOW() - TIME(6, 0, 0)))
+			RETURN
+			    SUMX(
+			        FILTER(RELATEDTABLE(FactStatusHistory), FactStatusHistory[Estado] = "Escalado QCOM" && FactStatusHistory[Inicio] < Fin),
+			        VAR FinTramo = IF(FactStatusHistory[Fin] < Fin, FactStatusHistory[Fin], Fin)
+			        RETURN DATEDIFF(FactStatusHistory[Inicio], FinTramo, MINUTE)
+			    )
+		dataType: int64
+		isHidden
+		formatString: 0
+		lineageTag: 2f57a5ea-d84d-4b58-b479-e57686354e7f
+		summarizeBy: none
+
+		annotation SummarizationSetBy = Automatic
+
+	/// Tiempo en Escalado QCOM hasta la fecha Resolved (todas las visitas sumadas).
+	column 'Tiempo Escalado QCOM' = VAR M = IEP_Tickets[Min Escalado QCOM] VAR D = INT(M / 1440) VAR H = INT(MOD(M, 1440) / 60) VAR Mi = MOD(M, 60) RETURN IF(ISBLANK(M), BLANK(), IF(D > 0, D & IF(D = 1, " día ", " días ") & H & " h " & FORMAT(Mi, "00") & " min", IF(H > 0, H & " h " & FORMAT(Mi, "00") & " min", Mi & " min")))
+		dataType: string
+		lineageTag: dfca05ab-9d19-4fbf-9393-16e29f28b77a
+		summarizeBy: none
+		sortByColumn: 'Min Escalado QCOM'
+
+		annotation SummarizationSetBy = Automatic
+
+	/// Minutos en Esperando por el cliente hasta la fecha Resolved.
+	column 'Min Esperando por el cliente' =
+			VAR Fin = COALESCE(IEP_Tickets[Fecha Resuelta], (UTCNOW() - TIME(6, 0, 0)))
+			RETURN
+			    SUMX(
+			        FILTER(RELATEDTABLE(FactStatusHistory), FactStatusHistory[Estado] = "Esperando por el cliente" && FactStatusHistory[Inicio] < Fin),
+			        VAR FinTramo = IF(FactStatusHistory[Fin] < Fin, FactStatusHistory[Fin], Fin)
+			        RETURN DATEDIFF(FactStatusHistory[Inicio], FinTramo, MINUTE)
+			    )
+		dataType: int64
+		isHidden
+		formatString: 0
+		lineageTag: 9fdedb40-8fab-4822-9c21-85fa0df60411
+		summarizeBy: none
+
+		annotation SummarizationSetBy = Automatic
+
+	/// Tiempo en Esperando por el cliente hasta la fecha Resolved (todas las visitas sumadas).
+	column 'Tiempo Esperando por el cliente' = VAR M = IEP_Tickets[Min Esperando por el cliente] VAR D = INT(M / 1440) VAR H = INT(MOD(M, 1440) / 60) VAR Mi = MOD(M, 60) RETURN IF(ISBLANK(M), BLANK(), IF(D > 0, D & IF(D = 1, " día ", " días ") & H & " h " & FORMAT(Mi, "00") & " min", IF(H > 0, H & " h " & FORMAT(Mi, "00") & " min", Mi & " min")))
+		dataType: string
+		lineageTag: 834d846d-ee85-47b4-a428-64421fab88dd
+		summarizeBy: none
+		sortByColumn: 'Min Esperando por el cliente'
+
+		annotation SummarizationSetBy = Automatic
+
+	/// Minutos en Planta externa hasta la fecha Resolved.
+	column 'Min Planta externa' =
+			VAR Fin = COALESCE(IEP_Tickets[Fecha Resuelta], (UTCNOW() - TIME(6, 0, 0)))
+			RETURN
+			    SUMX(
+			        FILTER(RELATEDTABLE(FactStatusHistory), FactStatusHistory[Estado] = "Planta externa" && FactStatusHistory[Inicio] < Fin),
+			        VAR FinTramo = IF(FactStatusHistory[Fin] < Fin, FactStatusHistory[Fin], Fin)
+			        RETURN DATEDIFF(FactStatusHistory[Inicio], FinTramo, MINUTE)
+			    )
+		dataType: int64
+		isHidden
+		formatString: 0
+		lineageTag: 94b197a7-5bd3-4918-9c6c-2b8e31530b08
+		summarizeBy: none
+
+		annotation SummarizationSetBy = Automatic
+
+	/// Tiempo en Planta externa hasta la fecha Resolved (todas las visitas sumadas).
+	column 'Tiempo Planta externa' = VAR M = IEP_Tickets[Min Planta externa] VAR D = INT(M / 1440) VAR H = INT(MOD(M, 1440) / 60) VAR Mi = MOD(M, 60) RETURN IF(ISBLANK(M), BLANK(), IF(D > 0, D & IF(D = 1, " día ", " días ") & H & " h " & FORMAT(Mi, "00") & " min", IF(H > 0, H & " h " & FORMAT(Mi, "00") & " min", Mi & " min")))
+		dataType: string
+		lineageTag: 8ef99f70-9f77-4d2f-95d9-a4739ed949e9
+		summarizeBy: none
+		sortByColumn: 'Min Planta externa'
+
+		annotation SummarizationSetBy = Automatic
+
+	/// Minutos en Otros estados hasta la fecha Resolved.
+	column 'Min Otros estados' =
+			VAR Fin = COALESCE(IEP_Tickets[Fecha Resuelta], (UTCNOW() - TIME(6, 0, 0)))
+			RETURN
+			    SUMX(
+			        FILTER(RELATEDTABLE(FactStatusHistory), NOT (FactStatusHistory[Estado] IN {"Nueva solicitud", "N1", "N1 QCOM", "N1 RAM", "N2 RAM", "N2 QCOM", "Esperando por el cliente", "Planta externa"}) && NOT (FactStatusHistory[Estado] IN {"Resuelta", "Cerrada"}) && FactStatusHistory[Inicio] < Fin),
+			        VAR FinTramo = IF(FactStatusHistory[Fin] < Fin, FactStatusHistory[Fin], Fin)
+			        RETURN DATEDIFF(FactStatusHistory[Inicio], FinTramo, MINUTE)
+			    )
+		dataType: int64
+		isHidden
+		formatString: 0
+		lineageTag: de936490-789c-42b5-89ed-05037e0ac212
+		summarizeBy: none
+
+		annotation SummarizationSetBy = Automatic
+
+	/// Tiempo en estados fuera del flujo principal (por ejemplo Reabierta) hasta la fecha Resolved.
+	column 'Tiempo Otros estados' = VAR M = IEP_Tickets[Min Otros estados] VAR D = INT(M / 1440) VAR H = INT(MOD(M, 1440) / 60) VAR Mi = MOD(M, 60) RETURN IF(ISBLANK(M), BLANK(), IF(D > 0, D & IF(D = 1, " día ", " días ") & H & " h " & FORMAT(Mi, "00") & " min", IF(H > 0, H & " h " & FORMAT(Mi, "00") & " min", Mi & " min")))
+		dataType: string
+		lineageTag: 1a6f4b50-4cbf-431b-ae39-ccc8d0bd4599
+		summarizeBy: none
+		sortByColumn: 'Min Otros estados'
+
+		annotation SummarizationSetBy = Automatic
+
+	/// Minutos en N2 (N2 RAM + N2 QCOM) hasta la fecha Resolved.
+	column 'Min N2' = IF(ISBLANK(IEP_Tickets[Min N2 RAM]) && ISBLANK(IEP_Tickets[Min N2 QCOM]), BLANK(), IEP_Tickets[Min N2 RAM] + IEP_Tickets[Min N2 QCOM])
+		dataType: int64
+		isHidden
+		formatString: 0
+		lineageTag: 0dcd27ce-9514-4dfa-a6f6-0f38fad60994
+		summarizeBy: none
+
+		annotation SummarizationSetBy = Automatic
+
+	/// Tiempo en N2 (N2 RAM + N2 QCOM) hasta la fecha Resolved (todas las visitas sumadas).
+	column 'Tiempo N2' = VAR M = IEP_Tickets[Min N2] VAR D = INT(M / 1440) VAR H = INT(MOD(M, 1440) / 60) VAR Mi = MOD(M, 60) RETURN IF(ISBLANK(M), BLANK(), IF(D > 0, D & IF(D = 1, " día ", " días ") & H & " h " & FORMAT(Mi, "00") & " min", IF(H > 0, H & " h " & FORMAT(Mi, "00") & " min", Mi & " min")))
+		dataType: string
+		lineageTag: ebb9157d-c230-42be-bcee-a155d7aaf065
+		summarizeBy: none
+		sortByColumn: 'Min N2'
+
+		annotation SummarizationSetBy = Automatic
+
+	partition IEP_Tickets = m
+		mode: import
+		source =
+				let
+				
+								    Issues = Jira_IEP_Issues,
+				
+				
+								    // ========================================
+								    // AYUDANTES
+								    // ========================================
+				
+								    // Jira devuelve fechas con zona ("-0600"); se pasan a hora de Mérida (UTC-6, sin horario de verano)
+								    ToLocal = (t as nullable text) as nullable datetime =>
+								        if t = null then null
+								        else
+								            let
+								                Len = Text.Length(t),
+								                Iso =
+								                    if Len > 5 and List.Contains({"+", "-"}, Text.At(t, Len - 5))
+								                    then Text.Insert(t, Len - 2, ":")
+								                    else t
+								            in
+								                DateTimeZone.RemoveZone(DateTimeZone.SwitchZone(DateTimeZone.FromText(Iso), -6)),
+				
+								    NameOf = (r as any, f as text) as any =>
+								        if r is record then Record.FieldOrDefault(r, f, null) else null,
+				
+								    // Texto sin espacios sobrantes; vacío -> null
+								    Limpio = (t as any) as nullable text =>
+								        if t = null then null
+								        else
+								            let
+								                s = Text.Combine(List.Select(Text.Split(Text.Trim(Text.From(t)), " "), each _ <> ""), " ")
+								            in
+								                if s = "" then null else s,
+				
+								    // Valor de un campo de opción (select / radio buttons)
+								    Opcion = (v as any) as nullable text => Limpio(NameOf(v, "value")),
+				
+								    // Resume un campo SLA de JSM: meta, tiempo transcurrido y estado
+								    SlaInfo = (v as any) as record =>
+								        let
+								            Ongoing = if v is record then Record.FieldOrDefault(v, "ongoingCycle", null) else null,
+								            Cycles =
+								                (if v is record then Record.FieldOrDefault(v, "completedCycles", {}) else {})
+								                & (if Ongoing = null then {} else {Ongoing}),
+								            Last = if List.IsEmpty(Cycles) then null else List.Last(Cycles),
+								            Hours = (c as record, f as text) as nullable number =>
+								                let
+								                    d = Record.FieldOrDefault(c, f, null)
+								                in
+								                    if d = null then null else d[millis] / 3600000,
+								            Breached =
+								                List.AnyTrue(
+								                    List.Transform(Cycles, each Record.FieldOrDefault(_, "breached", false) = true)
+								                ),
+								            Goal = if Last = null then null else Hours(Last, "goalDuration"),
+								            Elapsed = if Last = null then null else Hours(Last, "elapsedTime"),
+								            Remaining = if Last = null then null else Hours(Last, "remainingTime"),
+								            Paused = Ongoing <> null and Record.FieldOrDefault(Ongoing, "paused", false) = true,
+								            // Hora real en que se detuvo el ciclo (primera respuesta o entrada a Resuelta), según Jira
+								            Completados = if v is record then Record.FieldOrDefault(v, "completedCycles", {}) else {},
+								            Stop = (c as record) as nullable datetime =>
+								                let
+								                    s = Record.FieldOrDefault(c, "stopTime", null),
+								                    ms = if s is record then Record.FieldOrDefault(s, "epochMillis", null) else null
+								                in
+								                    if ms = null then null
+								                    else DateTimeZone.RemoveZone(DateTimeZone.SwitchZone(
+								                        #datetimezone(1970, 1, 1, 0, 0, 0, 0, 0) + #duration(0, 0, 0, ms / 1000), -6)),
+								            PrimerFin = if List.IsEmpty(Completados) then null else Stop(List.First(Completados)),
+								            UltimoFin = if List.IsEmpty(Completados) or Ongoing <> null then null else Stop(List.Last(Completados)),
+								            EstadoSla =
+								                if Last = null then "Sin SLA"
+								                else if Breached then "Incumplido"
+								                else if Paused then "Pausado"
+								                else if Ongoing = null then "Cumplido"
+								                else if Goal <> null and Remaining <> null and Remaining <= Goal * 0.25 then "En riesgo"
+								                else "En curso"
+								        in
+								            [Meta = Goal, Transcurrido = Elapsed, Estado = EstadoSla, PrimerFin = PrimerFin, UltimoFin = UltimoFin],
+				
+				
+								    // ========================================
+								    // UN RENGLÓN POR TICKET
+								    // ========================================
+				
+								    Rows =
+								        List.Transform(
+								            Issues,
+								            (i) =>
+								                let
+								                    f = i[fields],
+								                    StatusRec = Record.FieldOrDefault(f, "status", null),
+								                    AssigneeName = NameOf(Record.FieldOrDefault(f, "assignee", null), "displayName"),
+								                    Tecnicos = Record.FieldOrDefault(f, "customfield_11042", null),
+								                    Orgs = Record.FieldOrDefault(f, "customfield_10002", null),
+								                    RequestType =
+								                        NameOf(
+								                            NameOf(Record.FieldOrDefault(f, "customfield_10010", null), "requestType"),
+								                            "name"
+								                        ),
+								                    CausasLista =
+								                        let
+								                            v = Record.FieldOrDefault(f, "customfield_10897", null)
+								                        in
+								                            if v is list then List.Distinct(List.RemoveNulls(List.Transform(v, Opcion))) else {},
+								                    AP = Limpio(Record.FieldOrDefault(f, "customfield_10256", null)),
+								                    APCodigo =
+								                        if AP = null or not Text.Contains(AP, " - ") then null
+								                        else
+								                            let
+								                                c = Text.Trim(Text.BeforeDelimiter(AP, " - "))
+								                            in
+								                                if Text.Length(c) >= 4 and Text.Length(c) <= 8 and not Text.Contains(c, " ")
+								                                then Text.Upper(c) else null,
+								                    CreatedAt = ToLocal(f[created]),
+								                    Resolved = ToLocal(Record.FieldOrDefault(f, "resolutiondate", null)),
+								                    Respuesta = SlaInfo(Record.FieldOrDefault(f, "customfield_10936", null)),
+								                    Resolucion = SlaInfo(Record.FieldOrDefault(f, "customfield_10937", null)),
+								                    Vacio = (t as nullable text) as text => if t = null then "Sin dato" else t,
+				                    SinClasificar = (t as nullable text) as text => if t = null then "Sin clasificar" else t
+								                in
+								                    [
+								                        Key = i[key],
+								                        #"Issue ID" = Text.From(i[id]),
+								                        Summary = Record.FieldOrDefault(f, "summary", null),
+								                        Status = NameOf(StatusRec, "name"),
+								                        #"Status Category" = NameOf(NameOf(StatusRec, "statusCategory"), "name"),
+								                        Assignee = if AssigneeName = null then "Sin asignar" else AssigneeName,
+								                        #"Técnicos Asignados" =
+								                            if Tecnicos is list
+								                            then Text.Combine(List.Transform(Tecnicos, each NameOf(_, "displayName")), ", ")
+								                            else null,
+								                        #"Organización" =
+								                            if Orgs is list and not List.IsEmpty(Orgs)
+								                            then Text.Combine(List.Transform(Orgs, each NameOf(_, "name")), ", ")
+								                            else "Sin organización",
+								                        #"Request Type" = Vacio(RequestType),
+								                        #"Tipo de Ticket" = Vacio(Opcion(Record.FieldOrDefault(f, "customfield_10894", null))),
+								                        ISP = Vacio(Opcion(Record.FieldOrDefault(f, "customfield_10323", null))),
+								                        #"Tipo de Incidente" = SinClasificar(Opcion(Record.FieldOrDefault(f, "customfield_10896", null))),
+								                        Causas = if List.IsEmpty(CausasLista) then "Sin clasificar" else Text.Combine(CausasLista, ", "),
+								                        #"Causas Ruta" = if List.IsEmpty(CausasLista) then null else Text.Combine(CausasLista, "|"),
+								                        #"Access Point" = Vacio(AP),
+								                        #"AP Código" = APCodigo,
+								                        Created = CreatedAt,
+								                        #"Created Date" = Date.From(CreatedAt),
+								                        #"Resolution Date" = Resolved,
+								                        #"Resolution Date Only" = if Resolved = null then null else Date.From(Resolved),
+								                        #"Resolution Hours" = if Resolved = null then null else Duration.TotalHours(Resolved - CreatedAt),
+								                        #"JSM Respuesta Meta Horas" = Respuesta[Meta],
+								                        #"JSM Respuesta Horas" = Respuesta[Transcurrido],
+								                        #"JSM Respuesta Estado" = Respuesta[Estado],
+								                        #"JSM Resolución Meta Horas" = Resolucion[Meta],
+								                        #"JSM Resolución Horas" = Resolucion[Transcurrido],
+								                        #"JSM Resolución Estado" = Resolucion[Estado],
+								                        // Primera respuesta: fin del primer ciclo del SLA. Resolución: fin del último ciclo
+								                        // (entrada a Resuelta) cuando el SLA ya terminó. Horas naturales desde la creación.
+								                        #"Primera Respuesta" = Respuesta[PrimerFin],
+								                        #"JSM Horas a Primera Respuesta" =
+								                            if Respuesta[PrimerFin] = null then null
+								                            else Duration.TotalHours(Respuesta[PrimerFin] - CreatedAt),
+								                        #"Entrada a Resuelta" = Resolucion[UltimoFin],
+								                        #"JSM Horas a Resolución" =
+								                            if Resolucion[UltimoFin] = null then null
+								                            else Duration.TotalHours(Resolucion[UltimoFin] - CreatedAt),
+								                        #"Hora Creación" = Time.Hour(CreatedAt),
+								                        #"Día Semana Num" = Date.DayOfWeek(CreatedAt, Day.Monday) + 1
+								                    ]
+								        ),
+				
+								    Tickets =
+								        Table.FromRecords(
+								            Rows,
+								            type table [
+								                Key = text,
+								                #"Issue ID" = text,
+								                Summary = nullable text,
+								                Status = nullable text,
+								                #"Status Category" = nullable text,
+								                Assignee = text,
+								                #"Técnicos Asignados" = nullable text,
+								                #"Organización" = text,
+								                #"Request Type" = text,
+								                #"Tipo de Ticket" = text,
+								                ISP = text,
+								                #"Tipo de Incidente" = text,
+								                Causas = text,
+								                #"Causas Ruta" = nullable text,
+								                #"Access Point" = text,
+								                #"AP Código" = nullable text,
+								                Created = datetime,
+								                #"Created Date" = date,
+								                #"Resolution Date" = nullable datetime,
+								                #"Resolution Date Only" = nullable date,
+								                #"Resolution Hours" = nullable number,
+								                #"JSM Respuesta Meta Horas" = nullable number,
+								                #"JSM Respuesta Horas" = nullable number,
+								                #"JSM Respuesta Estado" = text,
+								                #"JSM Resolución Meta Horas" = nullable number,
+								                #"JSM Resolución Horas" = nullable number,
+								                #"JSM Resolución Estado" = text,
+								                #"Primera Respuesta" = nullable datetime,
+								                #"JSM Horas a Primera Respuesta" = nullable number,
+								                #"Entrada a Resuelta" = nullable datetime,
+								                #"JSM Horas a Resolución" = nullable number,
+								                #"Hora Creación" = Int64.Type,
+								                #"Día Semana Num" = Int64.Type
+								            ]
+								        )
+				
+								in
+								    Tickets
+
+	annotation PBI_ResultType = Table
+
