@@ -486,7 +486,7 @@ table _Medidas
 		displayFolder: Línea de Tiempo
 		lineageTag: 9a4c5d6e-7e8f-4901-840b-5c6d7e8f90a1
 
-	/// Color de la celda de la línea de tiempo agrupada (IEP Incident): azul N1, verde N2 RAM, azul claro N2 QCOM, gris el resto (Otro).
+	/// Color de la celda de la línea de tiempo agrupada (IEP Incident): azul N1, verde claro N2 RAM, verde oscuro N2 QCOM, gris el resto (Otro).
 	measure 'Color Gantt N1 N2' =
 			VAR Grupo = SELECTEDVALUE(FactStatusHistory[Grupo N1 N2])
 			RETURN
@@ -496,7 +496,7 @@ table _Medidas
 			            TRUE(),
 			            Grupo = "N1", "#06519A",
 			            Grupo = "N2 RAM", "#2ECC71",
-			            Grupo = "N2 QCOM", "#2E9BDA",
+			            Grupo = "N2 QCOM", "#145A32",
 			            "#9AA5B1"
 			        )
 			    )

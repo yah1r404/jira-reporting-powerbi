@@ -264,7 +264,7 @@
             "text": {
               "expr": {
                 "Literal": {
-                  "Value": "'N1 / N2 RAM / N2 QCOM / Otro (IEP Incident): en qué horas desde la creación estuvo cada ticket en cada grupo (azul = N1, verde = N2 RAM, azul claro = N2 QCOM, gris = Otro: Planta externa, Escalado, esperas, etc.)'"
+                  "Value": "'N1 / N2 RAM / N2 QCOM / Otro (IEP Incident): en qué horas desde la creación estuvo cada ticket en cada grupo (azul = N1, verde claro = N2 RAM, verde oscuro = N2 QCOM, gris = Otro: Planta externa, Escalado, esperas, etc.)'"
                 }
               }
             }
