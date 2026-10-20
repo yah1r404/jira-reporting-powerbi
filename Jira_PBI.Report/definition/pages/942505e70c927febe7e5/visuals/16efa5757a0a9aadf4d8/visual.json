@@ -1,5 +1,5 @@
 {
-  "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/visualContainer/2.13.0/schema.json",
+  "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/visualContainer/2.14.0/schema.json",
   "name": "16efa5757a0a9aadf4d8",
   "position": {
     "x": 1090,
@@ -85,7 +85,7 @@
             "text": {
               "expr": {
                 "Literal": {
-                  "Value": "'Horas promedio asignado por persona y request type'"
+                  "Value": "'Horas promedio asignado por persona y tipo de solicitud'"
                 }
               }
             }

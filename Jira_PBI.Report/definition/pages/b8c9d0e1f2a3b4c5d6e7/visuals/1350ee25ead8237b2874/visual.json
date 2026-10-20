@@ -1,5 +1,5 @@
 {
-  "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/visualContainer/2.13.0/schema.json",
+  "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/visualContainer/2.14.0/schema.json",
   "name": "1350ee25ead8237b2874",
   "position": {
     "x": 264,
@@ -42,11 +42,11 @@
                       "Entity": "_Medidas"
                     }
                   },
-                  "Property": "Tickets con Técnico"
+                  "Property": "Tickets escalados a N2"
                 }
               },
               "queryRef": "_Medidas.Tickets con Técnico",
-              "nativeQueryRef": "Tickets con Técnico"
+              "nativeQueryRef": "Tickets escalados a N2"
             }
           ]
         }
@@ -61,7 +61,7 @@
                     "Entity": "_Medidas"
                   }
                 },
-                "Property": "Tickets con Técnico"
+                "Property": "Tickets escalados a N2"
               }
             },
             "direction": "Descending"

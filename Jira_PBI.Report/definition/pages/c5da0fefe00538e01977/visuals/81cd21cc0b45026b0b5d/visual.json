@@ -1,5 +1,5 @@
 {
-  "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/visualContainer/2.13.0/schema.json",
+  "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/visualContainer/2.14.0/schema.json",
   "name": "81cd21cc0b45026b0b5d",
   "position": {
     "x": 264,
@@ -85,34 +85,6 @@
                       "Entity": "_Medidas"
                     }
                   },
-                  "Property": "Mediana Horas en Estado"
-                }
-              },
-              "queryRef": "_Medidas.Mediana Horas en Estado",
-              "nativeQueryRef": "Mediana Horas en Estado"
-            },
-            {
-              "field": {
-                "Measure": {
-                  "Expression": {
-                    "SourceRef": {
-                      "Entity": "_Medidas"
-                    }
-                  },
-                  "Property": "P90 Horas en Estado"
-                }
-              },
-              "queryRef": "_Medidas.P90 Horas en Estado",
-              "nativeQueryRef": "P90 Horas en Estado"
-            },
-            {
-              "field": {
-                "Measure": {
-                  "Expression": {
-                    "SourceRef": {
-                      "Entity": "_Medidas"
-                    }
-                  },
                   "Property": "Horas en Estado"
                 }
               },
@@ -137,7 +109,7 @@
             "text": {
               "expr": {
                 "Literal": {
-                  "Value": "'Time in Status por flujo'"
+                  "Value": "'Time in Status por tipo de servicio'"
                 }
               }
             }

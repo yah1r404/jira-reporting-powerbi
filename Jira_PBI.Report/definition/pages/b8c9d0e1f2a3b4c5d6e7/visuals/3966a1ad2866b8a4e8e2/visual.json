@@ -1,5 +1,5 @@
 {
-  "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/visualContainer/2.13.0/schema.json",
+  "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/visualContainer/2.14.0/schema.json",
   "name": "3966a1ad2866b8a4e8e2",
   "position": {
     "x": 800,
@@ -70,11 +70,11 @@
                       "Entity": "_Medidas"
                     }
                   },
-                  "Property": "Tickets Técnico Resueltos"
+                  "Property": "Tickets resueltos por técnicos"
                 }
               },
               "queryRef": "_Medidas.Tickets Técnico Resueltos",
-              "nativeQueryRef": "Tickets Técnico Resueltos"
+              "nativeQueryRef": "Tickets resueltos por técnicos"
             }
           ]
         }
@@ -152,7 +152,46 @@
             "text": {
               "expr": {
                 "Literal": {
-                  "Value": "'Abiertos, en proceso y resueltos por técnico'"
+                  "Value": "'Tickets abiertos, en proceso y resueltos por técnico'"
+                }
+              }
+            }
+          }
+        }
+      ],
+      "visualHeader": [
+        {
+          "properties": {
+            "show": {
+              "expr": {
+                "Literal": {
+                  "Value": "true"
+                }
+              }
+            }
+          }
+        }
+      ],
+      "visualTooltip": [
+        {
+          "properties": {
+            "show": {
+              "expr": {
+                "Literal": {
+                  "Value": "true"
+                }
+              }
+            }
+          }
+        }
+      ],
+      "subTitle": [
+        {
+          "properties": {
+            "show": {
+              "expr": {
+                "Literal": {
+                  "Value": "false"
                 }
               }
             }

@@ -4,5 +4,6 @@
   "displayName": "03 - SLA por Tipo de Ticket",
   "displayOption": "FitToWidth",
   "height": 1800,
-  "width": 1920
+  "width": 1920,
+  "visibility": "HiddenInViewMode"
 }

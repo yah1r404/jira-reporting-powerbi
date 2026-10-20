@@ -1,5 +1,5 @@
 {
-  "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/visualContainer/2.13.0/schema.json",
+  "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/visualContainer/2.14.0/schema.json",
   "name": "7a180296f03c37515096",
   "position": {
     "x": 264,
@@ -117,7 +117,20 @@
             "text": {
               "expr": {
                 "Literal": {
-                  "Value": "'Horas promedio por ticket en cada estado, por flujo'"
+                  "Value": "'Horas promedio por ticket en cada estado y tipo de servicio'"
+                }
+              }
+            }
+          }
+        }
+      ],
+      "subTitle": [
+        {
+          "properties": {
+            "show": {
+              "expr": {
+                "Literal": {
+                  "Value": "false"
                 }
               }
             }

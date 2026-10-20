@@ -607,37 +607,37 @@ table _Medidas
 		lineageTag: 93a4b5c6-d7e8-43f4-9f60-8192a3b4c5d6
 
 	/// Tickets únicos con al menos un técnico de campo. Un ticket con varios técnicos cuenta una vez.
-	measure 'Tickets con Técnico' = DISTINCTCOUNT(FactTecnicos[Key])
+	measure 'Tickets escalados a N2' = DISTINCTCOUNT(FactTecnicos[Key])
 		formatString: #,##0
 		displayFolder: Técnicos de Campo
 		lineageTag: 0b1c2d3e-4f50-4a61-9b72-c3d4e5f60811
 
 	/// Participaciones: cada par ticket × técnico. Un ticket con 3 técnicos suma 3.
-	measure 'Participaciones Técnicos' = COUNTROWS(FactTecnicos)
+	measure 'Total participaciones técnicos' = COUNTROWS(FactTecnicos)
 		formatString: #,##0
 		displayFolder: Técnicos de Campo
 		lineageTag: 1c2d3e4f-5061-4b72-8c83-d4e5f6081922
 
 	/// Técnicos de campo distintos que participaron.
-	measure 'Técnicos Involucrados' = DISTINCTCOUNT(FactTecnicos[Técnico])
+	measure 'Total técnicos activos' = DISTINCTCOUNT(FactTecnicos[Técnico])
 		formatString: #,##0
 		displayFolder: Técnicos de Campo
 		lineageTag: 2d3e4f50-6172-4c83-9d94-e5f608192a33
 
 	/// Promedio de tickets en los que participa cada técnico.
-	measure 'Tickets por Técnico' = DIVIDE([Participaciones Técnicos], [Técnicos Involucrados])
+	measure 'Tickets por Técnico' = DIVIDE([Total participaciones técnicos], [Total técnicos activos])
 		formatString: #,##0.0
 		displayFolder: Técnicos de Campo
 		lineageTag: 3e4f5061-7283-4d94-8ea5-f608192a3b44
 
 	/// Promedio de técnicos que participan en cada ticket.
-	measure 'Técnicos por Ticket' = DIVIDE([Participaciones Técnicos], [Tickets con Técnico])
+	measure 'Técnicos por Ticket' = DIVIDE([Total participaciones técnicos], [Tickets escalados a N2])
 		formatString: #,##0.0
 		displayFolder: Técnicos de Campo
 		lineageTag: 4f506172-8394-4ea5-9fb6-08192a3b4c55
 
 	/// Tickets con técnico ya resueltos (tienen fecha de resolución).
-	measure 'Tickets Técnico Resueltos' = CALCULATE([Tickets con Técnico], NOT ISBLANK(SLA_Tickets[Resolution Date]))
+	measure 'Tickets resueltos por técnicos' = CALCULATE([Tickets escalados a N2], NOT ISBLANK(SLA_Tickets[Resolution Date]))
 		formatString: #,##0
 		displayFolder: Técnicos de Campo
 		lineageTag: 5061728a-94a5-4fb6-80c7-192a3b4c5d66
@@ -645,7 +645,7 @@ table _Medidas
 	/// Tickets con técnico sin resolver que ya están en atención (categoría de estado "En curso").
 	measure 'Tickets Técnico En Proceso' =
 			CALCULATE(
-			    [Tickets con Técnico],
+			    [Tickets escalados a N2],
 			    ISBLANK(SLA_Tickets[Resolution Date]),
 			    SLA_Tickets[Status Category] <> "Por hacer"
 			)
@@ -656,7 +656,7 @@ table _Medidas
 	/// Tickets con técnico sin resolver que todavía no se atienden (categoría de estado "Por hacer").
 	measure 'Tickets Técnico Abiertos' =
 			CALCULATE(
-			    [Tickets con Técnico],
+			    [Tickets escalados a N2],
 			    ISBLANK(SLA_Tickets[Resolution Date]),
 			    SLA_Tickets[Status Category] = "Por hacer"
 			)
@@ -668,8 +668,8 @@ table _Medidas
 	/// La suma por técnico puede pasar de 100% porque un ticket puede tener varios técnicos.
 	measure '% Participación Técnico' =
 			DIVIDE(
-			    [Tickets con Técnico],
-			    CALCULATE([Tickets con Técnico], REMOVEFILTERS(FactTecnicos[Técnico], FactTecnicos[Técnico Account ID]))
+			    [Tickets escalados a N2],
+			    CALCULATE([Tickets escalados a N2], REMOVEFILTERS(FactTecnicos[Técnico], FactTecnicos[Técnico Account ID]))
 			)
 		formatString: 0.0%;-0.0%;0.0%
 		displayFolder: Técnicos de Campo
@@ -697,7 +697,7 @@ table _Medidas
 		lineageTag: acbdcedf-e9fa-44ab-95bc-6e7f8091a2bb
 
 	/// Tickets del técnico que incumplieron el SLA de resolución.
-	measure 'Tickets Técnico Incumplidos' = CALCULATE([Tickets con Técnico], SLA_Tickets[SLA Resolución Estado] = "Incumplido")
+	measure 'Tickets Técnico Incumplidos' = CALCULATE([Tickets escalados a N2], SLA_Tickets[SLA Resolución Estado] = "Incumplido")
 		formatString: #,##0
 		displayFolder: Técnicos de Campo
 		lineageTag: bdcedfe0-fa0b-45bc-a6cd-7f8091a2b3cc
