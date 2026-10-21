@@ -1,0 +1,32 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/visualContainerMobileState/2.8.0/schema.json",
+  "position": {
+    "x": 90,
+    "y": 0,
+    "z": 6,
+    "width": 230,
+    "height": 30,
+    "tabOrder": 6
+  },
+  "objects": {
+    "icon": [],
+    "text": [
+      {
+        "properties": {
+          "horizontalAlignment": {
+            "expr": {
+              "Literal": {
+                "Value": "'right'"
+              }
+            }
+          }
+        },
+        "selector": {
+          "id": "default"
+        }
+      }
+    ],
+    "fill": [],
+    "outline": []
+  }
+}

@@ -78,6 +78,11 @@
           "name": "quattrocom_logo.png",
           "path": "quattrocom_logo.png",
           "type": "Image"
+        },
+        {
+          "name": "filtro_icono.jpg",
+          "path": "filtro_icono.jpg",
+          "type": "Image"
         }
       ]
     }
