@@ -47,24 +47,6 @@ table FactStatusHistory
 
 		annotation SummarizationSetBy = Automatic
 
-	/// Agrupa el estado para la línea de tiempo, solo para el flujo "IEP Incident": N1 (Nueva solicitud, N1, Reabierta), N2 RAM, N2 QCOM, y "Otro" para el resto (Planta externa, Escalado y variantes, esperas, etc.). Vacío solo para el otro flujo.
-	column 'Grupo N1 N2' =
-			IF(
-			    FactStatusHistory[Flujo] = "IEP Incident",
-			    SWITCH(
-			        TRUE(),
-			        FactStatusHistory[Estado] IN {"Nueva solicitud", "N1", "Reabierta"}, "N1",
-			        FactStatusHistory[Estado] = "N2 RAM", "N2 RAM",
-			        FactStatusHistory[Estado] = "N2 QCOM", "N2 QCOM",
-			        "Otro"
-			    )
-			)
-		dataType: string
-		lineageTag: 5f607182-93a4-4b5c-8d6e-7f8091a2b3c4
-		summarizeBy: none
-
-		annotation SummarizationSetBy = Automatic
-
 	/// TRUE si el estado es final (categoría "done": Resuelta, Cerrada). Se excluyen de las medidas de Time in Status.
 	column 'Es Estado Final'
 		dataType: boolean
@@ -154,6 +136,24 @@ table FactStatusHistory
 		lineageTag: 1b2c3d4e-5f60-4b7c-9d8e-0f1a2b3c4d5e
 		summarizeBy: none
 		sourceColumn: Horas Hábiles
+
+		annotation SummarizationSetBy = Automatic
+
+	/// Agrupa el estado para la línea de tiempo, solo para el flujo "IEP Incident": N1 (Nueva solicitud, N1, Reabierta), N2 RAM, N2 QCOM, y "Otro" para el resto (Planta externa, Escalado y variantes, esperas, etc.). Vacío solo para el otro flujo.
+	column 'Grupo N1 N2' =
+			IF(
+			    FactStatusHistory[Flujo] = "IEP Incident",
+			    SWITCH(
+			        TRUE(),
+			        FactStatusHistory[Estado] IN {"Nueva solicitud", "N1", "Reabierta"}, "N1",
+			        FactStatusHistory[Estado] = "N2 RAM", "N2 RAM",
+			        FactStatusHistory[Estado] = "N2 QCOM", "N2 QCOM",
+			        "Otro"
+			    )
+			)
+		dataType: string
+		lineageTag: 5f607182-93a4-4b5c-8d6e-7f8091a2b3c4
+		summarizeBy: none
 
 		annotation SummarizationSetBy = Automatic
 

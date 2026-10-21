@@ -486,23 +486,6 @@ table _Medidas
 		displayFolder: Línea de Tiempo
 		lineageTag: 9a4c5d6e-7e8f-4901-840b-5c6d7e8f90a1
 
-	/// Color de la celda de la línea de tiempo agrupada (IEP Incident): azul N1, verde claro N2 RAM, verde oscuro N2 QCOM, gris el resto (Otro).
-	measure 'Color Gantt N1 N2' =
-			VAR Grupo = SELECTEDVALUE(FactStatusHistory[Grupo N1 N2])
-			RETURN
-			    IF(
-			        NOT ISBLANK([Gantt Estado]),
-			        SWITCH(
-			            TRUE(),
-			            Grupo = "N1", "#06519A",
-			            Grupo = "N2 RAM", "#2ECC71",
-			            Grupo = "N2 QCOM", "#145A32",
-			            "#9AA5B1"
-			        )
-			    )
-		displayFolder: Línea de Tiempo
-		lineageTag: 6071829a-3b4c-45d6-9e7f-8091a2b3c4d5
-
 	/// Texto con los filtros aplicados en las páginas de la mesa MDSC (se muestra debajo de la barra de filtros).
 	measure 'Filtros Activos' =
 			VAR Periodo =
@@ -830,6 +813,23 @@ table _Medidas
 		formatString: 0
 		displayFolder: Línea de Tiempo
 		lineageTag: 4dd47767-b2f0-4596-880f-9e780d040ab1
+
+	/// Color de la celda de la línea de tiempo agrupada (IEP Incident): azul N1, verde claro N2 RAM, verde oscuro N2 QCOM, gris el resto (Otro).
+	measure 'Color Gantt N1 N2' =
+			VAR Grupo = SELECTEDVALUE(FactStatusHistory[Grupo N1 N2])
+			RETURN
+			    IF(
+			        NOT ISBLANK([Gantt Estado]),
+			        SWITCH(
+			            TRUE(),
+			            Grupo = "N1", "#06519A",
+			            Grupo = "N2 RAM", "#2ECC71",
+			            Grupo = "N2 QCOM", "#145A32",
+			            "#9AA5B1"
+			        )
+			    )
+		displayFolder: Línea de Tiempo
+		lineageTag: 6071829a-3b4c-45d6-9e7f-8091a2b3c4d5
 
 	partition _Medidas = m
 		mode: import
