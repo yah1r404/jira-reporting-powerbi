@@ -3,9 +3,9 @@
   "name": "78d33ce6831d22ebbaab",
   "position": {
     "x": 264,
-    "y": 196,
+    "y": 108,
     "z": 400,
-    "height": 360,
+    "height": 380,
     "width": 1216,
     "tabOrder": 400
   },
@@ -60,11 +60,11 @@
                       "Entity": "_Medidas"
                     }
                   },
-                  "Property": "Total de Incidentes"
+                  "Property": "Incidentes por Falla con %"
                 }
               },
-              "queryRef": "_Medidas.Total de Incidentes",
-              "nativeQueryRef": "Total de Incidentes",
+              "queryRef": "_Medidas.Incidentes por Falla con %",
+              "nativeQueryRef": "Incidentes por Falla con %",
               "displayName": "Incidentes"
             }
           ]
@@ -80,7 +80,7 @@
                     "Entity": "_Medidas"
                   }
                 },
-                "Property": "Total de Incidentes"
+                "Property": "Incidentes por Falla con %"
               }
             },
             "direction": "Descending"
@@ -191,6 +191,13 @@
               }
             },
             "showAxisTitle": {
+              "expr": {
+                "Literal": {
+                  "Value": "false"
+                }
+              }
+            },
+            "show": {
               "expr": {
                 "Literal": {
                   "Value": "false"

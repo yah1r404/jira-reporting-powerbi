@@ -42,11 +42,11 @@
                       "Entity": "_Medidas"
                     }
                   },
-                  "Property": "Incidentes Creados"
+                  "Property": "Creados con %"
                 }
               },
-              "queryRef": "_Medidas.Incidentes Creados",
-              "nativeQueryRef": "Incidentes Creados",
+              "queryRef": "_Medidas.Creados con %",
+              "nativeQueryRef": "Creados con %",
               "displayName": "Creados"
             },
             {
@@ -57,11 +57,11 @@
                       "Entity": "_Medidas"
                     }
                   },
-                  "Property": "Incidentes Resueltos"
+                  "Property": "Resueltos con %"
                 }
               },
-              "queryRef": "_Medidas.Incidentes Resueltos",
-              "nativeQueryRef": "Incidentes Resueltos",
+              "queryRef": "_Medidas.Resueltos con %",
+              "nativeQueryRef": "Resueltos con %",
               "displayName": "Resueltos"
             }
           ]
@@ -134,7 +134,7 @@
             }
           },
           "selector": {
-            "metadata": "_Medidas.Incidentes Creados"
+            "metadata": "_Medidas.Creados con %"
           }
         },
         {
@@ -152,7 +152,7 @@
             }
           },
           "selector": {
-            "metadata": "_Medidas.Incidentes Resueltos"
+            "metadata": "_Medidas.Resueltos con %"
           }
         }
       ],
@@ -230,6 +230,13 @@
               }
             },
             "showAxisTitle": {
+              "expr": {
+                "Literal": {
+                  "Value": "false"
+                }
+              }
+            },
+            "show": {
               "expr": {
                 "Literal": {
                   "Value": "false"

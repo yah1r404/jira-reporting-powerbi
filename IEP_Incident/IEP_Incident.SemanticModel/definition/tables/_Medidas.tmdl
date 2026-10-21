@@ -540,6 +540,27 @@ table _Medidas
 
 		formatStringDefinition = "0% ""(" & FORMAT([Incidentes por Estado de SLA], "#,##0") & ")"""
 
+	/// Incidentes creados; la etiqueta muestra además el % sobre el total creado en el periodo.
+	measure 'Creados con %' = [Incidentes Creados]
+		displayFolder: Gráficas
+		lineageTag: 5cdba80d-4772-4e27-8c13-c5e2398acbb7
+
+		formatStringDefinition = "#,##0 ""(" & FORMAT(DIVIDE([Incidentes Creados], CALCULATE([Incidentes Creados], ALLSELECTED(DimFecha))), "0%") & ")"""
+
+	/// Incidentes resueltos; la etiqueta muestra además el % sobre el total resuelto en el periodo.
+	measure 'Resueltos con %' = [Incidentes Resueltos]
+		displayFolder: Gráficas
+		lineageTag: ca7f6402-66a5-4091-ab9b-97f607fb222f
+
+		formatStringDefinition = "#,##0 ""(" & FORMAT(DIVIDE([Incidentes Resueltos], CALCULATE([Incidentes Resueltos], ALLSELECTED(DimFecha))), "0%") & ")"""
+
+	/// Incidentes con la falla; la etiqueta muestra además el % sobre el total de incidentes (un ticket con varias fallas cuenta en cada una).
+	measure 'Incidentes por Falla con %' = [Total de Incidentes]
+		displayFolder: Gráficas
+		lineageTag: d05bf9a5-47fa-4f6a-90ae-8df6b1e99690
+
+		formatStringDefinition = "#,##0 ""(" & FORMAT(DIVIDE([Total de Incidentes], CALCULATE([Total de Incidentes], ALLSELECTED(FactCausas[Causa]))), "0%") & ")"""
+
 	partition _Medidas = m
 		mode: import
 		source =
