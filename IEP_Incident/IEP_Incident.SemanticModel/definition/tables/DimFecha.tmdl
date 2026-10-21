@@ -1,0 +1,84 @@
+table DimFecha
+	lineageTag: b19c3545-b8e9-4857-976a-f1fff9348b35
+	dataCategory: Time
+
+	column Date
+		dataType: dateTime
+		isKey
+		formatString: Short Date
+		lineageTag: 50375f09-cdcc-4c30-914b-d27f473ae784
+		summarizeBy: none
+		isNameInferred
+		sourceColumn: [Date]
+
+		annotation SummarizationSetBy = Automatic
+
+	column Año = YEAR([Date])
+		dataType: int64
+		formatString: 0
+		lineageTag: ace27914-210b-4eff-b05b-607dbb3504cf
+		summarizeBy: none
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Mes Numero' = MONTH([Date])
+		dataType: int64
+		formatString: 0
+		lineageTag: 177bbb7f-ba54-4c43-82dd-0d6e6103f2e3
+		summarizeBy: none
+
+		annotation SummarizationSetBy = Automatic
+
+	column Mes = FORMAT([Date], "mmmm")
+		dataType: string
+		lineageTag: 3e5d257b-0d04-454a-9ba5-c58ffb727732
+		summarizeBy: none
+		sortByColumn: 'Mes Numero'
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Año Mes' = FORMAT([Date], "yyyy-mm")
+		dataType: string
+		lineageTag: 2b42d5f0-c6f3-4235-b2e8-5f0e08e88116
+		summarizeBy: none
+
+		annotation SummarizationSetBy = Automatic
+
+	column Día = DAY([Date])
+		dataType: int64
+		formatString: 0
+		lineageTag: 44fbe400-ba1b-4e99-a880-7123c08c67fa
+		summarizeBy: none
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Día Semana Numero' = WEEKDAY([Date], 2)
+		dataType: int64
+		formatString: 0
+		lineageTag: 5409047b-2e07-407c-a062-19941e36c59d
+		summarizeBy: none
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Día Semana' = FORMAT([Date], "dddd")
+		dataType: string
+		lineageTag: 4d3db086-9817-44a9-939d-f12e43c387c9
+		summarizeBy: none
+		sortByColumn: 'Día Semana Numero'
+
+		annotation SummarizationSetBy = Automatic
+
+	/// Año y número de semana (lunes a domingo).
+	column Semana = YEAR([Date]) & "-S" & FORMAT(WEEKNUM([Date], 2), "00")
+		dataType: string
+		lineageTag: 29e786cf-1c4c-4eca-afe6-db4af2190d62
+		summarizeBy: none
+
+		annotation SummarizationSetBy = Automatic
+
+	partition DimFecha = calculated
+		mode: import
+		source = CALENDAR(MIN('IEP_Tickets'[Created Date]), MAX(MAX(MAX('IEP_Tickets'[Created Date]), MAX('IEP_Tickets'[Resolution Date Only])), TODAY()))
+
+	annotation PBI_Id = DimFecha_CalendarioPrincipal
+

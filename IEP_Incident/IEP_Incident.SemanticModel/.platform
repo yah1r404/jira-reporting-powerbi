@@ -1,0 +1,11 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/fabric/gitIntegration/platformProperties/2.0.0/schema.json",
+  "metadata": {
+    "type": "SemanticModel",
+    "displayName": "IEP_Incident"
+  },
+  "config": {
+    "version": "2.0",
+    "logicalId": "ed1374a4-30b7-4d7a-b43e-1a2769be2109"
+  }
+}

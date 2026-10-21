@@ -1,0 +1,574 @@
+table _Medidas
+	lineageTag: 74fe4178-e722-41d1-a903-785d192d86f2
+
+	/// Cumplidos / (Cumplidos + Incumplidos). Los que siguen en curso, pausados o sin SLA aún no se evalúan.
+	measure '% SLA Primera Respuesta' = DIVIDE([Primera Respuesta Cumplidos], [Primera Respuesta Cumplidos] + [Primera Respuesta Incumplidos])
+		formatString: 0.0%;-0.0%;0.0%
+		displayFolder: SLA Primera Respuesta
+		lineageTag: ac22bcae-d96d-41f3-aef1-8b33b01fc01c
+
+	/// Horas de las metas de resolución de los incidentes del contexto (ej. 15 h / 24 h).
+	measure 'Meta del SLA' =
+			CONCATENATEX(
+			    FILTER(VALUES(IEP_Tickets[SLA Resolución Meta Horas]), NOT ISBLANK(IEP_Tickets[SLA Resolución Meta Horas])),
+			    FORMAT(IEP_Tickets[SLA Resolución Meta Horas], "0.##") & " h",
+			    " / ", IEP_Tickets[SLA Resolución Meta Horas], ASC
+			)
+		displayFolder: SLA Resolución
+		lineageTag: 50a9a40e-185a-4ef6-8b70-deb9ad11bd67
+
+	/// Subtítulo con las horas de las metas de primera respuesta y resolución (según Jira).
+	measure 'Metas SLA Texto' =
+			VAR Resp =
+			    CONCATENATEX(
+			        FILTER(VALUES(IEP_Tickets[SLA Respuesta Meta Horas]), NOT ISBLANK(IEP_Tickets[SLA Respuesta Meta Horas])),
+			        IF(IEP_Tickets[SLA Respuesta Meta Horas] < 1, FORMAT(IEP_Tickets[SLA Respuesta Meta Horas] * 60, "0") & " min",
+			           FORMAT(IEP_Tickets[SLA Respuesta Meta Horas], "0.##") & " h"),
+			        " / ", IEP_Tickets[SLA Respuesta Meta Horas], ASC
+			    )
+			VAR Res = [Meta del SLA]
+			RETURN
+			    "Metas de SLA (calendario 24 h) · Primera respuesta: " & IF(Resp = "", "sin meta", Resp)
+			        & "   ·   Resolución: " & IF(Res = "", "sin meta", Res)
+		displayFolder: SLA Resolución
+		lineageTag: f257027c-a983-4fca-a0f5-0e313552e4ef
+
+	/// Meta de cumplimiento (azul desde aquí). Ajustar al acuerdo de servicio.
+	measure 'Meta % SLA' = 0.95
+		formatString: 0.0%;-0.0%;0.0%
+		displayFolder: Semáforo
+		lineageTag: d089a0b3-087b-484e-8f8a-c3bef340827e
+
+	/// Umbral de alerta (ámbar desde aquí, rojo por debajo).
+	measure 'Umbral Alerta % SLA' = 0.85
+		formatString: 0.0%;-0.0%;0.0%
+		displayFolder: Semáforo
+		lineageTag: 32203de5-d796-4180-9113-b978977b0258
+
+	/// Negro >= meta, rojo oscuro >= umbral, rojo debajo.
+	measure 'Color % SLA Primera Respuesta' =
+			VAR v = [% SLA Primera Respuesta]
+			RETURN SWITCH(TRUE(), ISBLANK(v), "#595959", v >= [Meta % SLA], "#1A1A1A", v >= [Umbral Alerta % SLA], "#A00D25", "#C8382E")
+		displayFolder: SLA Primera Respuesta
+		lineageTag: 62500aa8-b112-40fd-b176-739a83642cbc
+
+	/// Color de texto del estado del SLA de resolución.
+	measure 'Color Estado SLA' =
+			SWITCH(SELECTEDVALUE(IEP_Tickets[SLA Resolución Estado]), "Incumplido", "#C8382E", "En riesgo", "#A00D25", "Pausado", "#595959",
+			    "Cumplido", "#1A1A1A", "En curso", "#595959", "#595959")
+		displayFolder: Semáforo
+		lineageTag: 1ec7f21d-80ff-4fa8-9d35-047d061b3a46
+
+	/// Color de texto para valores de incumplimiento.
+	measure 'Color Alerta' = "#C8382E"
+		displayFolder: Semáforo
+		lineageTag: c9d9cc5c-84ae-4a57-9f28-897d959a6478
+
+	/// TRUE si las horas se calculan en horario laboral (L-V 6:00-23:00, Sáb 9:00-19:00). Es el valor predeterminado.
+	measure 'Usa Horario Laboral' = SELECTEDVALUE('Horario Cálculo'[Clave], "laboral") = "laboral"
+		displayFolder: Tiempo en Estado
+		lineageTag: 867f3e48-e426-405d-bce8-e8c40f06aa19
+
+	/// Horas que los tickets permanecieron en el estado/nivel (no es tiempo de trabajo efectivo). Excluye estados finales.
+	measure 'Horas en Estado' = CALCULATE(IF([Usa Horario Laboral], SUM(FactStatusHistory[Horas Hábiles]), SUM(FactStatusHistory[Horas])), FactStatusHistory[Es Estado Final] = FALSE())
+		formatString: #,##0.00
+		displayFolder: Tiempo en Estado
+		lineageTag: a14b5819-bc02-4780-a493-40a7841a331c
+
+	/// Tickets que pasaron por el estado o nivel.
+	measure 'Tickets en Estado' = CALCULATE(DISTINCTCOUNT(FactStatusHistory[Key]), FactStatusHistory[Es Estado Final] = FALSE())
+		formatString: #,##0
+		displayFolder: Tiempo en Estado
+		lineageTag: feedf641-39a9-45e0-a094-700e4229e4cc
+
+	/// Horas promedio por ticket en el estado o nivel (suma de sus periodos).
+	measure 'Prom Horas en Estado' = DIVIDE([Horas en Estado], [Tickets en Estado])
+		formatString: #,##0.00
+		displayFolder: Tiempo en Estado
+		lineageTag: c9256c95-e62e-4cd0-a2c4-ce927d38b3c1
+
+	/// Fecha y hora del último refresh de los datos (hora de Mérida).
+	measure 'Última Actualización' = CALCULATE(MAX(FactStatusHistory[Fin]), REMOVEFILTERS())
+		formatString: dd/mm/yyyy hh:nn
+		displayFolder: General
+		lineageTag: 963bfc8f-280a-4cae-834a-18e5c14607ad
+
+	/// Texto con los filtros aplicados.
+	measure 'Filtros Activos' =
+			VAR Periodo =
+			    IF(ISFILTERED(DimFecha[Date]),
+			        "Periodo: " & FORMAT(MIN(DimFecha[Date]), "dd/mm/yyyy") & " – " & FORMAT(MAX(DimFecha[Date]), "dd/mm/yyyy"))
+			VAR Est = IF(ISFILTERED(IEP_Tickets[Status]), "Estado: " & CONCATENATEX(VALUES(IEP_Tickets[Status]), IEP_Tickets[Status], ", "))
+			VAR TipoI = IF(ISFILTERED(IEP_Tickets[Tipo de Incidente]),
+			    "Tipo de incidente: " & IF(COUNTROWS(VALUES(IEP_Tickets[Tipo de Incidente])) > 2,
+			        COUNTROWS(VALUES(IEP_Tickets[Tipo de Incidente])) & " seleccionados",
+			        CONCATENATEX(VALUES(IEP_Tickets[Tipo de Incidente]), IEP_Tickets[Tipo de Incidente], ", ")))
+			VAR Cau = IF(ISFILTERED(FactCausas[Causa]),
+			    "Falla: " & IF(COUNTROWS(VALUES(FactCausas[Causa])) > 2, COUNTROWS(VALUES(FactCausas[Causa])) & " seleccionadas",
+			        CONCATENATEX(VALUES(FactCausas[Causa]), FactCausas[Causa], ", ")))
+			VAR Niv = IF(ISFILTERED(FactStatusHistory[Nivel]), "Nivel: " & CONCATENATEX(VALUES(FactStatusHistory[Nivel]), FactStatusHistory[Nivel], ", "))
+			VAR Partes = { "Alcance: IEP INCIDENT · Incidente Qcom", Periodo, Est, TipoI, Cau, Niv }
+			RETURN CONCATENATEX(FILTER(Partes, NOT ISBLANK([Value])), [Value], "   ·   ")
+		displayFolder: General
+		lineageTag: 8053040a-7e57-4d9d-977a-9388e6439e2c
+
+	/// Incidentes creados en el rango de fechas seleccionado.
+	measure 'Total de Incidentes' = COUNTROWS(IEP_Tickets)
+		formatString: #,##0
+		displayFolder: Volumen
+		lineageTag: b31f249a-8993-49e0-a1aa-192b601da0a5
+
+	/// Incidentes creados en el periodo seleccionado (fecha de creación).
+	measure 'Incidentes Creados' = COUNTROWS(IEP_Tickets)
+		formatString: #,##0
+		displayFolder: Volumen
+		lineageTag: d72f5415-6a71-42f1-86c9-8a8bd8b73130
+
+	/// Incidentes que entraron a Resuelta en el periodo seleccionado, aunque se hayan creado antes.
+	measure 'Incidentes Resueltos' = CALCULATE(COUNTROWS(IEP_Tickets), REMOVEFILTERS(DimFecha), TREATAS(VALUES(DimFecha[Date]), IEP_Tickets[Fecha Resuelta Día]))
+		formatString: #,##0
+		displayFolder: Volumen
+		lineageTag: 0cb9e79b-47b4-47fc-a48a-770dafeb19aa
+
+	/// Incidentes creados en el rango de fechas que hoy siguen sin resolver (no confundir con los resueltos en el periodo).
+	measure 'Incidentes Pendientes' = CALCULATE(COUNTROWS(IEP_Tickets), ISBLANK(IEP_Tickets[Fecha Resuelta])) + 0
+		formatString: #,##0
+		displayFolder: Volumen
+		lineageTag: 9021cb68-a4a6-4656-944d-ed2cf4dd1839
+
+	/// Días calendario del periodo seleccionado.
+	measure 'Días del Periodo' = COUNTROWS(DimFecha)
+		formatString: #,##0
+		displayFolder: Volumen
+		lineageTag: 942a4c26-0c4f-490d-bb8b-eb6ed33a51f7
+
+	/// Promedio de incidentes creados por día calendario del periodo.
+	measure 'Creados por Día' = DIVIDE([Incidentes Creados], [Días del Periodo])
+		formatString: #,##0.0
+		displayFolder: Volumen
+		lineageTag: aa7194c3-383e-4e43-ac2d-c43474e26230
+
+	/// Promedio de incidentes resueltos por día calendario del periodo.
+	measure 'Resueltos por Día' = DIVIDE([Incidentes Resueltos], [Días del Periodo])
+		formatString: #,##0.0
+		displayFolder: Volumen
+		lineageTag: 4c39c03f-2a19-4353-843e-f13a663345da
+
+	/// Incidentes abiertos al final de cada día: creados hasta ese día y sin resolver a esa fecha.
+	measure 'Pendientes al Cierre' =
+			VAR Dia = MAX(DimFecha[Date])
+			RETURN
+			    CALCULATE(
+			        COUNTROWS(IEP_Tickets),
+			        REMOVEFILTERS(DimFecha),
+			        IEP_Tickets[Created Date] <= Dia,
+			        ISBLANK(IEP_Tickets[Fecha Resuelta Día]) || IEP_Tickets[Fecha Resuelta Día] > Dia
+			    )
+		formatString: #,##0
+		displayFolder: Volumen
+		lineageTag: 88a9b547-6d0b-43bf-a26c-3c1b7b753549
+
+	/// Participación sobre el total visible (sin el corte del renglón o barra).
+	measure '% de Incidentes' = DIVIDE([Incidentes Creados], CALCULATE([Incidentes Creados], ALLSELECTED()))
+		formatString: 0.0%;-0.0%;0.0%
+		displayFolder: Volumen
+		lineageTag: cdc5c859-6952-4e5c-be2b-d665c1ba91aa
+
+	/// Participación de la causa dentro de su tipo de incidente.
+	measure '% del Tipo de Incidente' = DIVIDE([Incidentes Creados], CALCULATE([Incidentes Creados], REMOVEFILTERS(FactCausas[Causa])))
+		formatString: 0.0%;-0.0%;0.0%
+		displayFolder: Volumen
+		lineageTag: d5a717a5-3846-4595-9628-a7fd4fbecb3e
+
+	/// Tickets que cumplieron el SLA de primera respuesta (según Jira).
+	measure 'Primera Respuesta Cumplidos' = CALCULATE([Incidentes Creados], IEP_Tickets[SLA Respuesta Estado] = "Cumplido")
+		formatString: #,##0
+		displayFolder: SLA Primera Respuesta
+		lineageTag: bf2242ba-8a79-4d23-b5cb-e31648486d13
+
+	/// Tickets que excedieron el SLA de primera respuesta (resueltos fuera de tiempo o abiertos ya vencidos).
+	measure 'Primera Respuesta Incumplidos' = CALCULATE([Incidentes Creados], IEP_Tickets[SLA Respuesta Estado] = "Incumplido")
+		formatString: #,##0
+		displayFolder: SLA Primera Respuesta
+		lineageTag: 5d52bd4a-048c-44b1-abd3-c3781d4a7746
+
+	/// Tickets con el SLA de primera respuesta corriendo (incluye en riesgo).
+	measure 'Primera Respuesta En Curso' = CALCULATE([Incidentes Creados], IEP_Tickets[SLA Respuesta Estado] IN {"En curso", "En riesgo"})
+		formatString: #,##0
+		displayFolder: SLA Primera Respuesta
+		lineageTag: a80a01b5-6222-4bcd-916e-238dacca1760
+
+	/// Tickets con el SLA de primera respuesta pausado (estados de espera).
+	measure 'Primera Respuesta Pausados' = CALCULATE([Incidentes Creados], IEP_Tickets[SLA Respuesta Estado] = "Pausado")
+		formatString: #,##0
+		displayFolder: SLA Primera Respuesta
+		lineageTag: 8339532a-7890-4c0b-8480-ca280650cc3e
+
+	/// Tickets sin SLA de primera respuesta en Jira.
+	measure 'Primera Respuesta Sin SLA' = CALCULATE([Incidentes Creados], IEP_Tickets[SLA Respuesta Estado] = "Sin SLA")
+		formatString: #,##0
+		displayFolder: SLA Primera Respuesta
+		lineageTag: 6625796b-36a8-4d9e-87d1-5825c785161b
+
+	/// Tickets que cumplieron el SLA de resolución (según Jira).
+	measure 'Resolución Cumplidos' = CALCULATE([Incidentes Creados], IEP_Tickets[SLA Resolución Estado] = "Cumplido")
+		formatString: #,##0
+		displayFolder: SLA Resolución
+		lineageTag: 8c2251b7-b7f0-43b6-969f-7a97b9038ecb
+
+	/// Tickets que excedieron el SLA de resolución (resueltos fuera de tiempo o abiertos ya vencidos).
+	measure 'Resolución Incumplidos' = CALCULATE([Incidentes Creados], IEP_Tickets[SLA Resolución Estado] = "Incumplido")
+		formatString: #,##0
+		displayFolder: SLA Resolución
+		lineageTag: 7ed44814-3e35-4af7-b4c3-243baf8cfd76
+
+	/// Tickets con el SLA de resolución corriendo (incluye en riesgo).
+	measure 'Resolución En Curso' = CALCULATE([Incidentes Creados], IEP_Tickets[SLA Resolución Estado] IN {"En curso", "En riesgo"})
+		formatString: #,##0
+		displayFolder: SLA Resolución
+		lineageTag: 923bbda2-fefd-45a8-98a7-603569ad3e53
+
+	/// Tickets con el SLA de resolución pausado (estados de espera).
+	measure 'Resolución Pausados' = CALCULATE([Incidentes Creados], IEP_Tickets[SLA Resolución Estado] = "Pausado")
+		formatString: #,##0
+		displayFolder: SLA Resolución
+		lineageTag: c2a2dcee-6739-4632-a876-91dce902251a
+
+	/// Tickets sin SLA de resolución en Jira.
+	measure 'Resolución Sin SLA' = CALCULATE([Incidentes Creados], IEP_Tickets[SLA Resolución Estado] = "Sin SLA")
+		formatString: #,##0
+		displayFolder: SLA Resolución
+		lineageTag: f032673e-659a-421c-ac1a-7f7bb8a5dbe3
+
+	/// Cumplidos / (Cumplidos + Incumplidos). Los que siguen en curso, pausados o sin SLA aún no se evalúan.
+	measure '% SLA Resolución' = DIVIDE([Resolución Cumplidos], [Resolución Cumplidos] + [Resolución Incumplidos])
+		formatString: 0.0%;-0.0%;0.0%
+		displayFolder: SLA Resolución
+		lineageTag: 05ca04e3-8a75-4a19-a7c8-88f42e620241
+
+	/// Negro >= meta, rojo oscuro >= umbral, rojo debajo.
+	measure 'Color % SLA Resolución' =
+			VAR v = [% SLA Resolución]
+			RETURN SWITCH(TRUE(), ISBLANK(v), "#595959", v >= [Meta % SLA], "#1A1A1A", v >= [Umbral Alerta % SLA], "#A00D25", "#C8382E")
+		displayFolder: SLA Resolución
+		lineageTag: 495acd7a-b983-4ab4-94e4-cfb30a9c777d
+
+	/// Incidentes del SLA (eje 'SLA Comparación') en cada estado (eje 'Estado SLA').
+	measure 'Incidentes por Estado de SLA' =
+			VAR Sla = SELECTEDVALUE('SLA Comparación'[SLA])
+			VAR Est = SELECTEDVALUE('Estado SLA'[Estado del SLA])
+			RETURN
+			    IF(
+			        Sla = "Primera respuesta",
+			        CALCULATE([Incidentes Creados], IEP_Tickets[SLA Respuesta Estado] = Est),
+			        CALCULATE([Incidentes Creados], IEP_Tickets[SLA Resolución Estado] = Est)
+			    )
+		formatString: #,##0
+		displayFolder: Comparación SLA
+		lineageTag: 15c9ea52-6a97-4623-b466-b844cc694606
+
+	/// Horas NATURALES promedio desde la creación hasta la primera respuesta.
+	measure 'Prom Horas a Primera Respuesta' = AVERAGE(IEP_Tickets[Horas a Primera Respuesta])
+		formatString: #,##0.00
+		displayFolder: Tiempos
+		lineageTag: 41cc6004-d9d3-4dcf-884d-6634e0968412
+
+	/// Horas NATURALES promedio desde la creación hasta la entrada a Resuelta.
+	measure 'Prom Horas a Resolución' = AVERAGE(IEP_Tickets[Horas a Resolución])
+		formatString: #,##0.00
+		displayFolder: Tiempos
+		lineageTag: d55c9533-a789-43cd-b410-1b8032b642f0
+
+	/// Tiempo promedio de SLA de primera respuesta según Jira (descuenta pausas y usa el calendario del SLA).
+	measure 'Prom Horas SLA Primera Respuesta' = AVERAGE(IEP_Tickets[SLA Respuesta Horas])
+		formatString: #,##0.00
+		displayFolder: Tiempos
+		lineageTag: eabff366-81d8-4a60-9d2a-40a0164607ea
+
+	/// Tiempo promedio de SLA de resolución según Jira (descuenta pausas y usa el calendario del SLA).
+	measure 'Prom Horas SLA Resolución' = AVERAGE(IEP_Tickets[SLA Resolución Horas])
+		formatString: #,##0.00
+		displayFolder: Tiempos
+		lineageTag: fb8dddd0-ea59-4672-bde1-e3abbf8ca6a6
+
+	/// Promedio natural hasta la primera respuesta, en formato legible.
+	measure 'Tiempo a Primera Respuesta' =
+			VAR Hrs = [Prom Horas a Primera Respuesta]
+			VAR M = ROUND(Hrs * 60, 0)
+			VAR D = INT(M / 1440)
+			VAR H = INT(MOD(M, 1440) / 60)
+			VAR Mi = MOD(M, 60)
+			RETURN
+			    IF(
+			        ISBLANK(Hrs), BLANK(),
+			        IF(D > 0, D & IF(D = 1, " día ", " días ") & H & " h " & FORMAT(Mi, "00") & " min",
+			            IF(H > 0, H & " h " & FORMAT(Mi, "00") & " min", Mi & " min"))
+			    )
+		displayFolder: Tiempos
+		lineageTag: f1dc2f99-c9b0-482e-a779-bd1446210659
+
+	/// Promedio natural hasta la resolución, en formato legible.
+	measure 'Tiempo a Resolución' =
+			VAR Hrs = [Prom Horas a Resolución]
+			VAR M = ROUND(Hrs * 60, 0)
+			VAR D = INT(M / 1440)
+			VAR H = INT(MOD(M, 1440) / 60)
+			VAR Mi = MOD(M, 60)
+			RETURN
+			    IF(
+			        ISBLANK(Hrs), BLANK(),
+			        IF(D > 0, D & IF(D = 1, " día ", " días ") & H & " h " & FORMAT(Mi, "00") & " min",
+			            IF(H > 0, H & " h " & FORMAT(Mi, "00") & " min", Mi & " min"))
+			    )
+		displayFolder: Tiempos
+		lineageTag: 1886c12b-28e3-4594-8e33-bf7bd2dbb2c6
+
+	/// Promedio del tiempo de SLA de primera respuesta (Jira), legible.
+	measure 'Tiempo SLA Primera Respuesta' =
+			VAR Hrs = [Prom Horas SLA Primera Respuesta]
+			VAR M = ROUND(Hrs * 60, 0)
+			VAR D = INT(M / 1440)
+			VAR H = INT(MOD(M, 1440) / 60)
+			VAR Mi = MOD(M, 60)
+			RETURN
+			    IF(
+			        ISBLANK(Hrs), BLANK(),
+			        IF(D > 0, D & IF(D = 1, " día ", " días ") & H & " h " & FORMAT(Mi, "00") & " min",
+			            IF(H > 0, H & " h " & FORMAT(Mi, "00") & " min", Mi & " min"))
+			    )
+		displayFolder: Tiempos
+		lineageTag: 0a652b36-f9f7-4415-a28a-c02f5c3339d0
+
+	/// Promedio del tiempo de SLA de resolución (Jira), legible.
+	measure 'Tiempo SLA Resolución' =
+			VAR Hrs = [Prom Horas SLA Resolución]
+			VAR M = ROUND(Hrs * 60, 0)
+			VAR D = INT(M / 1440)
+			VAR H = INT(MOD(M, 1440) / 60)
+			VAR Mi = MOD(M, 60)
+			RETURN
+			    IF(
+			        ISBLANK(Hrs), BLANK(),
+			        IF(D > 0, D & IF(D = 1, " día ", " días ") & H & " h " & FORMAT(Mi, "00") & " min",
+			            IF(H > 0, H & " h " & FORMAT(Mi, "00") & " min", Mi & " min"))
+			    )
+		displayFolder: Tiempos
+		lineageTag: 7943df54-cdf2-4751-b695-1181e6296a79
+
+	/// Horas promedio por ticket en el estado o nivel, legible.
+	measure 'Tiempo Promedio en Estado' =
+			VAR Hrs = [Prom Horas en Estado]
+			VAR M = ROUND(Hrs * 60, 0)
+			VAR D = INT(M / 1440)
+			VAR H = INT(MOD(M, 1440) / 60)
+			VAR Mi = MOD(M, 60)
+			RETURN
+			    IF(
+			        ISBLANK(Hrs), BLANK(),
+			        IF(D > 0, D & IF(D = 1, " día ", " días ") & H & " h " & FORMAT(Mi, "00") & " min",
+			            IF(H > 0, H & " h " & FORMAT(Mi, "00") & " min", Mi & " min"))
+			    )
+		displayFolder: Tiempo en Estado
+		lineageTag: f63bb481-d08e-404e-a2a6-e741621a20ae
+
+	/// Periodos (entradas) en el estado o nivel; cada regreso cuenta aparte.
+	measure 'Periodos en Estado' = CALCULATE(COUNTROWS(FactStatusHistory), FactStatusHistory[Es Estado Final] = FALSE())
+		formatString: #,##0
+		displayFolder: Tiempo en Estado
+		lineageTag: 9936bc00-b475-4c0c-b674-82b8c09653cb
+
+	/// Participación del estado o nivel en el tiempo total del ticket.
+	measure '% del Tiempo' = DIVIDE([Horas en Estado], CALCULATE([Horas en Estado], REMOVEFILTERS(FactStatusHistory[Nivel], FactStatusHistory[Estado])))
+		formatString: 0.0%;-0.0%;0.0%
+		displayFolder: Tiempo en Estado
+		lineageTag: 431d24a5-4b2b-447f-80f1-6bc3dafb827f
+
+	/// Línea de tiempo: 1 si el ticket estaba en ese periodo durante esa hora desde su creación.
+	measure 'Gantt Nivel' =
+			VAR H = SELECTEDVALUE('Línea de Tiempo'[Hora])
+			VAR Ultima = CALCULATE(MAX('Línea de Tiempo'[Hora]), ALL('Línea de Tiempo'))
+			RETURN
+			    IF(NOT ISBLANK(H),
+			        IF(COUNTROWS(FILTER(FactStatusHistory, FactStatusHistory[Es Estado Final] = FALSE() && FactStatusHistory[Hora Fin] > H && (H = Ultima || FactStatusHistory[Hora Inicio] < H + 1))) > 0, 1))
+		formatString: 0
+		displayFolder: Tiempo en Estado
+		lineageTag: 0704c815-4518-46ea-b585-65a8d4245938
+
+	/// Color por nivel: N1 azul, N2 amarillo, espera gris, otros gris claro.
+	measure 'Color Gantt Nivel' =
+			IF(NOT ISBLANK([Gantt Nivel]),
+			    SWITCH(SELECTEDVALUE(FactStatusHistory[Nivel]), "N1", "#1A1A1A", "N2", "#8C8C8C", "En espera", "#8C8C8C",
+			        "Sin atender", "#BFBFBF", "Finalizado", "#1A1A1A", "#D9D9D9"))
+		displayFolder: Tiempo en Estado
+		lineageTag: c0632545-0512-4a58-a721-3f51246ef225
+
+	/// Tickets con el SLA de primera respuesta ya evaluado (cumplidos + incumplidos).
+	measure 'Primera Respuesta Evaluados' = [Primera Respuesta Cumplidos] + [Primera Respuesta Incumplidos]
+		formatString: #,##0
+		displayFolder: SLA Primera Respuesta
+		lineageTag: 9e976a2d-a15a-410b-8dce-de2364a4b3ff
+
+	/// Tickets con el SLA de resolución ya evaluado (cumplidos + incumplidos).
+	measure 'Resolución Evaluados' = [Resolución Cumplidos] + [Resolución Incumplidos]
+		formatString: #,##0
+		displayFolder: SLA Resolución
+		lineageTag: 422a2673-40f6-4c59-abcd-5294be013d2e
+
+	/// Meta del SLA de primera respuesta configurada en Jira (texto).
+	measure 'Meta Primera Respuesta' =
+			VAR Metas =
+			    CONCATENATEX(
+			        FILTER(VALUES(IEP_Tickets[SLA Respuesta Meta Horas]), NOT ISBLANK(IEP_Tickets[SLA Respuesta Meta Horas])),
+			        IF(IEP_Tickets[SLA Respuesta Meta Horas] < 1, FORMAT(IEP_Tickets[SLA Respuesta Meta Horas] * 60, "0") & " min",
+			           FORMAT(IEP_Tickets[SLA Respuesta Meta Horas], "0.##") & " h"),
+			        " / ", IEP_Tickets[SLA Respuesta Meta Horas], ASC
+			    )
+			RETURN "Meta: " & IF(Metas = "", "sin meta", Metas)
+		displayFolder: SLA Primera Respuesta
+		lineageTag: 209ec1b4-2d4e-4f35-805b-89587bff3214
+
+	/// Meta del SLA de resolución configurada en Jira (texto).
+	measure 'Meta Resolución' = "Meta: " & IF([Meta del SLA] = "", "sin meta", [Meta del SLA])
+		displayFolder: SLA Resolución
+		lineageTag: e5571957-09a8-41ea-8d9a-21dd4a719cd7
+
+	/// Texto de la última actualización; queda vacío (no '(En blanco)') si todavía no hay datos.
+	measure 'Texto Última Actualización' = VAR U = [Última Actualización] RETURN IF(ISBLANK(U), "", "Actualizado: " & FORMAT(U, "dd/mm/yyyy hh:nn"))
+		displayFolder: General
+		lineageTag: 867437b7-03d1-4769-97e6-db660976d293
+
+	/// Color de las barras de causa: azul marino; la causa más frecuente (sin contar 'Sin clasificar') en rojo.
+	measure 'Color Barra Causa' =
+			VAR Max =
+			    MAXX(FILTER(ALLSELECTED(FactCausas[Causa]), FactCausas[Causa] <> "Sin clasificar"), [Total de Incidentes])
+			RETURN
+			    IF(SELECTEDVALUE(FactCausas[Causa]) <> "Sin clasificar" && [Total de Incidentes] = Max, "#C8102E", "#1F3A5F")
+		displayFolder: Colores
+		lineageTag: 81aca7e1-2e96-4376-8d0e-82afb262c6a9
+
+	/// Color de las barras de tipo de incidente: tonos de azul marino según su volumen (el más frecuente, el más oscuro).
+	measure 'Color Barra Tipo Incidente' =
+			VAR R = RANKX(ALLSELECTED(IEP_Tickets[Tipo de Incidente]), [Total de Incidentes], , DESC, DENSE)
+			RETURN SWITCH(TRUE(), R = 1, "#1F3A5F", R = 2, "#2E4D78", R = 3, "#4A6A94", R <= 5, "#7088AE", "#9DB0CC")
+		displayFolder: Colores
+		lineageTag: 250dc9bf-a5cf-490d-8cbc-864be36de9c0
+
+	/// Color de texto de la situación del SLA: rojo si sigue pendiente y fuera de SLA.
+	measure 'Color Situación SLA' = IF(SELECTEDVALUE(IEP_Tickets[Situación SLA]) = "Pendiente · fuera de SLA", "#C8102E", "#1A1A1A")
+		displayFolder: Colores
+		lineageTag: 256bfaf0-21d2-4a0b-9baf-f5074150d4cd
+
+	/// Tiempo total en el estado (todas las visitas sumadas), en formato legible. No cuenta Resuelta ni Cerrada.
+	measure 'Tiempo en Estado' =
+			VAR M = ROUND(CALCULATE(SUM(FactStatusHistory[Horas]), KEEPFILTERS(FactStatusHistory[Es Estado Final] = FALSE())) * 60, 0)
+			VAR D = INT(M / 1440)
+			VAR H = INT(MOD(M, 1440) / 60)
+			VAR Mi = MOD(M, 60)
+			RETURN
+			    IF(ISBLANK(M), BLANK(),
+			        IF(D > 0, D & " d " & H & " h " & FORMAT(Mi, "00") & " min",
+			            IF(H > 0, H & " h " & FORMAT(Mi, "00") & " min", Mi & " min")))
+		displayFolder: Tiempos
+		lineageTag: 5f1242a5-fbfb-4faa-8355-413a62f544c7
+
+	/// % de los incidentes del periodo que cumplieron el SLA de primera respuesta.
+	measure 'Texto % Primera Respuesta Cumplidos' =
+			VAR P = DIVIDE([Primera Respuesta Cumplidos], [Incidentes Creados])
+			RETURN IF(ISBLANK(P), BLANK(), FORMAT(P, "0%") & " del total")
+		displayFolder: Textos
+		lineageTag: 0efef051-4a15-468a-9aab-9eb3712c3d7c
+
+	/// % de los incidentes del periodo que no cumplieron el SLA de primera respuesta.
+	measure 'Texto % Primera Respuesta Incumplidos' =
+			VAR P = DIVIDE([Primera Respuesta Incumplidos], [Incidentes Creados])
+			RETURN IF(ISBLANK(P), BLANK(), FORMAT(P, "0%") & " del total")
+		displayFolder: Textos
+		lineageTag: e8583ac7-af9a-40d3-b840-85ddac1589d6
+
+	/// % de los incidentes del periodo que cumplieron el SLA de resolución.
+	measure 'Texto % Resolución Cumplidos' =
+			VAR P = DIVIDE([Resolución Cumplidos], [Incidentes Creados])
+			RETURN IF(ISBLANK(P), BLANK(), FORMAT(P, "0%") & " del total")
+		displayFolder: Textos
+		lineageTag: 37e2c09d-5938-4edd-860e-21180170b0f0
+
+	/// % de los incidentes del periodo que no cumplieron el SLA de resolución.
+	measure 'Texto % Resolución Incumplidos' =
+			VAR P = DIVIDE([Resolución Incumplidos], [Incidentes Creados])
+			RETURN IF(ISBLANK(P), BLANK(), FORMAT(P, "0%") & " del total")
+		displayFolder: Textos
+		lineageTag: 3adf1a4b-ae42-4495-a45e-9d84ad8c02cd
+
+	/// Incidentes que estuvieron al menos una vez en Planta externa.
+	measure 'Incidentes con Planta Externa' = CALCULATE([Incidentes Creados], IEP_Tickets[Planta Externa] = "Pasó por Planta externa") + 0
+		formatString: #,##0
+		displayFolder: Volumen
+		lineageTag: c1a53d7f-1962-41f5-81b9-6b949d0c344a
+
+	/// % de los incidentes del periodo que pasaron por Planta externa.
+	measure '% Planta Externa' = DIVIDE([Incidentes con Planta Externa], [Incidentes Creados], 0)
+		formatString: 0.0%;-0.0%;0.0%
+		displayFolder: Volumen
+		lineageTag: de9b8c92-6e5e-4a0f-a69a-fbb132943a06
+
+	/// Detalle de la tarjeta de Planta externa (ej. "9 de 37 tickets").
+	measure 'Texto Planta Externa' = FORMAT([Incidentes con Planta Externa], "#,##0") & " de " & FORMAT([Incidentes Creados] + 0, "#,##0") & " tickets"
+		displayFolder: Textos
+		lineageTag: f4e8b95f-db31-4921-b828-6ee85c08e86e
+
+	/// Color del tiempo de SLA en la tabla: rojo si venció, verde si cumplió, texto oscuro si sigue en curso.
+	measure 'Color Tiempo SLA' = SWITCH(SELECTEDVALUE(IEP_Tickets[SLA Resolución Estado]), "Incumplido", "#C8102E", "Cumplido", "#1E7B34", "#1A1A1A")
+		displayFolder: Colores
+		lineageTag: ee7f6c4f-e4c1-453c-9434-d0af06d1fed9
+
+	/// % de los incidentes del periodo que se resolvieron en el periodo.
+	measure 'Texto % Resueltos' =
+			VAR P = DIVIDE([Incidentes Resueltos], [Incidentes Creados])
+			RETURN IF(ISBLANK(P), BLANK(), FORMAT(P, "0%") & " del total")
+		displayFolder: Textos
+		lineageTag: f495d78b-c87a-4a8d-bf17-d8dbb3ee94eb
+
+	/// % de los incidentes del periodo que siguen pendientes.
+	measure 'Texto % Pendientes' = FORMAT(DIVIDE([Incidentes Pendientes], [Incidentes Creados], 0), "0%") & " del total"
+		displayFolder: Textos
+		lineageTag: 119594f4-adb0-4415-a82f-010cb46fb23a
+
+	/// % de los incidentes de cada SLA que están en cada estado (las barras suman 100%). Se muestra como 86% (32): porcentaje y cantidad.
+	measure '% por Estado de SLA' = DIVIDE([Incidentes por Estado de SLA], [Incidentes Creados])
+		displayFolder: Comparación SLA
+		lineageTag: 213f2e88-827c-420e-a899-98599e4bb747
+
+		formatStringDefinition = "0% ""(" & FORMAT([Incidentes por Estado de SLA], "#,##0") & ")"""
+
+	/// Incidentes creados; la etiqueta muestra además el % sobre el total creado en el periodo.
+	measure 'Creados con %' = [Incidentes Creados]
+		displayFolder: Gráficas
+		lineageTag: 5cdba80d-4772-4e27-8c13-c5e2398acbb7
+
+		formatStringDefinition = "#,##0 ""(" & FORMAT(DIVIDE([Incidentes Creados], CALCULATE([Incidentes Creados], ALLSELECTED(DimFecha))), "0%") & ")"""
+
+	/// Incidentes resueltos; la etiqueta muestra además el % sobre el total resuelto en el periodo.
+	measure 'Resueltos con %' = [Incidentes Resueltos]
+		displayFolder: Gráficas
+		lineageTag: ca7f6402-66a5-4091-ab9b-97f607fb222f
+
+		formatStringDefinition = "#,##0 ""(" & FORMAT(DIVIDE([Incidentes Resueltos], CALCULATE([Incidentes Resueltos], ALLSELECTED(DimFecha))), "0%") & ")"""
+
+	/// Incidentes con la falla; la etiqueta muestra además el % sobre el total de incidentes (un ticket con varias fallas cuenta en cada una).
+	measure 'Incidentes por Falla con %' = [Total de Incidentes]
+		displayFolder: Gráficas
+		lineageTag: d05bf9a5-47fa-4f6a-90ae-8df6b1e99690
+
+		formatStringDefinition = "#,##0 ""(" & FORMAT(DIVIDE([Total de Incidentes], CALCULATE([Total de Incidentes], ALLSELECTED(FactCausas[Causa]))), "0%") & ")"""
+
+	partition _Medidas = m
+		mode: import
+		source =
+				let
+				    Origen = #table(type table [Columna1 = Int64.Type], {}),
+				    #"Columnas quitadas" = Table.RemoveColumns(Origen, {"Columna1"})
+				in
+				    #"Columnas quitadas"
+
+	annotation PBI_ResultType = Table
+

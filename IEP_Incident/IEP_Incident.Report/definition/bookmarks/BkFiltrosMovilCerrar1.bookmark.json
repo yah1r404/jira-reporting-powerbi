@@ -1,0 +1,62 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/bookmark/2.1.0/schema.json",
+  "displayName": "Filtros móvil cerrados (1)",
+  "name": "BkFiltrosMovilCerrar1",
+  "options": {
+    "applyOnlyToTargetVisuals": true,
+    "targetVisualNames": [
+      "movilFiltros1Panel",
+      "movilFiltros1Fecha",
+      "movilFiltros1Falla",
+      "movilFiltros1Listo"
+    ],
+    "suppressActiveSection": true,
+    "suppressData": true
+  },
+  "explorationState": {
+    "version": "1.0",
+    "activeSection": "a1e2b3c4d5f6a7b8c9d0",
+    "sections": {
+      "a1e2b3c4d5f6a7b8c9d0": {
+        "visualContainers": {
+          "movilFiltros1Panel": {
+            "singleVisual": {
+              "visualType": "shape",
+              "objects": {},
+              "display": {
+                "mode": "hidden"
+              }
+            }
+          },
+          "movilFiltros1Fecha": {
+            "singleVisual": {
+              "visualType": "slicer",
+              "objects": {},
+              "display": {
+                "mode": "hidden"
+              }
+            }
+          },
+          "movilFiltros1Falla": {
+            "singleVisual": {
+              "visualType": "slicer",
+              "objects": {},
+              "display": {
+                "mode": "hidden"
+              }
+            }
+          },
+          "movilFiltros1Listo": {
+            "singleVisual": {
+              "visualType": "actionButton",
+              "objects": {},
+              "display": {
+                "mode": "hidden"
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}

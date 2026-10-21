@@ -1,0 +1,694 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/visualContainer/2.13.0/schema.json",
+  "name": "ee20ad7f763863c01eff",
+  "position": {
+    "x": 264,
+    "y": 504,
+    "z": 402,
+    "height": 560,
+    "width": 1636,
+    "tabOrder": 402
+  },
+  "visual": {
+    "visualType": "tableEx",
+    "query": {
+      "queryState": {
+        "Values": {
+          "projections": [
+            {
+              "field": {
+                "Column": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "IEP_Tickets"
+                    }
+                  },
+                  "Property": "Key"
+                }
+              },
+              "queryRef": "IEP_Tickets.Key",
+              "nativeQueryRef": "Key",
+              "active": true,
+              "displayName": "Ticket"
+            },
+            {
+              "field": {
+                "Column": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "IEP_Tickets"
+                    }
+                  },
+                  "Property": "Summary"
+                }
+              },
+              "queryRef": "IEP_Tickets.Summary",
+              "nativeQueryRef": "Summary",
+              "active": true,
+              "displayName": "Resumen"
+            },
+            {
+              "field": {
+                "Column": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "IEP_Tickets"
+                    }
+                  },
+                  "Property": "Causas"
+                }
+              },
+              "queryRef": "IEP_Tickets.Causas",
+              "nativeQueryRef": "Causas",
+              "active": true,
+              "displayName": "Tipo de falla"
+            },
+            {
+              "field": {
+                "Column": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "IEP_Tickets"
+                    }
+                  },
+                  "Property": "Meta SLA Resolución"
+                }
+              },
+              "queryRef": "IEP_Tickets.Meta SLA Resolución",
+              "nativeQueryRef": "Meta SLA Resolución",
+              "active": true,
+              "displayName": "SLA target"
+            },
+            {
+              "field": {
+                "Column": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "IEP_Tickets"
+                    }
+                  },
+                  "Property": "Tiempo SLA Resolución"
+                }
+              },
+              "queryRef": "IEP_Tickets.Tiempo SLA Resolución",
+              "nativeQueryRef": "Tiempo SLA ",
+              "active": true,
+              "displayName": "Tiempo SLA "
+            },
+            {
+              "field": {
+                "Column": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "IEP_Tickets"
+                    }
+                  },
+                  "Property": "Tiempo Nueva solicitud"
+                }
+              },
+              "queryRef": "IEP_Tickets.Tiempo Nueva solicitud",
+              "nativeQueryRef": "Tiempo Nueva solicitud",
+              "active": true,
+              "displayName": "Nueva solicitud"
+            },
+            {
+              "field": {
+                "Column": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "IEP_Tickets"
+                    }
+                  },
+                  "Property": "Tiempo N1"
+                }
+              },
+              "queryRef": "IEP_Tickets.Tiempo N1",
+              "nativeQueryRef": "Tiempo N1",
+              "active": true,
+              "displayName": "N1"
+            },
+            {
+              "field": {
+                "Column": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "IEP_Tickets"
+                    }
+                  },
+                  "Property": "Tiempo N2"
+                }
+              },
+              "queryRef": "IEP_Tickets.Tiempo N2",
+              "nativeQueryRef": "Tiempo N2",
+              "active": true,
+              "displayName": "N2"
+            },
+            {
+              "field": {
+                "Column": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "IEP_Tickets"
+                    }
+                  },
+                  "Property": "Tiempo Esperando por el cliente"
+                }
+              },
+              "queryRef": "IEP_Tickets.Tiempo Esperando por el cliente",
+              "nativeQueryRef": "Tiempo Esperando por el cliente",
+              "active": true,
+              "displayName": "Esperando por el cliente"
+            },
+            {
+              "field": {
+                "Column": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "IEP_Tickets"
+                    }
+                  },
+                  "Property": "Tiempo Planta externa"
+                }
+              },
+              "queryRef": "IEP_Tickets.Tiempo Planta externa",
+              "nativeQueryRef": "Tiempo Planta externa",
+              "active": true,
+              "displayName": "Planta externa"
+            },
+            {
+              "field": {
+                "Column": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "IEP_Tickets"
+                    }
+                  },
+                  "Property": "Situación SLA"
+                }
+              },
+              "queryRef": "IEP_Tickets.Situación SLA",
+              "nativeQueryRef": "Situación SLA",
+              "active": true,
+              "displayName": "Situación"
+            },
+            {
+              "field": {
+                "Column": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "IEP_Tickets"
+                    }
+                  },
+                  "Property": "Created"
+                }
+              },
+              "queryRef": "IEP_Tickets.Created",
+              "nativeQueryRef": "Created",
+              "active": true,
+              "displayName": "Creación"
+            },
+            {
+              "field": {
+                "Column": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "IEP_Tickets"
+                    }
+                  },
+                  "Property": "Fecha Resuelta"
+                }
+              },
+              "queryRef": "IEP_Tickets.Fecha Resuelta",
+              "nativeQueryRef": "Fecha Resuelta",
+              "active": true,
+              "displayName": "Resuelto"
+            },
+            {
+              "field": {
+                "Column": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "IEP_Tickets"
+                    }
+                  },
+                  "Property": "Vida Total"
+                }
+              },
+              "queryRef": "IEP_Tickets.Vida Total",
+              "nativeQueryRef": "Vida Total",
+              "active": true,
+              "displayName": "Vida total"
+            },
+            {
+              "field": {
+                "Column": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "IEP_Tickets"
+                    }
+                  },
+                  "Property": "Jira Link"
+                }
+              },
+              "queryRef": "IEP_Tickets.Jira Link",
+              "nativeQueryRef": "Jira Link",
+              "active": true,
+              "displayName": "Jira"
+            }
+          ]
+        }
+      }
+    },
+    "objects": {
+      "values": [
+        {
+          "properties": {
+            "wordWrap": {
+              "expr": {
+                "Literal": {
+                  "Value": "true"
+                }
+              }
+            },
+            "urlIcon": {
+              "expr": {
+                "Literal": {
+                  "Value": "true"
+                }
+              }
+            },
+            "fontSize": {
+              "expr": {
+                "Literal": {
+                  "Value": "9D"
+                }
+              }
+            }
+          }
+        },
+        {
+          "properties": {
+            "fontColor": {
+              "solid": {
+                "color": {
+                  "expr": {
+                    "Measure": {
+                      "Expression": {
+                        "SourceRef": {
+                          "Entity": "_Medidas"
+                        }
+                      },
+                      "Property": "Color Situación SLA"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "selector": {
+            "data": [
+              {
+                "dataViewWildcard": {
+                  "matchingOption": 1
+                }
+              }
+            ],
+            "metadata": "IEP_Tickets.Situación SLA"
+          }
+        },
+        {
+          "properties": {
+            "fontColor": {
+              "solid": {
+                "color": {
+                  "expr": {
+                    "Measure": {
+                      "Expression": {
+                        "SourceRef": {
+                          "Entity": "_Medidas"
+                        }
+                      },
+                      "Property": "Color Tiempo SLA"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "selector": {
+            "data": [
+              {
+                "dataViewWildcard": {
+                  "matchingOption": 1
+                }
+              }
+            ],
+            "metadata": "IEP_Tickets.Tiempo SLA Resolución"
+          }
+        }
+      ],
+      "columnHeaders": [
+        {
+          "properties": {
+            "wordWrap": {
+              "expr": {
+                "Literal": {
+                  "Value": "true"
+                }
+              }
+            },
+            "fontSize": {
+              "expr": {
+                "Literal": {
+                  "Value": "9D"
+                }
+              }
+            },
+            "backColor": {
+              "solid": {
+                "color": {
+                  "expr": {
+                    "Literal": {
+                      "Value": "'#1A1A1A'"
+                    }
+                  }
+                }
+              }
+            },
+            "fontColor": {
+              "solid": {
+                "color": {
+                  "expr": {
+                    "Literal": {
+                      "Value": "'#FFFFFF'"
+                    }
+                  }
+                }
+              }
+            },
+            "bold": {
+              "expr": {
+                "Literal": {
+                  "Value": "false"
+                }
+              }
+            }
+          }
+        }
+      ],
+      "columnWidth": [
+        {
+          "properties": {
+            "value": {
+              "expr": {
+                "Literal": {
+                  "Value": "76D"
+                }
+              }
+            }
+          },
+          "selector": {
+            "metadata": "IEP_Tickets.Key"
+          }
+        },
+        {
+          "properties": {
+            "value": {
+              "expr": {
+                "Literal": {
+                  "Value": "235D"
+                }
+              }
+            }
+          },
+          "selector": {
+            "metadata": "IEP_Tickets.Summary"
+          }
+        },
+        {
+          "properties": {
+            "value": {
+              "expr": {
+                "Literal": {
+                  "Value": "242.60272991199844D"
+                }
+              }
+            }
+          },
+          "selector": {
+            "metadata": "IEP_Tickets.Causas"
+          }
+        },
+        {
+          "properties": {
+            "value": {
+              "expr": {
+                "Literal": {
+                  "Value": "85.95906159538944D"
+                }
+              }
+            }
+          },
+          "selector": {
+            "metadata": "IEP_Tickets.Meta SLA Resolución"
+          }
+        },
+        {
+          "properties": {
+            "value": {
+              "expr": {
+                "Literal": {
+                  "Value": "117.33105741335154D"
+                }
+              }
+            }
+          },
+          "selector": {
+            "metadata": "IEP_Tickets.Tiempo SLA Resolución"
+          }
+        },
+        {
+          "properties": {
+            "value": {
+              "expr": {
+                "Literal": {
+                  "Value": "78.45051463282026D"
+                }
+              }
+            }
+          },
+          "selector": {
+            "metadata": "IEP_Tickets.Tiempo Nueva solicitud"
+          }
+        },
+        {
+          "properties": {
+            "value": {
+              "expr": {
+                "Literal": {
+                  "Value": "84.90102926564052D"
+                }
+              }
+            }
+          },
+          "selector": {
+            "metadata": "IEP_Tickets.Tiempo N1"
+          }
+        },
+        {
+          "properties": {
+            "value": {
+              "expr": {
+                "Literal": {
+                  "Value": "104.2525731641013D"
+                }
+              }
+            }
+          },
+          "selector": {
+            "metadata": "IEP_Tickets.Tiempo N2"
+          }
+        },
+        {
+          "properties": {
+            "value": {
+              "expr": {
+                "Literal": {
+                  "Value": "72D"
+                }
+              }
+            }
+          },
+          "selector": {
+            "metadata": "IEP_Tickets.Tiempo Esperando por el cliente"
+          }
+        },
+        {
+          "properties": {
+            "value": {
+              "expr": {
+                "Literal": {
+                  "Value": "96.88055644087815D"
+                }
+              }
+            }
+          },
+          "selector": {
+            "metadata": "IEP_Tickets.Tiempo Planta externa"
+          }
+        },
+        {
+          "properties": {
+            "value": {
+              "expr": {
+                "Literal": {
+                  "Value": "98D"
+                }
+              }
+            }
+          },
+          "selector": {
+            "metadata": "IEP_Tickets.Situación SLA"
+          }
+        },
+        {
+          "properties": {
+            "value": {
+              "expr": {
+                "Literal": {
+                  "Value": "88D"
+                }
+              }
+            }
+          },
+          "selector": {
+            "metadata": "IEP_Tickets.Created"
+          }
+        },
+        {
+          "properties": {
+            "value": {
+              "expr": {
+                "Literal": {
+                  "Value": "88D"
+                }
+              }
+            }
+          },
+          "selector": {
+            "metadata": "IEP_Tickets.Fecha Resuelta"
+          }
+        },
+        {
+          "properties": {
+            "value": {
+              "expr": {
+                "Literal": {
+                  "Value": "80D"
+                }
+              }
+            }
+          },
+          "selector": {
+            "metadata": "IEP_Tickets.Vida Total"
+          }
+        },
+        {
+          "properties": {
+            "value": {
+              "expr": {
+                "Literal": {
+                  "Value": "36D"
+                }
+              }
+            }
+          },
+          "selector": {
+            "metadata": "IEP_Tickets.Jira Link"
+          }
+        }
+      ],
+      "columnFormatting": [
+        {
+          "properties": {
+            "fontColor": {
+              "solid": {
+                "color": {
+                  "expr": {
+                    "ThemeDataColor": {
+                      "ColorId": 2,
+                      "Percent": -0.5
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "selector": {
+            "metadata": "IEP_Tickets.Key"
+          }
+        },
+        {
+          "properties": {
+            "fontColor": {
+              "solid": {
+                "color": {
+                  "expr": {
+                    "Literal": {
+                      "Value": "'#1F3A5F'"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "selector": {
+            "metadata": "IEP_Tickets.Tiempo SLA Resolución"
+          }
+        }
+      ]
+    },
+    "visualContainerObjects": {
+      "title": [
+        {
+          "properties": {
+            "show": {
+              "expr": {
+                "Literal": {
+                  "Value": "true"
+                }
+              }
+            },
+            "text": {
+              "expr": {
+                "Literal": {
+                  "Value": "'Detalle de los incidentes'"
+                }
+              }
+            }
+          }
+        }
+      ],
+      "subTitle": [
+        {
+          "properties": {
+            "show": {
+              "expr": {
+                "Literal": {
+                  "Value": "false"
+                }
+              }
+            },
+            "text": {
+              "expr": {
+                "Literal": {
+                  "Value": "'Ordenado por mayor tiempo de SLA · tiempo SLA en rojo si venció y en verde si cumplió · SLA target 15 h sin pausas, hasta la fecha Resolved'"
+                }
+              }
+            }
+          }
+        }
+      ]
+    }
+  }
+}

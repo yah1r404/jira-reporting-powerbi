@@ -1,0 +1,27 @@
+model Model
+	culture: es-MX
+	defaultPowerBIDataSourceVersion: powerBI_V3
+	sourceQueryCulture: es-MX
+	valueFilterBehavior: independent
+	dataAccessOptions
+		legacyRedirects
+		returnErrorValuesAsNull
+
+annotation __PBI_TimeIntelligenceEnabled = 0
+
+annotation PBI_ProTooling = ["DevMode"]
+
+annotation PBI_QueryOrder = ["Jira_IEP_Issues","HorasLaborales","IEP_Tickets","FactStatusHistory","_Medidas"]
+
+ref table DimFecha
+ref table _Medidas
+ref table IEP_Tickets
+ref table FactStatusHistory
+ref table FactCausas
+ref table 'Horario Cálculo'
+ref table 'Línea de Tiempo'
+ref table 'Estado SLA'
+ref table 'SLA Comparación'
+
+ref cultureInfo es-MX
+

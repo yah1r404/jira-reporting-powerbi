@@ -90,11 +90,60 @@
               },
               "queryRef": "_Medidas.Horas en Estado",
               "nativeQueryRef": "Horas en Estado"
+            },
+            {
+              "field": {
+                "Measure": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "_Medidas"
+                    }
+                  },
+                  "Property": "Mediana Horas en Estado"
+                }
+              },
+              "queryRef": "_Medidas.Mediana Horas en Estado",
+              "nativeQueryRef": "Mediana Horas en Estado"
             }
           ]
         }
       }
     },
+    "expansionStates": [
+      {
+        "roles": [
+          "Rows"
+        ],
+        "levels": [
+          {
+            "queryRefs": [
+              "FactStatusHistory.Flujo"
+            ],
+            "identityKeys": [
+              {
+                "Column": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "FactStatusHistory"
+                    }
+                  },
+                  "Property": "Flujo"
+                }
+              }
+            ],
+            "isPinned": true
+          },
+          {
+            "queryRefs": [
+              "FactStatusHistory.Estado"
+            ],
+            "isCollapsed": true,
+            "isPinned": true
+          }
+        ],
+        "root": {}
+      }
+    ],
     "visualContainerObjects": {
       "title": [
         {

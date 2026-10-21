@@ -1,0 +1,35 @@
+/// Horas desde la creación del ticket (0 a 47 y "48+"), columnas de la línea de tiempo. Sin relaciones.
+table 'Línea de Tiempo'
+	lineageTag: a919d541-95eb-42c3-bbca-7e97065620d2
+
+	column Hora
+		dataType: int64
+		isHidden
+		formatString: 0
+		lineageTag: 350591ae-e8e5-44bd-9242-f176e7e882c8
+		summarizeBy: none
+		isNameInferred
+		sourceColumn: [Hora]
+
+		annotation SummarizationSetBy = Automatic
+
+	/// Etiqueta de la columna: "0h", "1h", … "48h+".
+	column 'Hora desde creación'
+		dataType: string
+		lineageTag: bc889f34-3880-4c22-948b-b106afc6cbbf
+		summarizeBy: none
+		isNameInferred
+		sourceColumn: [Hora desde creación]
+		sortByColumn: Hora
+
+		annotation SummarizationSetBy = Automatic
+
+	partition 'Línea de Tiempo' = calculated
+		mode: import
+		source =
+				SELECTCOLUMNS(
+				    GENERATESERIES(0, 48, 1),
+				    "Hora", [Value],
+				    "Hora desde creación", IF([Value] = 48, "48h+", FORMAT([Value], "0") & "h")
+				)
+

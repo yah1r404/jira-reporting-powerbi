@@ -1,0 +1,289 @@
+/// Tickets IEP INCIDENT con Tipo de Ticket = Incidente Qcom (todo el historial). Búsqueda ligera; el historial
+/// de estado se pide en bloque y solo lo calcula FactStatusHistory. No se carga al modelo.
+expression Jira_IEP_Issues =
+		let
+		
+		    // ========================================
+		    // CONFIGURACIÓN
+		    // ========================================
+		
+		    JiraBaseUrl = "https://secureopsmx.atlassian.net",
+		    // Alcance fijo del tablero: IEP INCIDENT con Tipo de Ticket = "Incidente Qcom" (customfield_10894).
+		    // Equivale a: project = MDSC AND type = "IEP INCIDENT" AND "tipo de ticket[radio buttons]" = "Incidente Qcom"
+		    JQL = "project = MDSC AND issuetype = ""IEP INCIDENT"" AND cf[10894] = ""Incidente Qcom"" ORDER BY created DESC",
+		
+		    // Tamaño de página de la búsqueda: Jira entrega como máximo 100 tickets por página con estos campos (medido)
+		    PageSize = "100",
+		    // Tickets por llamada al historial en bloque (máximo de Jira: 1000)
+		    BulkSize = 1000,
+		    // Solo interesan los cambios de estado (Tiempo en estado y consumo del SLA)
+		    CampoHistorial = {"status"},
+		
+		
+		    // ========================================
+		    // CAMPOS
+		    // ========================================
+		
+		    // Solo los campos que usa el modelo:
+		    // customfield_10010 = Request Type
+		    // customfield_10936 = Tiempo hasta primera respuesta (SLA JSM)
+		    // customfield_10937 = Tiempo hasta resolución (SLA JSM)
+		    // customfield_11042 = Técnico(s) asignado(s)
+		    // customfield_10002 = Organizations (cliente)
+		    // customfield_10894 = Tipo de Ticket (Incidente, Incidente Qcom, Problema, Servicio)
+		    // customfield_10323 = ISP
+		    // customfield_10896 = Tipo de incidente IEP
+		    // customfield_10897 = Causa (varias por ticket)
+		    // customfield_10256 = Access Point (texto "CÓDIGO - Nombre")
+		    BaseFields = {
+		        "summary", "status", "assignee", "created", "resolutiondate",
+		        "customfield_10010", "customfield_10936", "customfield_10937", "customfield_11042",
+		        "customfield_10002", "customfield_10894", "customfield_10323", "customfield_10896",
+		        "customfield_10897", "customfield_10256"
+		    },
+		
+		    JiraFields =
+		        Text.Combine(
+		            BaseFields,
+		            ","
+		        ),
+		
+		
+		    // ========================================
+		    // BÚSQUEDA PAGINADA (ligera: sin historial)
+		    // ========================================
+		
+		    GetPage = (NextToken as nullable text, ConHistorial as logical) as record =>
+		        let
+		            BaseQuery = [jql = JQL, maxResults = PageSize, fields = JiraFields],
+		            ConExpand = if ConHistorial then Record.AddField(BaseQuery, "expand", "changelog") else BaseQuery,
+		            RequestQuery =
+		                if NextToken = null
+		                then ConExpand
+		                else Record.AddField(ConExpand, "nextPageToken", NextToken)
+		        in
+		            Json.Document(
+		                Web.Contents(
+		                    JiraBaseUrl,
+		                    [
+		                        RelativePath = "rest/api/3/search/jql",
+		                        Query = RequestQuery,
+		                        Headers = [Accept = "application/json"]
+		                    ]
+		                )
+		            ),
+		
+		    Search = (ConHistorial as logical) as list =>
+		        List.Combine(
+		            List.Generate(
+		                () => GetPage(null, ConHistorial),
+		                each _ <> null,
+		                each
+		                    let
+		                        Token = Record.FieldOrDefault(_, "nextPageToken", null)
+		                    in
+		                        if Token = null then null else GetPage(Token, ConHistorial),
+		                each [issues]
+		            )
+		        ),
+		
+		    // List.Buffer: la lista se guarda en memoria y no se vuelve a pedir a Jira al recorrerla otra vez
+		    RawIssues = List.Buffer(Search(false)),
+		
+		
+		    // ========================================
+		    // HISTORIAL EN BLOQUE (solo estado y responsable)
+		    // ========================================
+		
+		    // POST /rest/api/3/changelog/bulkfetch: hasta 1000 tickets por llamada, filtrado por campo
+		    BulkPage = (Ids as list, NextToken as nullable text) as record =>
+		        let
+		            Body0 = [issueIdsOrKeys = Ids, fieldIds = CampoHistorial, maxResults = 1000],
+		            Body = if NextToken = null then Body0 else Record.AddField(Body0, "nextPageToken", NextToken)
+		        in
+		            Json.Document(
+		                Web.Contents(
+		                    JiraBaseUrl,
+		                    [
+		                        RelativePath = "rest/api/3/changelog/bulkfetch",
+		                        Headers = [Accept = "application/json", #"Content-Type" = "application/json"],
+		                        Content = Json.FromValue(Body)
+		                    ]
+		                )
+		            ),
+		
+		    BulkLote = (Ids as list) as list =>
+		        List.Combine(
+		            List.Generate(
+		                () => BulkPage(Ids, null),
+		                each _ <> null,
+		                each
+		                    let
+		                        Token = Record.FieldOrDefault(_, "nextPageToken", null)
+		                    in
+		                        if Token = null then null else BulkPage(Ids, Token),
+		                each Record.FieldOrDefault(_, "issueChangeLogs", {})
+		            )
+		        ),
+		
+		    // Un registro {issueId: lista de cambios}; se arma una sola vez y solo si una tabla pide el historial
+		    HistorialEnBloque =
+		        let
+		            Ids = List.Transform(RawIssues, each Text.From([id])),
+		            Lotes = List.Split(Ids, BulkSize),
+		            // POST no se guarda en caché: se buffer-ea para no repetir llamadas al recorrerlo
+		            Logs = List.Buffer(List.Combine(List.Transform(Lotes, BulkLote))),
+		            Agrupado =
+		                Table.Buffer(Table.Group(
+		                    Table.FromRecords(
+		                        List.Transform(
+		                            Logs,
+		                            each [IssueId = Text.From([issueId]), Cambios = Record.FieldOrDefault(_, "changeHistories", {})]
+		                        ),
+		                        type table [IssueId = text, Cambios = list]
+		                    ),
+		                    {"IssueId"},
+		                    {{"Cambios", each List.Combine([Cambios]), type list}}
+		                ))
+		        in
+		            Record.FromList(Agrupado[Cambios], Agrupado[IssueId]),
+		
+		    // Si el historial en bloque no está disponible, se usa el método anterior (búsqueda con historial)
+		    HistorialAnterior =
+		        let
+		            ConHistorial = List.Buffer(Search(true)),
+		            GetChangelogPage = (IssueKey as text, StartAt as number) as record =>
+		                Json.Document(
+		                    Web.Contents(
+		                        JiraBaseUrl,
+		                        [
+		                            RelativePath = "rest/api/3/issue/" & IssueKey & "/changelog",
+		                            Query = [startAt = Text.From(StartAt), maxResults = "100"],
+		                            Headers = [Accept = "application/json"]
+		                        ]
+		                    )
+		                ),
+		            GetFullChangelog = (IssueKey as text) as list =>
+		                List.Combine(
+		                    List.Generate(
+		                        () => GetChangelogPage(IssueKey, 0),
+		                        each _ <> null,
+		                        each
+		                            let
+		                                Next = [startAt] + List.Count([values])
+		                            in
+		                                if List.IsEmpty([values]) or Next >= [total]
+		                                then null
+		                                else GetChangelogPage(IssueKey, Next),
+		                        each [values]
+		                    )
+		                ),
+		            Completo = (Issue as record) as list =>
+		                let
+		                    Changelog = Record.FieldOrDefault(Issue, "changelog", null),
+		                    Embedded = if Changelog = null then null else Record.FieldOrDefault(Changelog, "histories", null),
+		                    IsComplete = Embedded <> null and List.Count(Embedded) >= Record.FieldOrDefault(Changelog, "total", 0)
+		                in
+		                    if IsComplete then Embedded else GetFullChangelog(Issue[key])
+		        in
+		            Record.FromList(
+		                List.Transform(ConHistorial, Completo),
+		                List.Transform(ConHistorial, each Text.From([id]))
+		            ),
+		
+		    Historial = try HistorialEnBloque otherwise HistorialAnterior,
+		
+		
+		    // ========================================
+		    // RESULTADO
+		    // ========================================
+		
+		    // "histories" se evalúa solo cuando una tabla lo usa (FactStatusHistory y FactAssigneeHistory);
+		    // SLA_Tickets y FactTecnicos solo hacen la búsqueda ligera.
+		    Issues =
+		        List.Transform(
+		            RawIssues,
+		            each [
+		                id = [id],
+		                key = [key],
+		                fields = [fields],
+		                histories = Record.FieldOrDefault(Historial, Text.From([id]), {})
+		            ]
+		        )
+		
+		in
+		    Issues
+	lineageTag: db7df9a0-f907-41bb-b7bb-7bf0562302e7
+
+	annotation PBI_NavigationStepName = Navegación
+
+	annotation PBI_ResultType = List
+
+/// Horas laborales entre dos fechas según el horario de la mesa: lunes a viernes 6:00-23:00, sábado 9:00-19:00, domingo sin horario.
+/// Para cambiar el horario, editar la función Ventana.
+expression HorasLaborales =
+		(Inicio as nullable datetime, Fin as nullable datetime) as number =>
+		    if Inicio = null or Fin = null or Fin <= Inicio then 0
+		    else
+		        let
+		            // Horas de inicio y fin de cada día (Date.DayOfWeek con lunes = 0)
+		            Ventana = (Dia as date) as nullable list =>
+		                let
+		                    DiaSemana = Date.DayOfWeek(Dia, Day.Monday)
+		                in
+		                    if DiaSemana <= 4 then {6, 23}
+		                    else if DiaSemana = 5 then {9, 19}
+		                    else null,
+		
+		            // Horas laborales de una semana completa: 5 x 17 h + 10 h del sábado
+		            HorasSemana = 95,
+		
+		            HorasEnDia = (Dia as date, Desde as datetime, Hasta as datetime) as number =>
+		                let
+		                    W = Ventana(Dia)
+		                in
+		                    if W = null then 0
+		                    else
+		                        let
+		                            Abre = Dia & #time(W{0}, 0, 0),
+		                            Cierra = Dia & #time(W{1}, 0, 0),
+		                            D = if Desde > Abre then Desde else Abre,
+		                            H = if Hasta < Cierra then Hasta else Cierra
+		                        in
+		                            if H > D then Duration.TotalHours(H - D) else 0,
+		
+		            Dia1 = Date.From(Inicio),
+		            DiaN = Date.From(Fin),
+		            TotalDias = Duration.Days(DiaN - Dia1) + 1
+		        in
+		            if TotalDias <= 14 then
+		                // Tramo corto: día por día
+		                List.Sum(
+		                    List.Transform(
+		                        List.Dates(Dia1, TotalDias, #duration(1, 0, 0, 0)),
+		                        (Dia) => HorasEnDia(Dia, Inicio, Fin)
+		                    )
+		                )
+		            else
+		                // Tramo largo: primer y último día parciales + semanas completas + días sueltos
+		                let
+		                    Intermedios = TotalDias - 2,
+		                    Semanas = Number.IntegerDivide(Intermedios, 7),
+		                    Sueltos = Number.Mod(Intermedios, 7),
+		                    DiasSueltos = List.Dates(Date.AddDays(Dia1, 1 + Semanas * 7), Sueltos, #duration(1, 0, 0, 0)),
+		                    HorasSueltos =
+		                        List.Sum(
+		                            List.Transform(
+		                                DiasSueltos,
+		                                (Dia) => HorasEnDia(Dia, Dia & #time(0, 0, 0), Date.AddDays(Dia, 1) & #time(0, 0, 0))
+		                            )
+		                        )
+		                in
+		                    HorasEnDia(Dia1, Inicio, Date.AddDays(Dia1, 1) & #time(0, 0, 0))
+		                        + Semanas * HorasSemana
+		                        + (if HorasSueltos = null then 0 else HorasSueltos)
+		                        + HorasEnDia(DiaN, DiaN & #time(0, 0, 0), Fin)
+	lineageTag: 61c75494-edc9-4c19-8856-fe94aa946481
+
+	annotation PBI_ResultType = Function
+

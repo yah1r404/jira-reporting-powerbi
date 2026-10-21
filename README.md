@@ -5,6 +5,15 @@ Mide el SLA y la eficiencia de la Mesa de Servicio **MDSC** de RAM (Redes y Ases
 
 Para abrirlo, abre `Jira_PBI.pbip` con Power BI Desktop.
 
+### Estructura del repositorio
+
+| Ruta | Contenido |
+|---|---|
+| `Jira_PBI.pbip`, `Jira_PBI.Report/`, `Jira_PBI.SemanticModel/` | Tablero principal de la Mesa de Servicio MDSC (secciones 1 a 6) |
+| `IEP_Incident/` | Tablero ejecutivo QuattroCom: `IEP_Incident.pbip`, su reporte, su modelo y `IEP_Incident_Graficas.txt` (títulos y significado de cada gráfica) (sección 7) |
+| `assets/` | Logos originales de RAM y QuattroCom (cada reporte guarda su propia copia en `StaticResources`) |
+| `CLAUDE.md` | Reglas de trabajo del proyecto (Jira solo lectura, sin secretos, etc.) |
+
 ---
 
 ## 1. Conexión a Jira
@@ -155,3 +164,30 @@ Todas las páginas comparten la misma estructura: barra lateral con el logo y el
 - Confirmar las metas reales de % SLA para el semáforo.
 - Validar los números contra Jira después del primer refresh completo.
 
+## 7. Tablero ejecutivo QuattroCom (`IEP_Incident/IEP_Incident.pbip`)
+
+Proyecto aparte en la carpeta `IEP_Incident/`. Usa las mismas credenciales de Jira y el **tema QuattroCom** (rojo, negro y blanco, con azul marino y verde en gráficas). Tiene 2 páginas de 1920 × 1080, ajustadas a la página. `IEP_Incident/IEP_Incident_Graficas.txt` explica cada tarjeta, gráfica y columna.
+
+**Identidad:** el panel lateral muestra los logos de **RAM** y **QuattroCom** (`redesmayab_logo.jpg` y `quattrocom_logo.png` en `IEP_Incident.Report/StaticResources/RegisteredResources/`).
+
+**Alcance fijo:** `project = MDSC AND type = "IEP INCIDENT" AND "tipo de ticket[radio buttons]" = "Incidente Qcom"` (en la consulta: `cf[10894] = "Incidente Qcom"`). Incluye todo el historial y también los tickets en Cerrada.
+
+**Filtros sincronizados en las 2 páginas:** Fecha (de creación) y Tipo de falla (campo *Causa* de Jira).
+
+**Página 1 · Resumen ejecutivo:** total, resueltos y pendientes (con % del total); tiempo promedio a primera respuesta y a resolución; % de cumplimiento por SLA con cumplidos e incumplidos (con % del total); cumplimiento de los SLA por estado (% y cantidad); cumplimiento mensual; creados vs. resueltos por mes; por hora y por día de la semana.
+
+**Página 2 · Análisis y detalle:** incidentes por tipo de falla; tarjeta de Planta externa (% de tickets que pasaron por ahí); **Detalle de tickets** con SLA target, tiempo SLA (rojo si venció, verde si cumplió), una columna de tiempo por estado (Nueva solicitud, N1, N2, Esperando por el cliente, Planta externa, Otros estados), situación, creación, resuelto, vida total y enlace a Jira.
+
+**Definiciones:**
+
+| Indicador | Cálculo |
+|---|---|
+| Fecha de resolución | Campo **Resolved** de Jira; si un ticket en Resuelta no lo tiene, la hora en que entró a Resuelta. Todas las medidas de resolución la usan. |
+| Total de incidentes | Creados en el rango de fechas |
+| Resueltos | Con fecha de resolución dentro del rango |
+| Pendientes | Creados en el rango que hoy no tienen fecha de resolución |
+| % SLA | Cumplidos / (cumplidos + incumplidos), con **las mismas reglas para todos los tickets**: primera respuesta en **30 min** y resolución en **15 h**, calendario de **24 h**. El tiempo de resolución va de la creación a la fecha de resolución (o al último refresh si sigue abierto) y descuenta el tiempo en pausa (Esperando por el cliente, Planta externa y Cerrada). La primera respuesta usa el dato de Jira; si no existe, el primer cambio de estado. Los valores originales de Jira se conservan ocultos como columnas `JSM …`. |
+| Tiempo por estado (tabla) | Tiempo en cada estado hasta la fecha de resolución, todas las visitas sumadas. N1 incluye N1 QCOM y N1 RAM y N2 incluye N2 RAM y N2 QCOM. Los estados que ya no existen en el flujo se conservan con su nombre del historial. |
+| Vida total | Tiempo natural de la creación a la fecha de resolución, sin descontar pausas |
+
+**Pendiente de confirmar:** las fechas de diagnóstico y de atención del servicio todavía no están en la tabla. Falta identificar en Jira qué campos son y qué tan llenos están.

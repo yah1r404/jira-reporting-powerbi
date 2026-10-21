@@ -1,0 +1,39 @@
+/// Un renglón por ticket y causa (un ticket puede tener varias causas; sin causa = 'Sin clasificar'). Se calcula a partir de IEP_Tickets[Causas Ruta],
+/// sin llamar otra vez a Jira. Un ticket con 2 causas cuenta en cada causa, pero una sola vez en los totales de tickets.
+table FactCausas
+	lineageTag: 27e8f90a-1b2c-4d3e-95f5-0c1d2e3f4a5e
+
+	column Key
+		dataType: string
+		lineageTag: 38f90a1b-2c3d-4e4f-a606-1d2e3f4a5b6f
+		summarizeBy: none
+		isNameInferred
+		sourceColumn: [Key]
+
+		annotation SummarizationSetBy = Automatic
+
+	column Causa
+		dataType: string
+		lineageTag: 490a1b2c-3d4e-4f50-b717-2e3f4a5b6c70
+		summarizeBy: none
+		isNameInferred
+		sourceColumn: [Causa]
+
+		annotation SummarizationSetBy = Automatic
+
+	partition FactCausas = calculated
+		mode: import
+		source =
+				SELECTCOLUMNS(
+				    GENERATE(
+				        SELECTCOLUMNS(
+				            IEP_Tickets,
+				            "Key", IEP_Tickets[Key],
+				            "Ruta", IF(ISBLANK(IEP_Tickets[Causas Ruta]), "Sin clasificar", IEP_Tickets[Causas Ruta])
+				        ),
+				        GENERATESERIES(1, PATHLENGTH([Ruta]))
+				    ),
+				    "Key", [Key],
+				    "Causa", PATHITEM([Ruta], [Value], TEXT)
+				)
+
