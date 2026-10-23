@@ -1,13 +1,13 @@
 {
-  "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/visualContainer/2.14.0/schema.json",
+  "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/visualContainer/2.13.0/schema.json",
   "name": "4648646a5b1471cbdac2",
   "position": {
-    "x": 1090,
-    "y": 196,
-    "z": 31000,
-    "height": 772,
-    "width": 810,
-    "tabOrder": 16000
+    "x": 264,
+    "y": 212,
+    "z": 34000,
+    "height": 410,
+    "width": 532,
+    "tabOrder": 19000
   },
   "visual": {
     "visualType": "clusteredBarChart",
@@ -28,7 +28,8 @@
               },
               "queryRef": "FactAssigneeHistory.Responsable",
               "nativeQueryRef": "Responsable",
-              "active": true
+              "active": true,
+              "displayName": "Persona"
             }
           ]
         },
@@ -42,14 +43,67 @@
                       "Entity": "_Medidas"
                     }
                   },
-                  "Property": "Tickets Atendidos"
+                  "Property": "Tickets Asignados"
                 }
               },
-              "queryRef": "_Medidas.Tickets Atendidos",
-              "nativeQueryRef": "Tickets Atendidos"
+              "queryRef": "_Medidas.Tickets Asignados",
+              "nativeQueryRef": "Tickets Asignados",
+              "displayName": "Tickets asignados"
+            }
+          ]
+        },
+        "Tooltips": {
+          "projections": [
+            {
+              "field": {
+                "Measure": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "_Medidas"
+                    }
+                  },
+                  "Property": "Participaciones"
+                }
+              },
+              "queryRef": "_Medidas.Participaciones",
+              "nativeQueryRef": "Participaciones",
+              "displayName": "Participaciones"
+            },
+            {
+              "field": {
+                "Measure": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "_Medidas"
+                    }
+                  },
+                  "Property": "Participaciones por Ticket"
+                }
+              },
+              "queryRef": "_Medidas.Participaciones por Ticket",
+              "nativeQueryRef": "Participaciones por Ticket",
+              "displayName": "Veces por ticket"
             }
           ]
         }
+      },
+      "sortDefinition": {
+        "sort": [
+          {
+            "field": {
+              "Measure": {
+                "Expression": {
+                  "SourceRef": {
+                    "Entity": "_Medidas"
+                  }
+                },
+                "Property": "Tickets Asignados"
+              }
+            },
+            "direction": "Descending"
+          }
+        ],
+        "isDefaultSort": true
       }
     },
     "objects": {
@@ -60,6 +114,23 @@
               "expr": {
                 "Literal": {
                   "Value": "true"
+                }
+              }
+            }
+          }
+        }
+      ],
+      "dataPoint": [
+        {
+          "properties": {
+            "fill": {
+              "solid": {
+                "color": {
+                  "expr": {
+                    "Literal": {
+                      "Value": "'#06519A'"
+                    }
+                  }
                 }
               }
             }
@@ -81,7 +152,7 @@
             "text": {
               "expr": {
                 "Literal": {
-                  "Value": "'Tickets atendidos por persona'"
+                  "Value": "'Tickets asignados por persona (cada ticket cuenta 1)'"
                 }
               }
             }

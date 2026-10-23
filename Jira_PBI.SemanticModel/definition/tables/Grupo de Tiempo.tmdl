@@ -1,0 +1,29 @@
+/// Grupos de tiempo para comparar trabajo de la mesa contra esperas de terceros. Sin relaciones.
+table 'Grupo de Tiempo'
+	lineageTag: fb3bb917-bc19-4e9f-ac70-298ff7b7aacc
+
+	column Grupo
+		dataType: string
+		lineageTag: 505781de-ae4b-41e2-979f-41203e9a534e
+		summarizeBy: none
+		isNameInferred
+		sourceColumn: [Grupo]
+		sortByColumn: Orden
+
+		annotation SummarizationSetBy = Automatic
+
+	column Orden
+		dataType: int64
+		isHidden
+		formatString: 0
+		lineageTag: 732232ee-e8ee-4e99-a65a-1afd092a2c4e
+		summarizeBy: none
+		isNameInferred
+		sourceColumn: [Orden]
+
+		annotation SummarizationSetBy = Automatic
+
+	partition 'Grupo de Tiempo' = calculated
+		mode: import
+		source = DATATABLE("Grupo", STRING, "Orden", INTEGER, { { "Antes de la primera atención", 1 }, { "Trabajo de la mesa", 2 }, { "Espera del cliente", 3 }, { "Espera de proveedor / terceros", 4 } })
+

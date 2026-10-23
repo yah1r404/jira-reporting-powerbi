@@ -3,7 +3,7 @@
   "name": "006043c48285db0f958f",
   "position": {
     "x": 16,
-    "y": 194,
+    "y": 280,
     "z": 4000,
     "height": 38,
     "width": 208,
@@ -42,7 +42,7 @@
             "text": {
               "expr": {
                 "Literal": {
-                  "Value": "'Vista ejecutiva'"
+                  "Value": "'Time in Status'"
                 }
               }
             },
@@ -95,7 +95,7 @@
             "text": {
               "expr": {
                 "Literal": {
-                  "Value": "'Vista ejecutiva'"
+                  "Value": "'Time in Status'"
                 }
               }
             },
@@ -148,7 +148,7 @@
             "text": {
               "expr": {
                 "Literal": {
-                  "Value": "'Vista ejecutiva'"
+                  "Value": "'Time in Status'"
                 }
               }
             },

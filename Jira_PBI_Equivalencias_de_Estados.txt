@@ -1,0 +1,81 @@
+JIRA_PBI - EQUIVALENCIAS DE ESTADOS (Time in Status y SLA)
+=====================================================================
+Los estados que ya no existen en los flujos actuales (o que vienen en inglés)
+se miden en el estado actual que los representa. El nombre original se
+conserva en la columna FactStatusHistory[Estado Jira].
+
+Cifras tomadas del historial cargado en Jira_PBI el 22/10/2026
+(tramos = veces que un ticket estuvo en ese estado).
+
+
+ESTADO ACTUAL             <-  ESTADOS DE JIRA QUE SE JUNTAN AQUÍ        TRAMOS   TICKETS
+---------------------------------------------------------------------------------------
+Nueva solicitud           <-  Nueva solicitud                            2,038    2,038
+                          <-  Esperando por ayuda                          264      231   (*)
+                          <-  Abiertos                                       7        7
+                          <-  Waiting for support                            5        5
+                          <-  cualquier otro estado inicial del ticket que no exista hoy
+                              (salvo Reabierta)
+
+N1                        <-  N1                                         1,603      843
+                          <-  N1 RAM                                     1,473      839
+                          <-  N1 QCOM                                      837      486
+                          <-  In Progress                                  159       76
+                          <-  Pending                                       52       43
+                          <-  Trabajo en curso                               7        7
+                          <-  Pendiente                                      1        1
+
+N2 RAM                    <-  N2 RAM                                       767      641
+                          <-  Escalado a N2                                 57       46
+                          <-  N2                                            27       22
+
+N2 QCOM                   <-  N2 QCOM                                      356      297
+
+N3 RAM                    <-  N3 RAM                                         4        4
+                          <-  Escalado a N3                                  4        4
+
+Esperando por el cliente  <-  Esperando por el cliente                     536      410
+                          <-  Esperando al solicitante                      64       60
+
+Esperando al proveedor    <-  Esperando al proveedor                        34       24
+
+Planta externa            <-  Planta externa                               114       99
+
+Escalado                  <-  Escalado                                      35       30
+
+Reabierta                 <-  Reabierta                                     46       44
+
+Resuelta                  <-  Resuelta                                   2,103    2,081
+                          <-  Resuelto                                      60       58   (*)
+                          <-  Completado                                     1        1
+
+Cerrada                   <-  Cerrada                                       22       21
+
+(*) Agregados hoy: "Esperando por ayuda" (202 tramos que no eran el primero
+    del ticket todavía quedaban sueltos; los 62 iniciales ya estaban en Nueva
+    solicitud) y "Resuelto" (quedaba suelto). Se aplican al Actualizar.
+
+
+TAMBIÉN RECONOCIDOS (no aparecieron en el historial actual, pero ya están mapeados)
+---------------------------------------------------------------------------------------
+Nueva solicitud           <-  Open, Abierto, Abierta, Nuevo, Nueva, New, To Do, Por hacer,
+                              Esperando soporte
+N1                        <-  En curso, En progreso
+N3 RAM                    <-  N3
+Esperando por el cliente  <-  Waiting for customer
+Escalado                  <-  Escalated
+Resuelta                  <-  Resolved, Completada, Completed
+Reabierta                 <-  Reopened
+Cerrada                   <-  Closed
+
+Los nombres se comparan sin distinguir mayúsculas ni espacios al inicio/final.
+
+
+CÓMO CUENTAN
+---------------------------------------------------------------------------------------
+- Time in Status: muestra los estados actuales con el tiempo de sus equivalentes.
+  No incluye Resuelta ni Cerrada.
+- SLA de resolución: Esperando por el cliente, Esperando al proveedor, Resuelta y
+  Cerrada son pausa (no suman). Todo lo demás suma.
+- Si aparece un estado nuevo sin equivalente, cuenta para el SLA pero no se muestra
+  en Time in Status (columna Vigente = FALSE) hasta agregarlo a esta lista.

@@ -1,13 +1,13 @@
 {
-  "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/visualContainer/2.14.0/schema.json",
+  "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/visualContainer/2.13.0/schema.json",
   "name": "004c7a7744fcbb24301b",
   "position": {
     "x": 264,
-    "y": 997,
-    "z": 32000,
-    "height": 787,
+    "y": 634,
+    "z": 35000,
+    "height": 430,
     "width": 810,
-    "tabOrder": 18000
+    "tabOrder": 21000
   },
   "visual": {
     "visualType": "pivotTable",
@@ -28,7 +28,8 @@
               },
               "queryRef": "FactAssigneeHistory.Responsable",
               "nativeQueryRef": "Responsable",
-              "active": true
+              "active": true,
+              "displayName": "Persona"
             }
           ]
         },
@@ -42,11 +43,42 @@
                       "Entity": "_Medidas"
                     }
                   },
+                  "Property": "Tickets Asignados"
+                }
+              },
+              "queryRef": "_Medidas.Tickets Asignados",
+              "nativeQueryRef": "Tickets Asignados",
+              "displayName": "Tickets asignados"
+            },
+            {
+              "field": {
+                "Measure": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "_Medidas"
+                    }
+                  },
+                  "Property": "Participaciones por Ticket"
+                }
+              },
+              "queryRef": "_Medidas.Participaciones por Ticket",
+              "nativeQueryRef": "Participaciones por Ticket",
+              "displayName": "Veces por ticket"
+            },
+            {
+              "field": {
+                "Measure": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "_Medidas"
+                    }
+                  },
                   "Property": "Tickets Atendidos"
                 }
               },
               "queryRef": "_Medidas.Tickets Atendidos",
-              "nativeQueryRef": "Tickets Atendidos"
+              "nativeQueryRef": "Tickets Atendidos",
+              "displayName": "Tickets resueltos en los que participó"
             },
             {
               "field": {
@@ -60,7 +92,8 @@
                 }
               },
               "queryRef": "_Medidas.Prom Horas Asignado por Ticket",
-              "nativeQueryRef": "Prom Horas Asignado por Ticket"
+              "nativeQueryRef": "Prom Horas Asignado por Ticket",
+              "displayName": "Tiempo promedio de participación"
             },
             {
               "field": {
@@ -74,7 +107,8 @@
                 }
               },
               "queryRef": "_Medidas.Mediana Horas Asignado",
-              "nativeQueryRef": "Mediana Horas Asignado"
+              "nativeQueryRef": "Mediana Horas Asignado",
+              "displayName": "Tiempo típico (mediana)"
             },
             {
               "field": {
@@ -88,7 +122,8 @@
                 }
               },
               "queryRef": "_Medidas.% SLA Resolución Tickets Atendidos",
-              "nativeQueryRef": "% SLA Resolución Tickets Atendidos"
+              "nativeQueryRef": "% SLA Resolución Tickets Atendidos",
+              "displayName": "% SLA de esos tickets"
             }
           ]
         }
@@ -108,7 +143,237 @@
             "text": {
               "expr": {
                 "Literal": {
-                  "Value": "'Eficiencia por persona (tickets resueltos'"
+                  "Value": "'Participación por persona'"
+                }
+              }
+            }
+          }
+        }
+      ]
+    },
+    "objects": {
+      "columnHeaders": [
+        {
+          "properties": {
+            "backColor": {
+              "solid": {
+                "color": {
+                  "expr": {
+                    "Literal": {
+                      "Value": "'#0A2E5C'"
+                    }
+                  }
+                }
+              }
+            },
+            "fontColor": {
+              "solid": {
+                "color": {
+                  "expr": {
+                    "Literal": {
+                      "Value": "'#FFFFFF'"
+                    }
+                  }
+                }
+              }
+            },
+            "bold": {
+              "expr": {
+                "Literal": {
+                  "Value": "true"
+                }
+              }
+            },
+            "fontSize": {
+              "expr": {
+                "Literal": {
+                  "Value": "10D"
+                }
+              }
+            },
+            "wordWrap": {
+              "expr": {
+                "Literal": {
+                  "Value": "true"
+                }
+              }
+            },
+            "alignment": {
+              "expr": {
+                "Literal": {
+                  "Value": "'Center'"
+                }
+              }
+            }
+          }
+        }
+      ],
+      "rowHeaders": [
+        {
+          "properties": {
+            "fontColor": {
+              "solid": {
+                "color": {
+                  "expr": {
+                    "Literal": {
+                      "Value": "'#0A2E5C'"
+                    }
+                  }
+                }
+              }
+            },
+            "fontSize": {
+              "expr": {
+                "Literal": {
+                  "Value": "10D"
+                }
+              }
+            },
+            "wordWrap": {
+              "expr": {
+                "Literal": {
+                  "Value": "true"
+                }
+              }
+            }
+          }
+        }
+      ],
+      "subTotals": [
+        {
+          "properties": {
+            "fontColor": {
+              "solid": {
+                "color": {
+                  "expr": {
+                    "Literal": {
+                      "Value": "'#0A2E5C'"
+                    }
+                  }
+                }
+              }
+            },
+            "backColor": {
+              "solid": {
+                "color": {
+                  "expr": {
+                    "Literal": {
+                      "Value": "'#D5E0F0'"
+                    }
+                  }
+                }
+              }
+            },
+            "bold": {
+              "expr": {
+                "Literal": {
+                  "Value": "true"
+                }
+              }
+            }
+          }
+        }
+      ],
+      "values": [
+        {
+          "properties": {
+            "fontSize": {
+              "expr": {
+                "Literal": {
+                  "Value": "10D"
+                }
+              }
+            },
+            "fontColorPrimary": {
+              "solid": {
+                "color": {
+                  "expr": {
+                    "Literal": {
+                      "Value": "'#1A1A1A'"
+                    }
+                  }
+                }
+              }
+            },
+            "backColorPrimary": {
+              "solid": {
+                "color": {
+                  "expr": {
+                    "Literal": {
+                      "Value": "'#FFFFFF'"
+                    }
+                  }
+                }
+              }
+            },
+            "fontColorSecondary": {
+              "solid": {
+                "color": {
+                  "expr": {
+                    "Literal": {
+                      "Value": "'#1A1A1A'"
+                    }
+                  }
+                }
+              }
+            },
+            "backColorSecondary": {
+              "solid": {
+                "color": {
+                  "expr": {
+                    "Literal": {
+                      "Value": "'#F4F6FA'"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      ],
+      "grid": [
+        {
+          "properties": {
+            "gridHorizontal": {
+              "expr": {
+                "Literal": {
+                  "Value": "true"
+                }
+              }
+            },
+            "gridHorizontalColor": {
+              "solid": {
+                "color": {
+                  "expr": {
+                    "Literal": {
+                      "Value": "'#E3E8EF'"
+                    }
+                  }
+                }
+              }
+            },
+            "gridVertical": {
+              "expr": {
+                "Literal": {
+                  "Value": "false"
+                }
+              }
+            },
+            "outlineColor": {
+              "solid": {
+                "color": {
+                  "expr": {
+                    "Literal": {
+                      "Value": "'#0A2E5C'"
+                    }
+                  }
+                }
+              }
+            },
+            "rowPadding": {
+              "expr": {
+                "Literal": {
+                  "Value": "4D"
                 }
               }
             }
