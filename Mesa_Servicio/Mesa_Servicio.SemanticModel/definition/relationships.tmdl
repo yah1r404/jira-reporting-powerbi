@@ -1,0 +1,8 @@
+relationship becbc262-e23b-428f-b2a7-3dcdee9275ad
+	fromColumn: Tickets.'Created Date'
+	toColumn: DimFecha.Date
+
+relationship 4a66f335-dfc0-423d-b900-f8d7b4812733
+	fromColumn: Historial.Key
+	toColumn: Tickets.Key
+

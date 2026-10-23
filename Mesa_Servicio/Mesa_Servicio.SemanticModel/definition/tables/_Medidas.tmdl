@@ -1,0 +1,380 @@
+table _Medidas
+	lineageTag: a8e6cd8f-152a-49c2-af0b-138dcd1915f8
+
+	/// Tickets de la mesa en el contexto actual.
+	measure 'Tickets' = COUNTROWS(Tickets)
+		formatString: #,##0
+		displayFolder: Volumen
+		lineageTag: 8cf27af1-4b49-4d0a-8572-51f67ebd73de
+
+	/// Tickets con fecha de resolución (Resolved o, si falta, entrada a Resuelta).
+	measure 'Tickets Resueltos' = CALCULATE([Tickets], NOT ISBLANK(Tickets[Fecha Resolución]))
+		formatString: #,##0
+		displayFolder: Volumen
+		lineageTag: 501ee3c0-b52c-41c2-9f96-bab1ed55a56e
+
+	/// Tickets pendientes (sin fecha de resolución).
+	measure 'Tickets Abiertos' = [Tickets] - [Tickets Resueltos]
+		formatString: #,##0
+		displayFolder: Volumen
+		lineageTag: 73342646-a32a-404e-a60d-09e71bb49bf7
+
+	/// Tickets resueltos dentro del periodo (por fecha de resolución), aunque se hayan creado antes.
+	measure 'Tickets Resueltos en Periodo' = CALCULATE([Tickets], REMOVEFILTERS(DimFecha), TREATAS(VALUES(DimFecha[Date]), Tickets[Fecha Resolución Día]))
+		formatString: #,##0
+		displayFolder: Volumen
+		lineageTag: 94810699-1df8-4d6f-8578-64ff75c5e323
+
+	/// Fecha y hora del último refresh (hora de Mérida).
+	measure 'Última Actualización' = CALCULATE(MAX(Historial[Fin]), REMOVEFILTERS())
+		formatString: dd/mm/yyyy hh:nn
+		displayFolder: Volumen
+		lineageTag: c109257a-d3d9-4724-8d8b-b85c9fbb9d8a
+
+	/// TRUE si se eligió el calendario operativo RAM; sin selección: 24/7 (contractual).
+	measure 'Calendario Es RAM' = SELECTEDVALUE('Calendario SLA'[Clave], "247") = "RAM"
+		displayFolder: Calendario
+		lineageTag: 161cb77c-72ee-40f5-8304-e366a8146dff
+
+	/// Texto del calendario con el que se miden los SLA.
+	measure 'Calendario SLA Elegido' = IF([Calendario Es RAM], "Calendario operativo RAM", "Calendario 24/7")
+		displayFolder: Calendario
+		lineageTag: e831891b-bf98-49ad-968d-ef451d597f83
+
+	/// Cumplidos (24x7).
+	measure 'Respuesta Cumplidos 24x7' = CALCULATE([Tickets], Tickets[SLA Respuesta Estado] = "Cumplido")
+		formatString: #,##0
+		displayFolder: SLA Primera Respuesta
+		lineageTag: ba50766a-4e4d-4d83-b69d-d98c42ed0611
+
+	/// Incumplidos (24x7).
+	measure 'Respuesta Incumplidos 24x7' = CALCULATE([Tickets], Tickets[SLA Respuesta Estado] = "Incumplido")
+		formatString: #,##0
+		displayFolder: SLA Primera Respuesta
+		lineageTag: 596ad123-343d-4c5f-af19-d7e1d3e3ee25
+
+	/// Promedio de horas (24x7) de los tickets con resultado.
+	measure 'Prom Horas Respuesta 24x7' = AVERAGEX(FILTER(Tickets, NOT ISBLANK(Tickets[Primer Comentario])), Tickets[SLA Respuesta Horas])
+		formatString: #,##0.00
+		displayFolder: SLA Primera Respuesta
+		lineageTag: 3055780f-533d-42ab-af86-f8d98cbe5e53
+
+	/// Cumplidos (RAM).
+	measure 'Respuesta Cumplidos RAM' = CALCULATE([Tickets], Tickets[SLA Respuesta Estado RAM] = "Cumplido")
+		formatString: #,##0
+		displayFolder: SLA Primera Respuesta
+		lineageTag: 091f12ef-1de2-4988-93cb-4db4e5d3ad05
+
+	/// Incumplidos (RAM).
+	measure 'Respuesta Incumplidos RAM' = CALCULATE([Tickets], Tickets[SLA Respuesta Estado RAM] = "Incumplido")
+		formatString: #,##0
+		displayFolder: SLA Primera Respuesta
+		lineageTag: 449c36f5-90e2-4e85-89ae-8dc498adccd0
+
+	/// Promedio de horas (RAM) de los tickets con resultado.
+	measure 'Prom Horas Respuesta RAM' = AVERAGEX(FILTER(Tickets, NOT ISBLANK(Tickets[Primer Comentario])), Tickets[SLA Respuesta Horas RAM])
+		formatString: #,##0.00
+		displayFolder: SLA Primera Respuesta
+		lineageTag: 8aa5646c-43e7-4176-a467-f12f327b0583
+
+	/// Tickets que cumplieron el SLA de respuesta con el calendario elegido.
+	measure 'SLA Respuesta Cumplidos' = IF([Calendario Es RAM], [Respuesta Cumplidos RAM], [Respuesta Cumplidos 24x7])
+		formatString: #,##0
+		displayFolder: SLA Primera Respuesta
+		lineageTag: 0871a139-bbd7-4419-bf10-2136f3a01532
+
+	/// Tickets que no cumplieron el SLA de respuesta (incluye abiertos que ya pasaron la meta), con el calendario elegido.
+	measure 'SLA Respuesta Incumplidos' = IF([Calendario Es RAM], [Respuesta Incumplidos RAM], [Respuesta Incumplidos 24x7])
+		formatString: #,##0
+		displayFolder: SLA Primera Respuesta
+		lineageTag: 35217a8b-9e95-4efe-8969-0dfaea663ef6
+
+	/// Tickets con resultado (cumplidos + incumplidos).
+	measure 'Respuesta Evaluados' = [SLA Respuesta Cumplidos] + [SLA Respuesta Incumplidos]
+		formatString: #,##0
+		displayFolder: SLA Primera Respuesta
+		lineageTag: d3032771-bf8c-43d3-93a3-6da3009f14fa
+
+	/// Promedio de horas del SLA de respuesta con el calendario elegido.
+	measure 'Prom Horas SLA Respuesta' = IF([Calendario Es RAM], [Prom Horas Respuesta RAM], [Prom Horas Respuesta 24x7])
+		formatString: #,##0.00
+		displayFolder: SLA Primera Respuesta
+		lineageTag: 899b80c8-fc22-4185-a5bf-23f47abc1819
+
+	/// Cumplidos (24x7).
+	measure 'Resolución Cumplidos 24x7' = CALCULATE([Tickets], Tickets[SLA Resolución Estado] = "Cumplido")
+		formatString: #,##0
+		displayFolder: SLA Resolución
+		lineageTag: a8ecdad5-17d7-48c8-afb2-d3c4d5641edc
+
+	/// Incumplidos (24x7).
+	measure 'Resolución Incumplidos 24x7' = CALCULATE([Tickets], Tickets[SLA Resolución Estado] = "Incumplido")
+		formatString: #,##0
+		displayFolder: SLA Resolución
+		lineageTag: 2c57b3f0-ea35-45d8-90e2-874975479d40
+
+	/// Promedio de horas (24x7) de los tickets con resultado.
+	measure 'Prom Horas Resolución 24x7' = AVERAGEX(FILTER(Tickets, NOT ISBLANK(Tickets[Fecha Resolución])), Tickets[SLA Resolución Horas])
+		formatString: #,##0.00
+		displayFolder: SLA Resolución
+		lineageTag: 5905dfd5-bfc2-46c5-84e0-cc798c96133d
+
+	/// Cumplidos (RAM).
+	measure 'Resolución Cumplidos RAM' = CALCULATE([Tickets], Tickets[SLA Resolución Estado RAM] = "Cumplido")
+		formatString: #,##0
+		displayFolder: SLA Resolución
+		lineageTag: 9b4c3910-5440-40b5-8f10-5d0d2e594b5e
+
+	/// Incumplidos (RAM).
+	measure 'Resolución Incumplidos RAM' = CALCULATE([Tickets], Tickets[SLA Resolución Estado RAM] = "Incumplido")
+		formatString: #,##0
+		displayFolder: SLA Resolución
+		lineageTag: 0a210fdb-b10e-411d-bcb2-2feb5a3a3516
+
+	/// Promedio de horas (RAM) de los tickets con resultado.
+	measure 'Prom Horas Resolución RAM' = AVERAGEX(FILTER(Tickets, NOT ISBLANK(Tickets[Fecha Resolución])), Tickets[SLA Resolución Horas RAM])
+		formatString: #,##0.00
+		displayFolder: SLA Resolución
+		lineageTag: f9bcd05c-d792-4cca-beb4-c0f86b31b94a
+
+	/// Tickets que cumplieron el SLA de resolución con el calendario elegido.
+	measure 'SLA Resolución Cumplidos' = IF([Calendario Es RAM], [Resolución Cumplidos RAM], [Resolución Cumplidos 24x7])
+		formatString: #,##0
+		displayFolder: SLA Resolución
+		lineageTag: fe81b10c-de83-485c-8893-48e684b607a4
+
+	/// Tickets que no cumplieron el SLA de resolución (incluye abiertos que ya pasaron la meta), con el calendario elegido.
+	measure 'SLA Resolución Incumplidos' = IF([Calendario Es RAM], [Resolución Incumplidos RAM], [Resolución Incumplidos 24x7])
+		formatString: #,##0
+		displayFolder: SLA Resolución
+		lineageTag: 5f697694-d7db-493d-8118-997f93b09486
+
+	/// Tickets con resultado (cumplidos + incumplidos).
+	measure 'Resolución Evaluados' = [SLA Resolución Cumplidos] + [SLA Resolución Incumplidos]
+		formatString: #,##0
+		displayFolder: SLA Resolución
+		lineageTag: 308d456d-34cf-4826-877f-9e36c64f9b38
+
+	/// Promedio de horas del SLA de resolución con el calendario elegido.
+	measure 'Prom Horas SLA Resolución' = IF([Calendario Es RAM], [Prom Horas Resolución RAM], [Prom Horas Resolución 24x7])
+		formatString: #,##0.00
+		displayFolder: SLA Resolución
+		lineageTag: 405d03f2-8859-4131-a7f7-326330cbe94f
+
+	/// % de cumplimiento del SLA de primera respuesta (30 min IEP / 4 h resto). No cuenta 'Sin dato' ni 'En curso'.
+	measure '% SLA Primera Respuesta' = DIVIDE([SLA Respuesta Cumplidos], [Respuesta Evaluados])
+		formatString: 0.0%;-0.0%;0.0%
+		displayFolder: SLA Primera Respuesta
+		lineageTag: ecd51bf5-8558-4536-a6d6-b3c23753a4ee
+
+	/// % de cumplimiento del SLA de resolución (15 h IEP / 24 h resto, sin pausas).
+	measure '% SLA Resolución' = DIVIDE([SLA Resolución Cumplidos], [Resolución Evaluados])
+		formatString: 0.0%;-0.0%;0.0%
+		displayFolder: SLA Resolución
+		lineageTag: 8f3550a1-a01f-4726-b9b6-f53b2592b120
+
+	/// Meta de cumplimiento para el semáforo.
+	measure 'Meta % SLA' = 0.95
+		formatString: 0.0%;-0.0%;0.0%
+		displayFolder: Semáforo
+		lineageTag: 4d197cd2-27da-45fb-bb6a-988de4c4b2cd
+
+	/// Por debajo de este % el semáforo pasa a rojo.
+	measure 'Umbral Alerta % SLA' = 0.85
+		formatString: 0.0%;-0.0%;0.0%
+		displayFolder: Semáforo
+		lineageTag: f4deb4c3-beeb-4990-988a-6897ff58757b
+
+	/// Color del % SLA primera respuesta: azul en meta, azul marino debajo, rojo bajo el umbral.
+	measure 'Color % SLA Primera Respuesta' =
+			VAR v = [% SLA Primera Respuesta]
+			RETURN SWITCH(TRUE(), ISBLANK(v), "#8A97A8", v >= [Meta % SLA], "#06519A", v >= [Umbral Alerta % SLA], "#0A2E5C", "#C8382E")
+		displayFolder: Semáforo
+		lineageTag: b99fc85b-7a94-4da9-b206-4154121c2662
+
+	/// Color del % SLA resolución: azul en meta, azul marino debajo, rojo bajo el umbral.
+	measure 'Color % SLA Resolución' =
+			VAR v = [% SLA Resolución]
+			RETURN SWITCH(TRUE(), ISBLANK(v), "#8A97A8", v >= [Meta % SLA], "#06519A", v >= [Umbral Alerta % SLA], "#0A2E5C", "#C8382E")
+		displayFolder: Semáforo
+		lineageTag: 78e6940a-93af-4c83-baa3-250f99043642
+
+	/// % del total de tickets resueltos.
+	measure 'Texto % Resueltos' =
+			VAR P = DIVIDE([Tickets Resueltos], [Tickets])
+			RETURN IF(ISBLANK(P), BLANK(), FORMAT(P, "0%") & " del total")
+		displayFolder: Textos
+		lineageTag: ea78abcc-0ac9-4473-a96f-2570ecd94017
+
+	/// % del total de tickets abiertos.
+	measure 'Texto % Pendientes' =
+			VAR P = DIVIDE([Tickets Abiertos], [Tickets])
+			RETURN IF(ISBLANK(P), BLANK(), FORMAT(P, "0%") & " del total")
+		displayFolder: Textos
+		lineageTag: 90483bd5-a99e-41a4-a3c6-d2c7cdf9e1d2
+
+	/// % del total de sla respuesta cumplidos.
+	measure 'Texto % Respuesta Cumplidos' =
+			VAR P = DIVIDE([SLA Respuesta Cumplidos], [Tickets])
+			RETURN IF(ISBLANK(P), BLANK(), FORMAT(P, "0%") & " del total")
+		displayFolder: Textos
+		lineageTag: e553c0b7-1aab-4d5b-9838-5f20783a02e6
+
+	/// % del total de sla respuesta incumplidos.
+	measure 'Texto % Respuesta Incumplidos' =
+			VAR P = DIVIDE([SLA Respuesta Incumplidos], [Tickets])
+			RETURN IF(ISBLANK(P), BLANK(), FORMAT(P, "0%") & " del total")
+		displayFolder: Textos
+		lineageTag: 9b7595cb-b2e6-4c68-b822-45ce2ad0681e
+
+	/// % del total de sla resolución cumplidos.
+	measure 'Texto % Resolución Cumplidos' =
+			VAR P = DIVIDE([SLA Resolución Cumplidos], [Tickets])
+			RETURN IF(ISBLANK(P), BLANK(), FORMAT(P, "0%") & " del total")
+		displayFolder: Textos
+		lineageTag: 109414c8-7845-4fb8-a236-c8e830638aaa
+
+	/// % del total de sla resolución incumplidos.
+	measure 'Texto % Resolución Incumplidos' =
+			VAR P = DIVIDE([SLA Resolución Incumplidos], [Tickets])
+			RETURN IF(ISBLANK(P), BLANK(), FORMAT(P, "0%") & " del total")
+		displayFolder: Textos
+		lineageTag: 9603e995-3cb8-41c3-bbb2-49192a2643e1
+
+	/// Tiempo promedio a la primera respuesta, legible.
+	measure 'Tiempo Promedio a Primera Respuesta' =
+			VAR Hrs = [Prom Horas SLA Respuesta]
+			VAR M = ROUND(Hrs * 60, 0)
+			VAR D = INT(M / 1440)
+			VAR Hr = INT(MOD(M, 1440) / 60)
+			VAR Mi = MOD(M, 60)
+			RETURN
+			    IF(ISBLANK(Hrs), BLANK(),
+			        IF(D > 0, D & IF(D = 1, " día ", " días ") & Hr & " h " & FORMAT(Mi, "00") & " min",
+			            IF(Hr > 0, Hr & " h " & FORMAT(Mi, "00") & " min", Mi & " min")))
+		displayFolder: Textos
+		lineageTag: 9b39f179-9c6e-4050-887f-dc6463df6fcc
+
+	/// Tiempo promedio de SLA de resolución, legible.
+	measure 'Tiempo Promedio a Resolución' =
+			VAR Hrs = [Prom Horas SLA Resolución]
+			VAR M = ROUND(Hrs * 60, 0)
+			VAR D = INT(M / 1440)
+			VAR Hr = INT(MOD(M, 1440) / 60)
+			VAR Mi = MOD(M, 60)
+			RETURN
+			    IF(ISBLANK(Hrs), BLANK(),
+			        IF(D > 0, D & IF(D = 1, " día ", " días ") & Hr & " h " & FORMAT(Mi, "00") & " min",
+			            IF(Hr > 0, Hr & " h " & FORMAT(Mi, "00") & " min", Mi & " min")))
+		displayFolder: Textos
+		lineageTag: 2fd12ed7-435c-4e2e-ae1f-b57c34e61121
+
+	/// Metas de los tickets en pantalla y calendario elegido.
+	measure 'Meta Primera Respuesta Texto' =
+			"Meta: " & CONCATENATEX(
+			    FILTER(VALUES(Tickets[SLA Respuesta Meta Horas]), NOT ISBLANK(Tickets[SLA Respuesta Meta Horas])),
+			    IF(Tickets[SLA Respuesta Meta Horas] < 1, FORMAT(Tickets[SLA Respuesta Meta Horas] * 60, "0") & " min", FORMAT(Tickets[SLA Respuesta Meta Horas], "0.##") & " h"),
+			    " / ", Tickets[SLA Respuesta Meta Horas], ASC) & " · " & [Calendario SLA Elegido]
+		displayFolder: Textos
+		lineageTag: a85a8bdd-a040-4f5c-b72f-6a79ad8873a4
+
+	/// Metas de los tickets en pantalla y calendario elegido.
+	measure 'Meta Resolución Texto' =
+			"Meta: " & CONCATENATEX(
+			    FILTER(VALUES(Tickets[SLA Resolución Meta Horas]), NOT ISBLANK(Tickets[SLA Resolución Meta Horas])),
+			    IF(Tickets[SLA Resolución Meta Horas] < 1, FORMAT(Tickets[SLA Resolución Meta Horas] * 60, "0") & " min", FORMAT(Tickets[SLA Resolución Meta Horas], "0.##") & " h"),
+			    " / ", Tickets[SLA Resolución Meta Horas], ASC) & " · " & [Calendario SLA Elegido]
+		displayFolder: Textos
+		lineageTag: 8559bbc8-6be2-4589-a08e-1eaa235b734b
+
+	/// Tickets de cada SLA en cada estado (calendario elegido).
+	measure 'Tickets por Estado de SLA' =
+			VAR Sla = SELECTEDVALUE('SLA Comparación'[SLA])
+			VAR Est = SELECTEDVALUE('Estado SLA'[Estado del SLA])
+			VAR UsaRAM = [Calendario Es RAM]
+			RETURN
+			    SWITCH(TRUE(),
+			        Sla = "Primera respuesta" && UsaRAM, CALCULATE([Tickets], Tickets[SLA Respuesta Estado RAM] = Est),
+			        Sla = "Primera respuesta", CALCULATE([Tickets], Tickets[SLA Respuesta Estado] = Est),
+			        UsaRAM, CALCULATE([Tickets], Tickets[SLA Resolución Estado RAM] = Est),
+			        CALCULATE([Tickets], Tickets[SLA Resolución Estado] = Est))
+		formatString: #,##0
+		displayFolder: Gráficas
+		lineageTag: beafdf44-3a4a-4468-9176-d8aaec2b4a18
+
+	/// % de cada estado por SLA; se muestra como 86% (32).
+	measure '% por Estado de SLA' = DIVIDE([Tickets por Estado de SLA], [Tickets])
+		displayFolder: Gráficas
+		lineageTag: a77dc758-4afd-4cc8-bca0-5547581e78fb
+		formatStringDefinition = "0% ""(" & FORMAT([Tickets por Estado de SLA], "#,##0") & ")"""
+
+	/// Tickets creados; la etiqueta incluye el % del periodo.
+	measure 'Creados con %' = [Tickets]
+		displayFolder: Gráficas
+		lineageTag: d28c23c5-fd11-41c8-8b37-eef2b158268f
+		formatStringDefinition = "#,##0 ""(" & FORMAT(DIVIDE([Tickets], CALCULATE([Tickets], ALLSELECTED(DimFecha))), "0%") & ")"""
+
+	/// Tickets resueltos; la etiqueta incluye el % del periodo.
+	measure 'Resueltos con %' = [Tickets Resueltos en Periodo]
+		displayFolder: Gráficas
+		lineageTag: f95c8376-0b78-4c9b-a0e1-ad2c3c3ebd98
+		formatStringDefinition = "#,##0 ""(" & FORMAT(DIVIDE([Tickets Resueltos en Periodo], CALCULATE([Tickets Resueltos en Periodo], ALLSELECTED(DimFecha))), "0%") & ")"""
+
+	/// TRUE con el horario operativo RAM (predeterminado); FALSE con 24/7.
+	measure 'Usa Horario Laboral' = SELECTEDVALUE('Horario Cálculo'[Clave], "laboral") = "laboral"
+		displayFolder: Time in Status
+		lineageTag: ad294cd9-fdf6-4e3f-8365-9dff74fe062f
+
+	/// Horas de los tramos con el horario elegido.
+	measure 'Suma Horas' = IF([Usa Horario Laboral], SUM(Historial[Horas RAM]), SUM(Historial[Horas]))
+		formatString: #,##0.00
+		displayFolder: Time in Status
+		lineageTag: 166f2015-0a29-42e8-aa10-07b7a388b199
+
+	/// Horas en cada estado (sin Resuelta ni Cerrada).
+	measure 'Horas en Estado' = CALCULATE([Suma Horas], Historial[Campo] = "Estado", Historial[Es Estado Final] = FALSE())
+		formatString: #,##0.00
+		displayFolder: Time in Status
+		lineageTag: e3a96bf4-22ea-4f4c-9222-554916b11031
+
+	/// Tickets que pasaron por el estado.
+	measure 'Tickets en Estado' = CALCULATE(DISTINCTCOUNT(Historial[Key]), Historial[Campo] = "Estado", Historial[Es Estado Final] = FALSE())
+		formatString: #,##0
+		displayFolder: Time in Status
+		lineageTag: 801ee5b0-219c-4910-93ae-f8127fe6271b
+
+	/// Horas promedio por ticket en el estado.
+	measure 'Prom Horas en Estado' = DIVIDE([Horas en Estado], [Tickets en Estado])
+		formatString: #,##0.00
+		displayFolder: Time in Status
+		lineageTag: fe119dc3-a553-425d-b2aa-ec7970598154
+
+	/// Mediana de horas por ticket en el estado.
+	measure 'Mediana Horas en Estado' = CALCULATE(MEDIANX(VALUES(Historial[Key]), CALCULATE([Suma Horas])), Historial[Campo] = "Estado", Historial[Es Estado Final] = FALSE())
+		formatString: #,##0.00
+		displayFolder: Time in Status
+		lineageTag: c38944c4-9367-470d-907c-c6b272e4f186
+
+	/// Texto con los filtros aplicados y el calendario de SLA.
+	measure 'Filtros Activos' =
+			VAR Periodo = IF(ISFILTERED(DimFecha[Date]), "Periodo: " & FORMAT(MIN(DimFecha[Date]), "dd/mm/yyyy") & " – " & FORMAT(MAX(DimFecha[Date]), "dd/mm/yyyy"))
+			VAR Org = IF(ISFILTERED(Tickets[Organización]), "Cliente: " & IF(COUNTROWS(VALUES(Tickets[Organización])) > 2, COUNTROWS(VALUES(Tickets[Organización])) & " seleccionadas", CONCATENATEX(VALUES(Tickets[Organización]), Tickets[Organización], ", ")))
+			VAR Flujo = IF(ISFILTERED(Tickets[Flujo]), "Flujo: " & CONCATENATEX(VALUES(Tickets[Flujo]), Tickets[Flujo], ", "))
+			VAR RT = IF(ISFILTERED(Tickets[Request Type]), "Tipo de solicitud: " & IF(COUNTROWS(VALUES(Tickets[Request Type])) > 2, COUNTROWS(VALUES(Tickets[Request Type])) & " seleccionados", CONCATENATEX(VALUES(Tickets[Request Type]), Tickets[Request Type], ", ")))
+			VAR Cal = "SLA: " & [Calendario SLA Elegido]
+			VAR Partes = { Periodo, Org, Flujo, RT, Cal }
+			RETURN "Filtros activos:   " & CONCATENATEX(FILTER(Partes, NOT ISBLANK([Value])), [Value], "   ·   ")
+		displayFolder: Filtros
+		lineageTag: 1825dca3-56bd-4544-91b1-e971f0e14204
+
+	partition _Medidas = m
+		mode: import
+		source =
+				let
+				    Origen = #table(type table [Columna1 = Int64.Type], {}),
+				    Vacia = Table.RemoveColumns(Origen, {"Columna1"})
+				in
+				    Vacia
+
+	annotation PBI_ResultType = Table
+

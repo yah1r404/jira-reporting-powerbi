@@ -1,0 +1,98 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/visualContainer/2.14.0/schema.json",
+  "name": "6441c8e123745b2acdb6",
+  "position": {
+    "x": 1290,
+    "y": 616,
+    "z": 31000,
+    "height": 448,
+    "width": 610,
+    "tabOrder": 18000
+  },
+  "visual": {
+    "visualType": "pivotTable",
+    "query": {
+      "queryState": {
+        "Columns": {
+          "projections": [
+            {
+              "field": {
+                "Column": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "Historial"
+                    }
+                  },
+                  "Property": "Valor"
+                }
+              },
+              "queryRef": "Historial.Valor",
+              "nativeQueryRef": "Estado",
+              "active": true
+            }
+          ]
+        },
+        "Rows": {
+          "projections": [
+            {
+              "field": {
+                "Column": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "Tickets"
+                    }
+                  },
+                  "Property": "Request Type"
+                }
+              },
+              "queryRef": "Tickets.Request Type",
+              "nativeQueryRef": "Request Type",
+              "active": true,
+              "displayName": "Tipo de solicitud"
+            }
+          ]
+        },
+        "Values": {
+          "projections": [
+            {
+              "field": {
+                "Measure": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "_Medidas"
+                    }
+                  },
+                  "Property": "Prom Horas en Estado"
+                }
+              },
+              "queryRef": "_Medidas.Prom Horas en Estado",
+              "nativeQueryRef": "Prom Horas en Estado"
+            }
+          ]
+        }
+      }
+    },
+    "visualContainerObjects": {
+      "title": [
+        {
+          "properties": {
+            "show": {
+              "expr": {
+                "Literal": {
+                  "Value": "true"
+                }
+              }
+            },
+            "text": {
+              "expr": {
+                "Literal": {
+                  "Value": "'Horas promedio en estado por tipo de solución'"
+                }
+              }
+            }
+          }
+        }
+      ]
+    }
+  }
+}

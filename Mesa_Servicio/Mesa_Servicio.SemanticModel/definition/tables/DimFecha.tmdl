@@ -1,0 +1,31 @@
+/// Calendario de fechas de creación (y de resolución hasta hoy).
+table DimFecha
+	lineageTag: 21a3cf21-e03e-468d-955c-9dcdc1d12c93
+
+	/// Día.
+	column Date
+		dataType: dateTime
+		formatString: dd/mm/yyyy
+		lineageTag: f3a350b2-824f-4178-a6fc-c7ce83b50cac
+		summarizeBy: none
+		isNameInferred
+		sourceColumn: [Date]
+
+		annotation SummarizationSetBy = Automatic
+
+
+	/// Año y mes (2026-10).
+	column 'Año Mes' = FORMAT([Date], "yyyy-mm")
+		dataType: string
+		lineageTag: dd51c1a3-0edc-492f-ae76-3eeb7ad28f72
+		summarizeBy: none
+
+		annotation SummarizationSetBy = Automatic
+
+
+	partition DimFecha = calculated
+		mode: import
+		source = CALENDAR(MIN(Tickets[Created Date]), MAX(MAX(Tickets[Created Date]), TODAY()))
+
+	annotation PBI_Id = DimFecha
+

@@ -1,0 +1,29 @@
+/// Leyenda de la gráfica 'Cumplimiento de los SLA'. Sin relaciones.
+table 'Estado SLA'
+	lineageTag: 99035e48-711e-44c3-bb4b-d9fd4368a169
+
+	column 'Estado del SLA'
+		dataType: string
+		lineageTag: ea9803ca-2c7b-42b2-acd2-6ae71912f1a6
+		summarizeBy: none
+		isNameInferred
+		sourceColumn: [Estado del SLA]
+		sortByColumn: 'Orden Estado SLA'
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Orden Estado SLA'
+		dataType: int64
+		isHidden
+		formatString: 0
+		lineageTag: a434574d-7d5c-4cea-8130-2c43e3a813f9
+		summarizeBy: none
+		isNameInferred
+		sourceColumn: [Orden Estado SLA]
+
+		annotation SummarizationSetBy = Automatic
+
+	partition 'Estado SLA' = calculated
+		mode: import
+		source = DATATABLE("Estado del SLA", STRING, "Orden Estado SLA", INTEGER, { { "Cumplido", 1 }, { "Incumplido", 2 }, { "En curso", 3 }, { "En riesgo", 4 }, { "Pausado", 5 }, { "Sin dato", 6 } })
+

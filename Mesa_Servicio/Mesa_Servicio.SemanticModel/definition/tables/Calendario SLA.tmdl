@@ -1,0 +1,39 @@
+/// Selector 'Calendario SLA': 24/7 (contractual, predeterminado) u operativo RAM. Sin relaciones.
+table 'Calendario SLA'
+	lineageTag: a116d0be-a483-4cf1-a561-cd2d72120d77
+
+	column 'Calendario'
+		dataType: string
+		lineageTag: 6efca0bf-b30c-469c-8b5f-8b10a54bdc21
+		summarizeBy: none
+		isNameInferred
+		sourceColumn: [Calendario]
+		sortByColumn: 'Orden'
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Clave'
+		dataType: string
+		isHidden
+		lineageTag: d3ea34dc-83e8-4abc-a4e7-2359fe0cfa8e
+		summarizeBy: none
+		isNameInferred
+		sourceColumn: [Clave]
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Orden'
+		dataType: int64
+		isHidden
+		formatString: 0
+		lineageTag: 7c3eabf8-5288-42b0-ab42-abbcf5f72f7d
+		summarizeBy: none
+		isNameInferred
+		sourceColumn: [Orden]
+
+		annotation SummarizationSetBy = Automatic
+
+	partition 'Calendario SLA' = calculated
+		mode: import
+		source = DATATABLE("Calendario", STRING, "Clave", STRING, "Orden", INTEGER, { { "24/7 (contractual)", "247", 1 }, { "Operativo RAM", "RAM", 2 } })
+

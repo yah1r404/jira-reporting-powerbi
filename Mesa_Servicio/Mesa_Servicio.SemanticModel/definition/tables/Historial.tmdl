@@ -1,0 +1,254 @@
+/// Un renglón por tramo de cada ticket en un estado (o con un responsable): base de Time in Status y del SLA.
+table Historial
+	lineageTag: 52010102-0246-4304-9543-d55167fc5e4d
+
+	/// Clave del ticket.
+	column Key
+		dataType: string
+		lineageTag: 30e37ecc-121d-46ce-b383-4229ad765292
+		summarizeBy: none
+		sourceColumn: Key
+
+		annotation SummarizationSetBy = Automatic
+
+	/// Qué cambió: Estado (Time in Status) o Responsable (para Time in Assignee).
+	column Campo
+		dataType: string
+		lineageTag: 784dd447-824d-4ba7-9bc5-10a2c99ce439
+		summarizeBy: none
+		sourceColumn: Campo
+
+		annotation SummarizationSetBy = Automatic
+
+	/// Estado (ya pasado a su equivalente actual) o responsable del tramo.
+	column Valor
+		dataType: string
+		lineageTag: 503186be-5b9a-42de-962c-70de5db29895
+		summarizeBy: none
+		sourceColumn: Valor
+		sortByColumn: 'Orden'
+
+		annotation SummarizationSetBy = Automatic
+
+	/// Nombre tal como viene de Jira (antes de normalizar).
+	column 'Valor Jira'
+		dataType: string
+		lineageTag: 96a94412-df07-43c2-97d4-2df8e74af67c
+		summarizeBy: none
+		sourceColumn: Valor Jira
+
+		annotation SummarizationSetBy = Automatic
+
+	/// Orden de los estados para gráficas y tablas.
+	column Orden
+		dataType: int64
+		isHidden
+		formatString: 0
+		lineageTag: 79fbaa9e-02d0-40ab-bba4-85fb225c6d88
+		summarizeBy: none
+		sourceColumn: Orden
+
+		annotation SummarizationSetBy = Automatic
+
+	/// TRUE si el estado existe hoy en algún flujo.
+	column Vigente
+		dataType: boolean
+		formatString: """TRUE"";""TRUE"";""FALSE"""
+		lineageTag: f6fffe1b-55bf-428d-bf82-b2436dc47110
+		summarizeBy: none
+		sourceColumn: Vigente
+
+		annotation SummarizationSetBy = Automatic
+
+	/// TRUE en Resuelta y Cerrada (no cuentan para el SLA ni para Time in Status).
+	column 'Es Estado Final'
+		dataType: boolean
+		formatString: """TRUE"";""TRUE"";""FALSE"""
+		lineageTag: 8e65c9c0-d7b3-48fe-9d9f-3dc2b2b31418
+		summarizeBy: none
+		sourceColumn: Es Estado Final
+
+		annotation SummarizationSetBy = Automatic
+
+	/// Número de tramo dentro del ticket.
+	column Visita
+		dataType: int64
+		formatString: 0
+		lineageTag: 225c4754-44ed-49df-889a-269cc570c032
+		summarizeBy: none
+		sourceColumn: Visita
+
+		annotation SummarizationSetBy = Automatic
+
+	/// Inicio del tramo (hora de Mérida).
+	column Inicio
+		dataType: dateTime
+		formatString: General Date
+		lineageTag: 4e838958-3641-4d70-ad18-948586bbe65f
+		summarizeBy: none
+		sourceColumn: Inicio
+
+		annotation SummarizationSetBy = Automatic
+
+	/// Fin del tramo (el último termina en el refresh).
+	column Fin
+		dataType: dateTime
+		formatString: General Date
+		lineageTag: 0c527cff-ff43-483a-bf9d-1eb7fac313f6
+		summarizeBy: none
+		sourceColumn: Fin
+
+		annotation SummarizationSetBy = Automatic
+
+	/// Horas del tramo, 24/7.
+	column Horas
+		dataType: double
+		formatString: #,##0.00
+		lineageTag: 2a502b24-d816-4295-94c7-f5045fd10328
+		summarizeBy: none
+		sourceColumn: Horas
+
+		annotation SummarizationSetBy = Automatic
+
+	/// Horas del tramo dentro del calendario operativo RAM.
+	column 'Horas RAM'
+		dataType: double
+		formatString: #,##0.00
+		lineageTag: 05058f38-d4f8-4915-99c5-d155c2ecbd4f
+		summarizeBy: none
+		sourceColumn: Horas RAM
+
+		annotation SummarizationSetBy = Automatic
+
+	/// TRUE si es el tramo actual (sigue abierto).
+	column 'Es Actual'
+		dataType: boolean
+		formatString: """TRUE"";""TRUE"";""FALSE"""
+		lineageTag: d3780fc6-6019-4eb7-b43c-395f1ef4e450
+		summarizeBy: none
+		sourceColumn: Es Actual
+
+		annotation SummarizationSetBy = Automatic
+
+	partition Historial = m
+		mode: import
+		source =
+				let
+				    JiraBaseUrl = "https://secureopsmx.atlassian.net",
+				    Issues = Jira_Fuente,
+				
+				    // Jira devuelve fechas con zona ("-0600"); se pasan a hora de Mérida (UTC-6, sin horario de verano)
+				    ToLocal = (t as nullable text) as nullable datetime =>
+				        if t = null then null
+				        else
+				            let
+				                Len = Text.Length(t),
+				                Iso = if Len > 5 and List.Contains({"+", "-"}, Text.At(t, Len - 5)) then Text.Insert(t, Len - 2, ":") else t
+				            in
+				                DateTimeZone.RemoveZone(DateTimeZone.SwitchZone(DateTimeZone.FromText(Iso), -6)),
+				
+				    NameOf = (r as any, f as text) as any => if r is record then Record.FieldOrDefault(r, f, null) else null,
+				
+				    Now = DateTimeZone.RemoveZone(DateTimeZone.SwitchZone(DateTimeZone.UtcNow(), -6)),
+				
+				    // Orden de los estados de ambos flujos para gráficas y tablas (uno que no esté aquí va al final)
+				    OrdenEstados = {
+				        "Nueva solicitud", "Reabierta", "N1", "N2 RAM", "N2 QCOM", "N3 RAM", "Escalado", "Escalado QCOM",
+				        "Planta externa", "Esperando al proveedor", "Esperando por el cliente", "Resuelta", "Cerrada"
+				    },
+				
+				    // Estados que existen hoy en algún flujo del proyecto
+				    ProjectStatuses = Json.Document(Web.Contents(JiraBaseUrl, [RelativePath = "rest/api/3/project/MDSC/statuses", Headers = [Accept = "application/json"]])),
+				    Catalogo =
+				        Table.Distinct(
+				            Table.FromRecords(
+				                List.Combine(List.Transform(ProjectStatuses, (t) => List.Transform(t[statuses], (s) =>
+				                    [EstadoId = Text.From(s[id]), Nombre = s[name], Final = s[statusCategory][key] = "done"]))),
+				                type table [EstadoId = text, Nombre = text, Final = logical]
+				            ),
+				            {"EstadoId"}
+				        ),
+				    NombreDeId = Record.FromList(Catalogo[Nombre], Catalogo[EstadoId]),
+				    Actuales = List.Buffer(List.Distinct(Catalogo[Nombre])),
+				
+				    // Nombre de Jira -> estado actual que lo representa (inglés -> español y estados de flujos anteriores)
+				    Mapa = [
+				        #"open" = "Nueva solicitud", #"abierto" = "Nueva solicitud", #"abierta" = "Nueva solicitud", #"abiertos" = "Nueva solicitud",
+				        #"nuevo" = "Nueva solicitud", #"nueva" = "Nueva solicitud", #"new" = "Nueva solicitud", #"to do" = "Nueva solicitud",
+				        #"por hacer" = "Nueva solicitud", #"waiting for support" = "Nueva solicitud", #"esperando soporte" = "Nueva solicitud",
+				        #"esperando por ayuda" = "Nueva solicitud",
+				        #"in progress" = "N1", #"en curso" = "N1", #"trabajo en curso" = "N1", #"en progreso" = "N1", #"pendiente" = "N1",
+				        #"pending" = "N1", #"n1 qcom" = "N1", #"n1 ram" = "N1",
+				        #"escalado a n2" = "N2 RAM", #"n2" = "N2 RAM", #"escalado a n3" = "N3 RAM", #"n3" = "N3 RAM",
+				        #"waiting for customer" = "Esperando por el cliente", #"esperando al solicitante" = "Esperando por el cliente",
+				        #"escalated" = "Escalado", #"resolved" = "Resuelta", #"resuelto" = "Resuelta", #"completado" = "Resuelta", #"completada" = "Resuelta",
+				        #"completed" = "Resuelta", #"reopened" = "Reabierta", #"closed" = "Cerrada"
+				    ],
+				    Normaliza = (n as nullable text) as nullable text => if n = null then null else Record.FieldOrDefault(Mapa, Text.Lower(Text.Trim(n)), Text.Trim(n)),
+				
+				    // Campos de Jira -> nombre del campo en el modelo
+				    CampoModelo = [status = "Estado", assignee = "Responsable"],
+				
+				    // Tramos de un ticket para un campo: del alta (o del cambio) hasta el siguiente cambio o el último refresh
+				    Segments = (i as record, campo as text) as list =>
+				        let
+				            f = i[fields],
+				            CreatedAt = ToLocal(f[created]),
+				            Actual = Record.FieldOrDefault(f, campo, null),
+				            Changes =
+				                List.Sort(
+				                    List.Combine(List.Transform(i[histories], (h) =>
+				                        List.Transform(
+				                            List.Select(h[items], each Record.FieldOrDefault(_, "field", null) = campo),
+				                            (it) => [
+				                                At = ToLocal(h[created]),
+				                                FromId = Text.From(Record.FieldOrDefault(it, "from", null)),
+				                                ToId = Text.From(Record.FieldOrDefault(it, "to", null)),
+				                                FromName = Record.FieldOrDefault(it, "fromString", null),
+				                                ToName = Record.FieldOrDefault(it, "toString", null)
+				                            ]))),
+				                    (a, b) => Value.Compare(a[At], b[At])
+				                ),
+				            Inicial =
+				                if List.IsEmpty(Changes)
+				                then [Id = Text.From(NameOf(Actual, if campo = "status" then "id" else "accountId")),
+				                      Nombre = NameOf(Actual, if campo = "status" then "name" else "displayName")]
+				                else [Id = Changes{0}[FromId], Nombre = Changes{0}[FromName]],
+				            Starts = {[Id = Inicial[Id], Nombre = Inicial[Nombre], Inicio = CreatedAt]}
+				                     & List.Transform(Changes, each [Id = [ToId], Nombre = [ToName], Inicio = [At]]),
+				            Total = List.Count(Starts)
+				        in
+				            List.Transform({0 .. Total - 1}, (n) =>
+				                let
+				                    s = Starts{n},
+				                    EsUltimo = n = Total - 1,
+				                    Fin = if EsUltimo then Now else Starts{n + 1}[Inicio],
+				                    // estado: nombre de hoy por ID (o el del historial), pasado a su equivalente actual
+				                    Jira = if campo = "status" then Record.FieldOrDefault(NombreDeId, s[Id] ?? "", s[Nombre]) ?? "Sin estado" else s[Nombre] ?? "Sin asignar",
+				                    Norm = if campo = "status" then Normaliza(Jira) else Jira,
+				                    Valor = if campo = "status" and n = 0 and not List.Contains(Actuales, Norm) and Norm <> "Reabierta" then "Nueva solicitud" else Norm
+				                in
+				                    [
+				                        Key = i[key], Campo = Record.Field(CampoModelo, campo), Valor = Valor, #"Valor Jira" = Jira,
+				                        Visita = n + 1, Inicio = s[Inicio], Fin = Fin,
+				                        Horas = Duration.TotalHours(Fin - s[Inicio]), #"Horas RAM" = HorasLaborales(s[Inicio], Fin), #"Es Actual" = EsUltimo
+				                    ]),
+				
+				    // Campos del historial que se cargan. Para Time in Assignee: {"status", "assignee"} (el historial ya los trae)
+				    CamposCargados = {"status"},
+				    Base =
+				        Table.Buffer(
+				            Table.FromRecords(
+				                List.Combine(List.Transform(Issues, (i) => List.Combine(List.Transform(CamposCargados, (c) => Segments(i, c))))),
+				                type table [Key = text, Campo = text, Valor = text, #"Valor Jira" = text, Visita = Int64.Type,
+				                            Inicio = datetime, Fin = datetime, Horas = number, #"Horas RAM" = number, #"Es Actual" = logical]
+				            )
+				        ),
+				    ConVigente = Table.AddColumn(Base, "Vigente", each [Campo] <> "Estado" or List.Contains(Actuales, [Valor]), type logical),
+				    ConFinal = Table.AddColumn(ConVigente, "Es Estado Final", each [Campo] = "Estado" and List.Contains({"Resuelta", "Cerrada"}, [Valor]), type logical),
+				    ConOrden = Table.AddColumn(ConFinal, "Orden", each let p = List.PositionOf(OrdenEstados, [Valor]) in if p < 0 then 99 else p + 1, Int64.Type)
+				in
+				    ConOrden
+
+	annotation PBI_ResultType = Table
+

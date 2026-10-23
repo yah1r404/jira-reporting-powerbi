@@ -22,6 +22,10 @@ ref table 'SLA Objetivo'
 ref table 'Línea de Tiempo'
 ref table 'Horario Cálculo'
 ref table FactTecnicos
+ref table 'Calendario SLA'
+ref table 'SLA Comparación'
+ref table 'Estado SLA'
+ref table 'Grupo de Tiempo'
 
 ref cultureInfo es-MX
 

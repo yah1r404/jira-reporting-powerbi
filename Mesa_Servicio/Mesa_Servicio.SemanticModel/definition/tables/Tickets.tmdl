@@ -1,0 +1,484 @@
+/// Un renglón por ticket: atributos, primera respuesta, fechas y SLA calculado (24/7 y operativo RAM).
+table Tickets
+	lineageTag: c562abb3-2dd8-4f97-afe5-bed4d08c9ab8
+
+	/// Clave del ticket en Jira (ej. MDSC-1234).
+	column Key
+		dataType: string
+		lineageTag: 5cde6158-be29-45e9-a49b-45d1ef7e80a4
+		summarizeBy: none
+		sourceColumn: Key
+
+		annotation SummarizationSetBy = Automatic
+
+	/// Resumen del ticket.
+	column Summary
+		dataType: string
+		lineageTag: 5bee2e63-a39a-45d6-b416-0f662a3d5479
+		summarizeBy: none
+		sourceColumn: Summary
+
+		annotation SummarizationSetBy = Automatic
+
+	/// Tipo de solicitud de Jira (IEP INCIDENT, Emailed request, Tarea…).
+	column 'Issue Type'
+		dataType: string
+		lineageTag: 7fe0d668-6acd-4f7a-a964-95e1ebcf61a5
+		summarizeBy: none
+		sourceColumn: Issue Type
+
+		annotation SummarizationSetBy = Automatic
+
+	/// Tipo de servicio: Proyecto Internet en Parques (IEP) o Mesa de Servicio.
+	column Flujo
+		dataType: string
+		lineageTag: b95a2289-592a-4442-a974-6a11186f9574
+		summarizeBy: none
+		sourceColumn: Flujo
+
+		annotation SummarizationSetBy = Automatic
+
+	/// Request type de JSM.
+	column 'Request Type'
+		dataType: string
+		lineageTag: 82c41c8a-fd1a-4a67-bada-105fa6d52835
+		summarizeBy: none
+		sourceColumn: Request Type
+
+		annotation SummarizationSetBy = Automatic
+
+	/// Organización (cliente) de JSM; si tiene varias, separadas por comas.
+	column 'Organización'
+		dataType: string
+		lineageTag: 39476bb9-0a97-414b-b568-183a620c8158
+		summarizeBy: none
+		sourceColumn: Organización
+
+		annotation SummarizationSetBy = Automatic
+
+	/// Estado actual del ticket.
+	column Status
+		dataType: string
+		lineageTag: f6786060-05d5-45e1-8777-7d082e65cdc7
+		summarizeBy: none
+		sourceColumn: Status
+
+		annotation SummarizationSetBy = Automatic
+
+	/// Usuario asignado al ticket (assignee). Distinto de los técnicos asignados.
+	column Assignee
+		dataType: string
+		lineageTag: 931e02e3-8301-4484-a18d-289d8cb27df8
+		summarizeBy: none
+		sourceColumn: Assignee
+
+		annotation SummarizationSetBy = Automatic
+
+	/// ID de cuenta del assignee (para el análisis por assignee).
+	column 'Assignee ID'
+		dataType: string
+		isHidden
+		lineageTag: d1dcac2a-59c8-4ebd-b081-f5177b49faa2
+		summarizeBy: none
+		sourceColumn: Assignee ID
+
+		annotation SummarizationSetBy = Automatic
+
+	/// Técnicos de campo del campo 'Técnico(s) asignado(s)' (distinto del assignee).
+	column 'Técnicos Asignados'
+		dataType: string
+		lineageTag: 42317d1b-0944-4120-b8ef-a6c8aa04ca0b
+		summarizeBy: none
+		sourceColumn: Técnicos Asignados
+
+		annotation SummarizationSetBy = Automatic
+
+	/// Técnicos asignados separados por '|' (para separarlos en una tabla por técnico).
+	column 'Técnicos Ruta'
+		dataType: string
+		isHidden
+		lineageTag: 285b5992-38db-400d-9f28-ceef7a78a530
+		summarizeBy: none
+		sourceColumn: Técnicos Ruta
+
+		annotation SummarizationSetBy = Automatic
+
+	/// Fecha y hora de creación (hora de Mérida).
+	column Created
+		dataType: dateTime
+		formatString: General Date
+		lineageTag: d14213d6-d15a-439e-ac04-ec5cea6f42c2
+		summarizeBy: none
+		sourceColumn: Created
+
+		annotation SummarizationSetBy = Automatic
+
+	/// Día de creación (relación con DimFecha).
+	column 'Created Date'
+		dataType: dateTime
+		isHidden
+		formatString: Short Date
+		lineageTag: fad4212f-2f06-4642-b139-cee5d9506a42
+		summarizeBy: none
+		sourceColumn: Created Date
+
+		annotation SummarizationSetBy = Automatic
+
+	/// Campo Resolved de Jira.
+	column Resolved
+		dataType: dateTime
+		formatString: General Date
+		lineageTag: 1f9fe402-43ae-4cb0-ad3f-6e52252a1acc
+		summarizeBy: none
+		sourceColumn: Resolved
+
+		annotation SummarizationSetBy = Automatic
+
+	/// Primera respuesta: primer comentario de alguien distinto a quien levantó el ticket.
+	column 'Primer Comentario'
+		dataType: dateTime
+		formatString: General Date
+		lineageTag: ed56eac8-b9eb-4f8a-89db-3216526d95df
+		summarizeBy: none
+		sourceColumn: Primer Comentario
+
+		annotation SummarizationSetBy = Automatic
+
+	/// Horas en calendario operativo RAM hasta el primer comentario.
+	column 'Horas RAM a Primer Comentario'
+		dataType: double
+		isHidden
+		formatString: #,##0.00
+		lineageTag: 6e066d18-cb46-4656-90b8-9e5ce41b0109
+		summarizeBy: none
+		sourceColumn: Horas RAM a Primer Comentario
+
+		annotation SummarizationSetBy = Automatic
+
+	/// Meta de primera respuesta: 30 min (IEP INCIDENT) o 4 h (resto).
+	column 'SLA Respuesta Meta Horas'
+		dataType: double
+		formatString: #,##0.00
+		lineageTag: bfb91b0c-eee3-4d61-b7a6-0f8168260a06
+		summarizeBy: none
+		sourceColumn: SLA Respuesta Meta Horas
+
+		annotation SummarizationSetBy = Automatic
+
+	/// Meta de resolución: 15 h (IEP INCIDENT) o 24 h (resto).
+	column 'SLA Resolución Meta Horas'
+		dataType: double
+		formatString: #,##0.00
+		lineageTag: 5892015b-35ae-41ca-b4b3-659fb3cb9e71
+		summarizeBy: none
+		sourceColumn: SLA Resolución Meta Horas
+
+		annotation SummarizationSetBy = Automatic
+
+	/// Hora de creación (0-23).
+	column 'Hora Creación'
+		dataType: int64
+		isHidden
+		formatString: 0
+		lineageTag: dab819d7-23ea-4900-b1bb-3bee4e9de8c8
+		summarizeBy: none
+		sourceColumn: Hora Creación
+
+		annotation SummarizationSetBy = Automatic
+
+	/// Día de la semana de creación (1 = lunes).
+	column 'Día Semana Num'
+		dataType: int64
+		isHidden
+		formatString: 0
+		lineageTag: 29d59c18-f972-4248-89fc-541836250e0f
+		summarizeBy: none
+		sourceColumn: Día Semana Num
+
+		annotation SummarizationSetBy = Automatic
+
+	/// Hora de creación como texto (00:00 a 23:00).
+	column 'Hora Creación Texto' = FORMAT(Tickets[Hora Creación], "00") & ":00"
+		dataType: string
+		lineageTag: 973f52db-f26f-4956-ac46-79d741ada287
+		summarizeBy: none
+		sortByColumn: 'Hora Creación'
+
+		annotation SummarizationSetBy = Automatic
+
+	/// Día de la semana de creación.
+	column 'Día Semana' = SWITCH(Tickets[Día Semana Num], 1, "Lunes", 2, "Martes", 3, "Miércoles", 4, "Jueves", 5, "Viernes", 6, "Sábado", "Domingo")
+		dataType: string
+		lineageTag: 30f005e9-e3c9-49a5-91f0-27ca090d1e77
+		summarizeBy: none
+		sortByColumn: 'Día Semana Num'
+
+		annotation SummarizationSetBy = Automatic
+
+	/// Última entrada a Resuelta según el historial.
+	column 'Entrada a Resuelta' = MAXX(FILTER(RELATEDTABLE(Historial), Historial[Campo] = "Estado" && Historial[Valor] = "Resuelta"), Historial[Inicio])
+		dataType: dateTime
+		isHidden
+		formatString: General Date
+		lineageTag: 485f7a94-d879-4b99-a6e7-6c95edea301a
+		summarizeBy: none
+
+		annotation SummarizationSetBy = Automatic
+
+	/// Fin del SLA de resolución: Resolved; si falta y el ticket está en Resuelta/Cerrada, su última entrada a Resuelta.
+	column 'Fecha Resolución' = IF(NOT ISBLANK(Tickets[Resolved]), Tickets[Resolved], IF(Tickets[Status] IN {"Resuelta", "Cerrada"}, Tickets[Entrada a Resuelta]))
+		dataType: dateTime
+		formatString: General Date
+		lineageTag: 10be5172-a177-406f-963f-71eaa8c8c06a
+		summarizeBy: none
+
+		annotation SummarizationSetBy = Automatic
+
+	/// Día de resolución (resueltos por periodo).
+	column 'Fecha Resolución Día' = IF(ISBLANK(Tickets[Fecha Resolución]), BLANK(), DATE(YEAR(Tickets[Fecha Resolución]), MONTH(Tickets[Fecha Resolución]), DAY(Tickets[Fecha Resolución])))
+		dataType: dateTime
+		isHidden
+		formatString: Short Date
+		lineageTag: b0dff3aa-0c4d-42b4-a0c1-63add9a9e9ad
+		summarizeBy: none
+
+		annotation SummarizationSetBy = Automatic
+
+	/// Resolved (Jira), Entrada a Resuelta (historial) o Sin resolver.
+	column 'Fuente Fecha Resolución' = SWITCH(TRUE(), NOT ISBLANK(Tickets[Resolved]), "Resolved (Jira)", NOT ISBLANK(Tickets[Fecha Resolución]), "Entrada a Resuelta (historial)", "Sin resolver")
+		dataType: string
+		lineageTag: fd5f12c4-c68e-4a72-88f2-76db393059a3
+		summarizeBy: none
+
+		annotation SummarizationSetBy = Automatic
+
+	/// Fecha de resolución o, si sigue abierto, el último refresh (tiempo acumulado).
+	column 'Fin SLA' = COALESCE(Tickets[Fecha Resolución], (UTCNOW() - TIME(6, 0, 0)))
+		dataType: dateTime
+		isHidden
+		formatString: General Date
+		lineageTag: 25b76ded-4ef8-4ce9-9f5d-0c32e2e3019e
+		summarizeBy: none
+
+		annotation SummarizationSetBy = Automatic
+
+	/// Horas en pausa (Esperando por el cliente, Esperando al proveedor, Resuelta y Cerrada) antes del fin del conteo.
+	column 'Horas en Pausa' =
+			VAR Fin = Tickets[Fin SLA]
+			RETURN
+			    SUMX(
+			        FILTER(RELATEDTABLE(Historial), Historial[Campo] = "Estado" && Historial[Valor] IN {"Esperando por el cliente", "Esperando al proveedor", "Resuelta", "Cerrada"} && Historial[Inicio] < Fin),
+			        DATEDIFF(Historial[Inicio], IF(Historial[Fin] < Fin, Historial[Fin], Fin), MINUTE) / 60
+			    ) + 0
+		dataType: double
+		isHidden
+		formatString: #,##0.00
+		lineageTag: 6f477c26-9bd8-462a-b6f6-580fe74d1068
+		summarizeBy: none
+
+		annotation SummarizationSetBy = Automatic
+
+	/// Tiempo de SLA de resolución, calendario 24/7: tiempo real menos pausas.
+	column 'SLA Resolución Horas' = MAX(0, DATEDIFF(Tickets[Created], Tickets[Fin SLA], MINUTE) / 60 - Tickets[Horas en Pausa])
+		dataType: double
+		formatString: #,##0.00
+		lineageTag: 9292e6c1-4e4c-405f-af33-0d3f54db10fc
+		summarizeBy: none
+
+		annotation SummarizationSetBy = Automatic
+
+	/// Tiempo de SLA de resolución, calendario operativo RAM (horas hábiles fuera de pausa).
+	column 'SLA Resolución Horas RAM' =
+			VAR Fin = Tickets[Fin SLA]
+			RETURN SUMX(FILTER(RELATEDTABLE(Historial), Historial[Campo] = "Estado" && NOT (Historial[Valor] IN {"Esperando por el cliente", "Esperando al proveedor", "Resuelta", "Cerrada"}) && Historial[Inicio] < Fin), Historial[Horas RAM])
+		dataType: double
+		formatString: #,##0.00
+		lineageTag: ccfb29f4-d904-468c-834d-82676c0257b0
+		summarizeBy: none
+
+		annotation SummarizationSetBy = Automatic
+
+	/// Estado del SLA de resolución (24/7).
+	column 'SLA Resolución Estado' =
+			VAR H = Tickets[SLA Resolución Horas]
+			VAR Meta = Tickets[SLA Resolución Meta Horas]
+			VAR Resuelto = NOT ISBLANK(Tickets[Fecha Resolución])
+			RETURN
+			    SWITCH(TRUE(),
+			        ISBLANK(H), "Sin dato",
+			        Resuelto && H <= Meta, "Cumplido",
+			        Resuelto, "Incumplido",
+			        H > Meta, "Incumplido",
+			        Tickets[Status] IN {"Esperando por el cliente", "Esperando al proveedor", "Resuelta", "Cerrada"}, "Pausado",
+			        H >= Meta * 0.75, "En riesgo",
+			        "En curso")
+		dataType: string
+		lineageTag: 19425277-0e0a-43c9-82c2-98e80b7bafad
+		summarizeBy: none
+
+		annotation SummarizationSetBy = Automatic
+
+	/// Estado del SLA de resolución (operativo RAM).
+	column 'SLA Resolución Estado RAM' =
+			VAR H = Tickets[SLA Resolución Horas RAM]
+			VAR Meta = Tickets[SLA Resolución Meta Horas]
+			VAR Resuelto = NOT ISBLANK(Tickets[Fecha Resolución])
+			RETURN
+			    SWITCH(TRUE(),
+			        ISBLANK(H), "Sin dato",
+			        Resuelto && H <= Meta, "Cumplido",
+			        Resuelto, "Incumplido",
+			        H > Meta, "Incumplido",
+			        Tickets[Status] IN {"Esperando por el cliente", "Esperando al proveedor", "Resuelta", "Cerrada"}, "Pausado",
+			        H >= Meta * 0.75, "En riesgo",
+			        "En curso")
+		dataType: string
+		lineageTag: 8883d45c-2e25-45db-be8b-0070bef93779
+		summarizeBy: none
+
+		annotation SummarizationSetBy = Automatic
+
+	/// Horas a la primera respuesta (24/7). Sin comentario: acumulado si sigue abierto.
+	column 'SLA Respuesta Horas' =
+			IF(NOT ISBLANK(Tickets[Primer Comentario]), DATEDIFF(Tickets[Created], Tickets[Primer Comentario], MINUTE) / 60,
+			    IF(ISBLANK(Tickets[Fecha Resolución]), DATEDIFF(Tickets[Created], (UTCNOW() - TIME(6, 0, 0)), MINUTE) / 60))
+		dataType: double
+		formatString: #,##0.00
+		lineageTag: 59a4ae51-9664-4380-8d61-551fa1e1d490
+		summarizeBy: none
+
+		annotation SummarizationSetBy = Automatic
+
+	/// Horas a la primera respuesta (operativo RAM).
+	column 'SLA Respuesta Horas RAM' =
+			IF(NOT ISBLANK(Tickets[Primer Comentario]), Tickets[Horas RAM a Primer Comentario],
+			    IF(ISBLANK(Tickets[Fecha Resolución]), SUMX(FILTER(RELATEDTABLE(Historial), Historial[Campo] = "Estado"), Historial[Horas RAM])))
+		dataType: double
+		formatString: #,##0.00
+		lineageTag: a73b8f5e-19b7-43ec-85b1-ca63943bc234
+		summarizeBy: none
+
+		annotation SummarizationSetBy = Automatic
+
+	/// Estado del SLA de primera respuesta (24/7).
+	column 'SLA Respuesta Estado' =
+			VAR H = Tickets[SLA Respuesta Horas]
+			VAR Meta = Tickets[SLA Respuesta Meta Horas]
+			VAR Abierto = ISBLANK(Tickets[Fecha Resolución])
+			RETURN
+			    SWITCH(TRUE(),
+			        NOT ISBLANK(Tickets[Primer Comentario]) && H <= Meta, "Cumplido",
+			        NOT ISBLANK(Tickets[Primer Comentario]), "Incumplido",
+			        Abierto && H > Meta, "Incumplido",
+			        Abierto, "En curso",
+			        "Sin dato")
+		dataType: string
+		lineageTag: 90b7150c-5a8b-496b-8f4b-bb5e5b9dd39d
+		summarizeBy: none
+
+		annotation SummarizationSetBy = Automatic
+
+	/// Estado del SLA de primera respuesta (operativo RAM).
+	column 'SLA Respuesta Estado RAM' =
+			VAR H = Tickets[SLA Respuesta Horas RAM]
+			VAR Meta = Tickets[SLA Respuesta Meta Horas]
+			VAR Abierto = ISBLANK(Tickets[Fecha Resolución])
+			RETURN
+			    SWITCH(TRUE(),
+			        NOT ISBLANK(Tickets[Primer Comentario]) && H <= Meta, "Cumplido",
+			        NOT ISBLANK(Tickets[Primer Comentario]), "Incumplido",
+			        Abierto && H > Meta, "Incumplido",
+			        Abierto, "En curso",
+			        "Sin dato")
+		dataType: string
+		lineageTag: 3f0afac3-28ce-492c-b202-4fc3b5baba19
+		summarizeBy: none
+
+		annotation SummarizationSetBy = Automatic
+
+	partition Tickets = m
+		mode: import
+		source =
+				let
+				    Issues = Jira_Fuente,
+				
+				    // Jira devuelve fechas con zona ("-0600"); se pasan a hora de Mérida (UTC-6, sin horario de verano)
+				    ToLocal = (t as nullable text) as nullable datetime =>
+				        if t = null then null
+				        else
+				            let
+				                Len = Text.Length(t),
+				                Iso = if Len > 5 and List.Contains({"+", "-"}, Text.At(t, Len - 5)) then Text.Insert(t, Len - 2, ":") else t
+				            in
+				                DateTimeZone.RemoveZone(DateTimeZone.SwitchZone(DateTimeZone.FromText(Iso), -6)),
+				
+				    NameOf = (r as any, f as text) as any => if r is record then Record.FieldOrDefault(r, f, null) else null,
+				
+				    // Texto de una lista de personas (Técnico(s) asignado(s))
+				    Nombres = (v as any) as list => if v is list then List.RemoveNulls(List.Transform(v, each NameOf(_, "displayName"))) else {},
+				
+				    // Primera respuesta: comentario más antiguo de alguien distinto a quien levantó el ticket
+				    // (todas las fechas vienen con la misma zona horaria: el orden de texto es el cronológico)
+				    PrimerComentario = (f as record) as nullable text =>
+				        let
+				            Reporter = NameOf(Record.FieldOrDefault(f, "reporter", null), "accountId"),
+				            Lista = Record.FieldOrDefault(Record.FieldOrDefault(f, "comment", []) ?? [], "comments", {}),
+				            Fechas = List.Sort(List.Transform(List.Select(Lista, each NameOf(Record.FieldOrDefault(_, "author", null), "accountId") <> Reporter), each [created]))
+				        in
+				            if List.IsEmpty(Fechas) then null else Fechas{0},
+				
+				    Rows =
+				        List.Transform(
+				            Issues,
+				            (i) =>
+				                let
+				                    f = i[fields],
+				                    IssueType = NameOf(Record.FieldOrDefault(f, "issuetype", null), "name"),
+				                    EsIEP = IssueType = "IEP INCIDENT",
+				                    StatusRec = Record.FieldOrDefault(f, "status", null),
+				                    AssigneeRec = Record.FieldOrDefault(f, "assignee", null),
+				                    Tecnicos = Nombres(Record.FieldOrDefault(f, "customfield_11042", null)),
+				                    Orgs = Record.FieldOrDefault(f, "customfield_10002", null),
+				                    RequestType = NameOf(NameOf(Record.FieldOrDefault(f, "customfield_10010", null), "requestType"), "name"),
+				                    CreatedAt = ToLocal(f[created]),
+				                    Primero = ToLocal(PrimerComentario(f))
+				                in
+				                    [
+				                        Key = i[key],
+				                        Summary = Record.FieldOrDefault(f, "summary", null),
+				                        #"Issue Type" = IssueType,
+				                        Flujo = if EsIEP then "Proyecto Internet en Parques (IEP)" else "Mesa de Servicio",
+				                        #"Request Type" = RequestType ?? "Sin request type",
+				                        #"Organización" = if Orgs is list and not List.IsEmpty(Orgs) then Text.Combine(List.Transform(Orgs, each NameOf(_, "name")), ", ") else "Sin organización",
+				                        Status = NameOf(StatusRec, "name"),
+				                        Assignee = NameOf(AssigneeRec, "displayName") ?? "Sin asignar",
+				                        #"Assignee ID" = NameOf(AssigneeRec, "accountId"),
+				                        #"Técnicos Asignados" = if List.IsEmpty(Tecnicos) then null else Text.Combine(Tecnicos, ", "),
+				                        #"Técnicos Ruta" = if List.IsEmpty(Tecnicos) then null else Text.Combine(Tecnicos, "|"),
+				                        Created = CreatedAt,
+				                        #"Created Date" = Date.From(CreatedAt),
+				                        Resolved = ToLocal(Record.FieldOrDefault(f, "resolutiondate", null)),
+				                        #"Primer Comentario" = Primero,
+				                        #"Horas RAM a Primer Comentario" = if Primero = null then null else HorasLaborales(CreatedAt, Primero),
+				                        #"SLA Respuesta Meta Horas" = if EsIEP then 0.5 else 4,
+				                        #"SLA Resolución Meta Horas" = if EsIEP then 15 else 24,
+				                        #"Hora Creación" = Time.Hour(CreatedAt),
+				                        #"Día Semana Num" = Date.DayOfWeek(CreatedAt, Day.Monday) + 1
+				                    ]
+				        )
+				in
+				    Table.FromRecords(
+				        Rows,
+				        type table [
+				            Key = text, Summary = nullable text, #"Issue Type" = nullable text, Flujo = text, #"Request Type" = text,
+				            #"Organización" = text, Status = nullable text, Assignee = text, #"Assignee ID" = nullable text,
+				            #"Técnicos Asignados" = nullable text, #"Técnicos Ruta" = nullable text,
+				            Created = datetime, #"Created Date" = date, Resolved = nullable datetime,
+				            #"Primer Comentario" = nullable datetime, #"Horas RAM a Primer Comentario" = nullable number,
+				            #"SLA Respuesta Meta Horas" = number, #"SLA Resolución Meta Horas" = number,
+				            #"Hora Creación" = Int64.Type, #"Día Semana Num" = Int64.Type
+				        ]
+				    )
+
+	annotation PBI_ResultType = Table
+

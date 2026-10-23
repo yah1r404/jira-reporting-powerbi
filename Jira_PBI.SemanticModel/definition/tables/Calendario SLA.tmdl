@@ -1,0 +1,50 @@
+/// Opciones del selector "Calendario SLA". Sin relaciones. Sin selección se usa 24/7 (calendario contractual).
+table 'Calendario SLA'
+	lineageTag: 208b080f-285f-46cd-a920-1b3e8e155188
+
+	column Calendario
+		dataType: string
+		lineageTag: 731e225c-2778-4620-a0ce-3b1f7426284b
+		summarizeBy: none
+		isNameInferred
+		sourceColumn: [Calendario]
+		sortByColumn: Orden
+
+		annotation SummarizationSetBy = Automatic
+
+	column Clave
+		dataType: string
+		isHidden
+		lineageTag: 6408a919-f8f0-4b16-b6b2-7d3808f3dfe2
+		summarizeBy: none
+		isNameInferred
+		sourceColumn: [Clave]
+
+		annotation SummarizationSetBy = Automatic
+
+	column Orden
+		dataType: int64
+		isHidden
+		formatString: 0
+		lineageTag: a29f0717-08a7-4eb4-922b-e454311e5c3f
+		summarizeBy: none
+		isNameInferred
+		sourceColumn: [Orden]
+
+		annotation SummarizationSetBy = Automatic
+
+	partition 'Calendario SLA' = calculated
+		mode: import
+		source =
+				DATATABLE(
+				    "Calendario", STRING,
+				    "Clave", STRING,
+				    "Orden", INTEGER,
+				    {
+				        { "24/7 (contractual)", "247", 1 },
+				        { "Operativo RAM", "RAM", 2 }
+				    }
+				)
+
+	annotation PBI_Id = CalendarioSLA
+

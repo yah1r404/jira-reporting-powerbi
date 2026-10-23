@@ -3,11 +3,11 @@
   "name": "0d1691be06c90b30f6f2",
   "position": {
     "x": 264,
-    "y": 16,
-    "z": 16000,
-    "height": 42,
-    "width": 1270,
-    "tabOrder": 25000
+    "y": 10,
+    "z": 15000,
+    "height": 44,
+    "width": 480,
+    "tabOrder": 16000
   },
   "visual": {
     "visualType": "textbox",
@@ -19,11 +19,11 @@
               {
                 "textRuns": [
                   {
-                    "value": "Vista ejecutiva de SLA",
+                    "value": "Time in Status",
                     "textStyle": {
                       "fontFamily": "Segoe UI Semibold",
                       "fontSize": "22pt",
-                      "color": "#0A2E5C"
+                      "color": "#0a2e5c"
                     }
                   }
                 ]

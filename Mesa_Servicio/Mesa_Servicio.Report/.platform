@@ -1,0 +1,11 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/fabric/gitIntegration/platformProperties/2.0.0/schema.json",
+  "metadata": {
+    "type": "Report",
+    "displayName": "Mesa_Servicio"
+  },
+  "config": {
+    "version": "2.0",
+    "logicalId": "f20097a9-aaae-46c7-8d73-677030b547c3"
+  }
+}

@@ -36,7 +36,7 @@ table SLA_Tickets
 
 		annotation SummarizationSetBy = Automatic
 
-	/// Flujo de trabajo del ticket: "IEP Incident" (tipo IEP INCIDENT) o "Mesa de Servicio - Clientes" (resto de tipos).
+	/// Tipo de servicio: "Proyecto Internet en Parques (IEP)" (tipo IEP INCIDENT) o "Mesa de Servicio" (resto de tipos).
 	column Flujo
 		dataType: string
 		lineageTag: 763fe92f-2999-44bb-90d3-1c3c96da9cd1
@@ -146,60 +146,66 @@ table SLA_Tickets
 		annotation SummarizationSetBy = Automatic
 
 	/// Meta del SLA "Tiempo hasta primera respuesta" de JSM, en horas.
-	column 'SLA Respuesta Meta Horas'
+	column 'JSM Respuesta Meta Horas'
 		dataType: double
+		isHidden
 		formatString: #,##0.00
 		lineageTag: 632fc5ee-2f0b-47c6-bfce-dd0cbff6077d
 		summarizeBy: none
-		sourceColumn: SLA Respuesta Meta Horas
+		sourceColumn: JSM Respuesta Meta Horas
 
 		annotation SummarizationSetBy = Automatic
 
 	/// Tiempo transcurrido del SLA de primera respuesta según JSM (respeta pausas y calendario del SLA).
-	column 'SLA Respuesta Horas'
+	column 'JSM Respuesta Horas'
 		dataType: double
+		isHidden
 		formatString: #,##0.00
 		lineageTag: 3fc2e1a5-2400-4670-9603-7d48c565e660
 		summarizeBy: none
-		sourceColumn: SLA Respuesta Horas
+		sourceColumn: JSM Respuesta Horas
 
 		annotation SummarizationSetBy = Automatic
 
 	/// Cumplido / Incumplido / En curso / En riesgo (queda 25% o menos) / Sin SLA.
-	column 'SLA Respuesta Estado'
+	column 'JSM Respuesta Estado'
 		dataType: string
+		isHidden
 		lineageTag: e10e3e97-23ac-45a4-8f85-9c9606751598
 		summarizeBy: none
-		sourceColumn: SLA Respuesta Estado
+		sourceColumn: JSM Respuesta Estado
 
 		annotation SummarizationSetBy = Automatic
 
 	/// Meta del SLA "Tiempo hasta resolución" de JSM, en horas.
-	column 'SLA Resolución Meta Horas'
+	column 'JSM Resolución Meta Horas'
 		dataType: double
+		isHidden
 		formatString: #,##0.00
 		lineageTag: d1155f00-a4d6-4a4f-97c3-dd99eee60bea
 		summarizeBy: none
-		sourceColumn: SLA Resolución Meta Horas
+		sourceColumn: JSM Resolución Meta Horas
 
 		annotation SummarizationSetBy = Automatic
 
 	/// Tiempo transcurrido del SLA de resolución según JSM (respeta pausas y calendario del SLA).
-	column 'SLA Resolución Horas'
+	column 'JSM Resolución Horas'
 		dataType: double
+		isHidden
 		formatString: #,##0.00
 		lineageTag: 0c1a658b-8112-423a-9a53-b263e2d8e170
 		summarizeBy: none
-		sourceColumn: SLA Resolución Horas
+		sourceColumn: JSM Resolución Horas
 
 		annotation SummarizationSetBy = Automatic
 
 	/// Cumplido / Incumplido / En curso / En riesgo (queda 25% o menos) / Sin SLA.
-	column 'SLA Resolución Estado'
+	column 'JSM Resolución Estado'
 		dataType: string
+		isHidden
 		lineageTag: ae8479a5-3f74-46c8-a622-bc32f4b662ba
 		summarizeBy: none
-		sourceColumn: SLA Resolución Estado
+		sourceColumn: JSM Resolución Estado
 
 		annotation SummarizationSetBy = Automatic
 
@@ -238,11 +244,341 @@ table SLA_Tickets
 
 		annotation SummarizationSetBy = Automatic
 
-	/// Horas que se comparan contra el SLA objetivo elegido: tiempo de SLA de resolución de JSM (respeta pausas y horario); si el ticket no tiene SLA en JSM, horas calendario de resolución.
-	column 'Horas SLA Base' = IF(NOT ISBLANK(SLA_Tickets[SLA Resolución Horas]), SLA_Tickets[SLA Resolución Horas], SLA_Tickets[Resolution Hours])
+	/// Horas que se comparan contra el SLA objetivo elegido: tiempo de SLA de resolución 24/7 (reglas propias, sin pausas).
+	column 'Horas SLA Base' = SLA_Tickets[SLA Resolución Horas]
 		dataType: double
 		formatString: #,##0.00
 		lineageTag: 9a2f3e4d-5c6b-4d7e-8f90-1b2c3d4e5f60
+		summarizeBy: none
+
+		annotation SummarizationSetBy = Automatic
+
+	/// Flujo de trabajo de Jira: IEP INCIDENT usa el classic default workflow; Emailed request, Tarea y el resto usan Mesa de Servicio - Clientes.
+	column 'Flujo de Trabajo' = IF(SLA_Tickets[Issue Type] = "IEP INCIDENT", "classic default workflow", "Mesa de Servicio - Clientes")
+		dataType: string
+		lineageTag: 1295cd40-4f9a-4613-9c9f-3f219fe7cfee
+		summarizeBy: none
+
+		annotation SummarizationSetBy = Automatic
+
+	/// Meta de primera respuesta: 30 min para IEP INCIDENT; 4 h para Emailed request, Tarea y el resto de la mesa.
+	column 'SLA Respuesta Meta Horas' = IF(SLA_Tickets[Issue Type] = "IEP INCIDENT", 0.5, 4)
+		dataType: double
+		formatString: #,##0.00
+		lineageTag: 94cc8953-4ff0-4311-aa13-52f3351615da
+		summarizeBy: none
+
+		annotation SummarizationSetBy = Automatic
+
+	/// Meta de resolución: 15 h para IEP INCIDENT; 24 h para Emailed request, Tarea y el resto de la mesa.
+	column 'SLA Resolución Meta Horas' = IF(SLA_Tickets[Issue Type] = "IEP INCIDENT", 15, 24)
+		dataType: double
+		formatString: #,##0.00
+		lineageTag: 4f8ce552-673c-4d19-92b3-5666bfad394e
+		summarizeBy: none
+
+		annotation SummarizationSetBy = Automatic
+
+	/// Fecha y hora del primer comentario de alguien distinto a quien levantó el ticket (primera respuesta). Vacío si no hay.
+	column 'Primer Comentario'
+		dataType: dateTime
+		formatString: General Date
+		lineageTag: 1859da5f-f9e8-4b3b-ae5e-c11367fc4c31
+		summarizeBy: none
+		sourceColumn: Primer Comentario
+
+		annotation SummarizationSetBy = Automatic
+
+	/// Horas dentro del calendario operativo RAM entre la creación y el primer comentario.
+	column 'Horas RAM a Primer Comentario'
+		dataType: double
+		isHidden
+		formatString: #,##0.00
+		lineageTag: 382de0a8-2e9f-4ebb-b6be-246137d42d29
+		summarizeBy: none
+		sourceColumn: Horas RAM a Primer Comentario
+
+		annotation SummarizationSetBy = Automatic
+
+	/// Última entrada a Resuelta según el historial de estados.
+	column 'Entrada a Resuelta' = MAXX(FILTER(RELATEDTABLE(FactStatusHistory), FactStatusHistory[Estado] = "Resuelta"), FactStatusHistory[Inicio])
+		dataType: dateTime
+		isHidden
+		formatString: General Date
+		lineageTag: 2f4e5881-33b1-452a-939b-50ce37268baa
+		summarizeBy: none
+
+		annotation SummarizationSetBy = Automatic
+
+	/// Fin del SLA de resolución: campo Resolved de Jira; si está vacío y el ticket está en Resuelta/Cerrada, su última entrada a Resuelta. Vacío si sigue abierto.
+	column 'Fecha Resolución' =
+			IF(
+			    NOT ISBLANK(SLA_Tickets[Resolution Date]),
+			    SLA_Tickets[Resolution Date],
+			    IF(SLA_Tickets[Status] IN {"Resuelta", "Cerrada"}, SLA_Tickets[Entrada a Resuelta])
+			)
+		dataType: dateTime
+		formatString: General Date
+		lineageTag: e76eb880-7ccb-4762-9736-43107e3c435c
+		summarizeBy: none
+
+		annotation SummarizationSetBy = Automatic
+
+	/// De dónde sale la fecha de resolución: Resolved de Jira, entrada a Resuelta del historial o sin resolver.
+	column 'Fuente Fecha Resolución' =
+			SWITCH(TRUE(),
+			    NOT ISBLANK(SLA_Tickets[Resolution Date]), "Resolved (Jira)",
+			    NOT ISBLANK(SLA_Tickets[Fecha Resolución]), "Entrada a Resuelta (historial)",
+			    "Sin resolver")
+		dataType: string
+		lineageTag: 8e17b9a4-a18b-4ac2-bcf1-d1082a42f921
+		summarizeBy: none
+
+		annotation SummarizationSetBy = Automatic
+
+	/// TRUE si el ticket pasó alguna vez por Reabierta.
+	column 'Fue Reabierto' = NOT ISEMPTY(FILTER(RELATEDTABLE(FactStatusHistory), FactStatusHistory[Estado] = "Reabierta"))
+		dataType: boolean
+		formatString: """TRUE"";""TRUE"";""FALSE"""
+		lineageTag: d33634eb-951b-41dd-92cc-c0c6d730ec96
+		summarizeBy: none
+
+		annotation SummarizationSetBy = Automatic
+
+	/// Resuelto, resuelto con reapertura, reabierto y aún abierto, o abierto.
+	column 'Situación del Ticket' =
+			VAR Resuelto = NOT ISBLANK(SLA_Tickets[Fecha Resolución])
+			RETURN
+			    SWITCH(TRUE(),
+			        Resuelto && SLA_Tickets[Fue Reabierto], "Resuelto (tuvo reapertura)",
+			        Resuelto, "Resuelto",
+			        SLA_Tickets[Fue Reabierto], "Reabierto (abierto)",
+			        "Abierto")
+		dataType: string
+		lineageTag: f2c26c44-b20f-4ff6-b9fb-e7813762efed
+		summarizeBy: none
+
+		annotation SummarizationSetBy = Automatic
+
+	/// Fin del conteo: fecha de resolución o, si sigue abierto, el último refresh (tiempo acumulado, no definitivo).
+	column 'Fin SLA' = COALESCE(SLA_Tickets[Fecha Resolución], (UTCNOW() - TIME(6, 0, 0)))
+		dataType: dateTime
+		isHidden
+		formatString: General Date
+		lineageTag: dbc5b8ac-bb23-418e-8632-4cf51bb8530c
+		summarizeBy: none
+
+		annotation SummarizationSetBy = Automatic
+
+	/// Tiempo real transcurrido desde la creación hasta la resolución (o hasta el último refresh si sigue abierto).
+	column 'Horas Naturales' = DATEDIFF(SLA_Tickets[Created], SLA_Tickets[Fin SLA], MINUTE) / 60
+		dataType: double
+		formatString: #,##0.00
+		lineageTag: bad6a7cf-4277-449d-a1b1-4b8e88a1a2a4
+		summarizeBy: none
+
+		annotation SummarizationSetBy = Automatic
+
+	/// Horas en pausa del SLA de resolución (Esperando por el cliente, Esperando al proveedor, Resuelta y Cerrada) antes del fin del conteo.
+	column 'Horas en Pausa' =
+			VAR Fin = SLA_Tickets[Fin SLA]
+			RETURN
+			    SUMX(
+			        FILTER(RELATEDTABLE(FactStatusHistory), FactStatusHistory[Estado] IN {"Esperando por el cliente", "Esperando al proveedor", "Resuelta", "Cerrada"} && FactStatusHistory[Inicio] < Fin),
+			        VAR FinTramo = IF(FactStatusHistory[Fin] < Fin, FactStatusHistory[Fin], Fin)
+			        RETURN DATEDIFF(FactStatusHistory[Inicio], FinTramo, MINUTE) / 60
+			    ) + 0
+		dataType: double
+		formatString: #,##0.00
+		lineageTag: 581a3d04-ec79-4a46-9562-13711ce8a1b2
+		summarizeBy: none
+
+		annotation SummarizationSetBy = Automatic
+
+	/// Tiempo de SLA de resolución en calendario 24/7: tiempo real menos las pausas.
+	column 'SLA Resolución Horas' = MAX(0, SLA_Tickets[Horas Naturales] - SLA_Tickets[Horas en Pausa])
+		dataType: double
+		formatString: #,##0.00
+		lineageTag: 85c746f0-3c51-48e9-8cd6-a30c6b835db8
+		summarizeBy: none
+
+		annotation SummarizationSetBy = Automatic
+
+	/// Tiempo de SLA de resolución en calendario operativo RAM: horas hábiles de los tramos que no son pausa.
+	column 'SLA Resolución Horas RAM' =
+			VAR Fin = SLA_Tickets[Fin SLA]
+			RETURN
+			    SUMX(
+			        FILTER(RELATEDTABLE(FactStatusHistory), NOT (FactStatusHistory[Estado] IN {"Esperando por el cliente", "Esperando al proveedor", "Resuelta", "Cerrada"}) && FactStatusHistory[Inicio] < Fin),
+			        FactStatusHistory[Horas Hábiles]
+			    )
+		dataType: double
+		formatString: #,##0.00
+		lineageTag: 52933462-a628-475a-8d3e-7542f2413104
+		summarizeBy: none
+
+		annotation SummarizationSetBy = Automatic
+
+	/// Estado del SLA de resolución (24/7): Cumplido, Incumplido, Pausado, En riesgo, En curso o Sin dato.
+	column 'SLA Resolución Estado' =
+			VAR H = SLA_Tickets[SLA Resolución Horas]
+			VAR Meta = SLA_Tickets[SLA Resolución Meta Horas]
+			VAR Resuelto = NOT ISBLANK(SLA_Tickets[Fecha Resolución])
+			RETURN
+			    SWITCH(TRUE(),
+			        ISBLANK(H), "Sin dato",
+			        Resuelto && H <= Meta, "Cumplido",
+			        Resuelto, "Incumplido",
+			        H > Meta, "Incumplido",
+			        SLA_Tickets[Status] IN {"Esperando por el cliente", "Esperando al proveedor", "Resuelta", "Cerrada"}, "Pausado",
+			        H >= Meta * 0.75, "En riesgo",
+			        "En curso")
+		dataType: string
+		lineageTag: e10eec3b-04ef-438b-a44a-85126075c059
+		summarizeBy: none
+
+		annotation SummarizationSetBy = Automatic
+
+	/// Estado del SLA de resolución (calendario operativo RAM).
+	column 'SLA Resolución Estado RAM' =
+			VAR H = SLA_Tickets[SLA Resolución Horas RAM]
+			VAR Meta = SLA_Tickets[SLA Resolución Meta Horas]
+			VAR Resuelto = NOT ISBLANK(SLA_Tickets[Fecha Resolución])
+			RETURN
+			    SWITCH(TRUE(),
+			        ISBLANK(H), "Sin dato",
+			        Resuelto && H <= Meta, "Cumplido",
+			        Resuelto, "Incumplido",
+			        H > Meta, "Incumplido",
+			        SLA_Tickets[Status] IN {"Esperando por el cliente", "Esperando al proveedor", "Resuelta", "Cerrada"}, "Pausado",
+			        H >= Meta * 0.75, "En riesgo",
+			        "En curso")
+		dataType: string
+		lineageTag: b296034c-6eea-4bc7-8aa0-4b023208a9de
+		summarizeBy: none
+
+		annotation SummarizationSetBy = Automatic
+
+	/// Tiempo a la primera respuesta (24/7). Sin comentario: tiempo acumulado si sigue abierto; vacío (Sin dato) si ya se resolvió.
+	column 'SLA Respuesta Horas' =
+			IF(
+			    NOT ISBLANK(SLA_Tickets[Primer Comentario]),
+			    DATEDIFF(SLA_Tickets[Created], SLA_Tickets[Primer Comentario], MINUTE) / 60,
+			    IF(ISBLANK(SLA_Tickets[Fecha Resolución]), DATEDIFF(SLA_Tickets[Created], (UTCNOW() - TIME(6, 0, 0)), MINUTE) / 60)
+			)
+		dataType: double
+		formatString: #,##0.00
+		lineageTag: 25b1170a-108a-43dc-9383-ec376739dd4e
+		summarizeBy: none
+
+		annotation SummarizationSetBy = Automatic
+
+	/// Tiempo a la primera respuesta en calendario operativo RAM.
+	column 'SLA Respuesta Horas RAM' =
+			IF(
+			    NOT ISBLANK(SLA_Tickets[Primer Comentario]),
+			    SLA_Tickets[Horas RAM a Primer Comentario],
+			    IF(ISBLANK(SLA_Tickets[Fecha Resolución]), SUMX(RELATEDTABLE(FactStatusHistory), FactStatusHistory[Horas Hábiles]))
+			)
+		dataType: double
+		formatString: #,##0.00
+		lineageTag: 084652d6-9bb6-4170-aacd-facfc06295b8
+		summarizeBy: none
+
+		annotation SummarizationSetBy = Automatic
+
+	/// Estado del SLA de primera respuesta (24/7): Cumplido, Incumplido, En curso o Sin dato.
+	column 'SLA Respuesta Estado' =
+			VAR H = SLA_Tickets[SLA Respuesta Horas]
+			VAR Meta = SLA_Tickets[SLA Respuesta Meta Horas]
+			VAR Respondido = NOT ISBLANK(SLA_Tickets[Primer Comentario])
+			VAR Abierto = ISBLANK(SLA_Tickets[Fecha Resolución])
+			RETURN
+			    SWITCH(TRUE(),
+			        Respondido && H <= Meta, "Cumplido",
+			        Respondido, "Incumplido",
+			        Abierto && H > Meta, "Incumplido",
+			        Abierto, "En curso",
+			        "Sin dato")
+		dataType: string
+		lineageTag: 4652c726-4780-4e6b-bdc2-a0474abd8d52
+		summarizeBy: none
+
+		annotation SummarizationSetBy = Automatic
+
+	/// Estado del SLA de primera respuesta (calendario operativo RAM).
+	column 'SLA Respuesta Estado RAM' =
+			VAR H = SLA_Tickets[SLA Respuesta Horas RAM]
+			VAR Meta = SLA_Tickets[SLA Respuesta Meta Horas]
+			VAR Respondido = NOT ISBLANK(SLA_Tickets[Primer Comentario])
+			VAR Abierto = ISBLANK(SLA_Tickets[Fecha Resolución])
+			RETURN
+			    SWITCH(TRUE(),
+			        Respondido && H <= Meta, "Cumplido",
+			        Respondido, "Incumplido",
+			        Abierto && H > Meta, "Incumplido",
+			        Abierto, "En curso",
+			        "Sin dato")
+		dataType: string
+		lineageTag: 36a2bcb9-fdb3-49d1-90b5-baf0c4224110
+		summarizeBy: none
+
+		annotation SummarizationSetBy = Automatic
+
+	/// Horas que se comparan contra el SLA objetivo elegido con el calendario operativo RAM.
+	column 'Horas SLA Base RAM' = SLA_Tickets[SLA Resolución Horas RAM]
+		dataType: double
+		isHidden
+		formatString: #,##0.00
+		lineageTag: 3ebdf598-2299-403b-b73e-7b51bc1b98ac
+		summarizeBy: none
+
+		annotation SummarizationSetBy = Automatic
+
+	/// Hora del día en que se creó el ticket (0-23).
+	column 'Hora Creación' = HOUR(SLA_Tickets[Created])
+		dataType: int64
+		isHidden
+		formatString: 0
+		lineageTag: cadb19ff-6a34-47d8-b5f3-ae8b1b540803
+		summarizeBy: none
+
+		annotation SummarizationSetBy = Automatic
+
+	/// Hora de creación como texto (00:00 a 23:00).
+	column 'Hora Creación Texto' = FORMAT(SLA_Tickets[Hora Creación], "00") & ":00"
+		dataType: string
+		lineageTag: 3f99f1d6-bace-4319-bafa-b448aaf27aaf
+		summarizeBy: none
+		sortByColumn: 'Hora Creación'
+
+		annotation SummarizationSetBy = Automatic
+
+	/// Día de la semana de creación (1 = lunes).
+	column 'Día Semana Num' = WEEKDAY(SLA_Tickets[Created], 2)
+		dataType: int64
+		isHidden
+		formatString: 0
+		lineageTag: 7c637222-0232-4d2e-9920-08fdec3bba02
+		summarizeBy: none
+
+		annotation SummarizationSetBy = Automatic
+
+	/// Día de la semana en que se creó el ticket.
+	column 'Día Semana' = SWITCH(SLA_Tickets[Día Semana Num], 1, "Lunes", 2, "Martes", 3, "Miércoles", 4, "Jueves", 5, "Viernes", 6, "Sábado", "Domingo")
+		dataType: string
+		lineageTag: c02ddc8c-e781-493a-b17d-ee6c2236ea6e
+		summarizeBy: none
+		sortByColumn: 'Día Semana Num'
+
+		annotation SummarizationSetBy = Automatic
+
+	/// Día de resolución, para contar los resueltos por periodo.
+	column 'Fecha Resolución Día' = IF(ISBLANK(SLA_Tickets[Fecha Resolución]), BLANK(), DATE(YEAR(SLA_Tickets[Fecha Resolución]), MONTH(SLA_Tickets[Fecha Resolución]), DAY(SLA_Tickets[Fecha Resolución])))
+		dataType: dateTime
+		isHidden
+		formatString: Short Date
+		lineageTag: 44307e73-656e-4c37-a4bf-94d52f0f952d
 		summarizeBy: none
 
 		annotation SummarizationSetBy = Automatic
@@ -331,14 +667,15 @@ table SLA_Tickets
 				                    CreatedAt = ToLocal(f[created]),
 				                    Resolved = ToLocal(Record.FieldOrDefault(f, "resolutiondate", null)),
 				                    Respuesta = SlaInfo(Record.FieldOrDefault(f, "customfield_10936", null)),
-				                    Resolucion = SlaInfo(Record.FieldOrDefault(f, "customfield_10937", null))
+				                    Resolucion = SlaInfo(Record.FieldOrDefault(f, "customfield_10937", null)),
+				                    PrimerComentario = ToLocal(i[primerComentario])
 				                in
 				                    [
 				                        Key = i[key],
 				                        #"Issue ID" = i[id],
 				                        Summary = Record.FieldOrDefault(f, "summary", null),
 				                        #"Issue Type" = IssueType,
-				                        Flujo = if IssueType = "IEP INCIDENT" then "IEP Incident" else "Mesa de Servicio - Clientes",
+				                        Flujo = if IssueType = "IEP INCIDENT" then "Proyecto Internet en Parques (IEP)" else "Mesa de Servicio",
 				                        #"Request Type" = if RequestType = null then "Sin request type" else RequestType,
 				                        #"Tipo de Ticket" = if Tipo = null then "Sin tipo" else Tipo,
 				                        Status = NameOf(StatusRec, "name"),
@@ -357,12 +694,15 @@ table SLA_Tickets
 				                        #"Resolution Date" = Resolved,
 				                        #"Resolution Date Only" = if Resolved = null then null else Date.From(Resolved),
 				                        #"Resolution Hours" = if Resolved = null then null else Duration.TotalHours(Resolved - CreatedAt),
-				                        #"SLA Respuesta Meta Horas" = Respuesta[Meta],
-				                        #"SLA Respuesta Horas" = Respuesta[Transcurrido],
-				                        #"SLA Respuesta Estado" = Respuesta[Estado],
-				                        #"SLA Resolución Meta Horas" = Resolucion[Meta],
-				                        #"SLA Resolución Horas" = Resolucion[Transcurrido],
-				                        #"SLA Resolución Estado" = Resolucion[Estado]
+				                        #"JSM Respuesta Meta Horas" = Respuesta[Meta],
+				                        #"JSM Respuesta Horas" = Respuesta[Transcurrido],
+				                        #"JSM Respuesta Estado" = Respuesta[Estado],
+				                        #"JSM Resolución Meta Horas" = Resolucion[Meta],
+				                        #"JSM Resolución Horas" = Resolucion[Transcurrido],
+				                        #"JSM Resolución Estado" = Resolucion[Estado],
+				                        #"Primer Comentario" = PrimerComentario,
+				                        #"Horas RAM a Primer Comentario" =
+				                            if PrimerComentario = null then null else HorasLaborales(CreatedAt, PrimerComentario)
 				                    ]
 				        ),
 				
@@ -387,12 +727,14 @@ table SLA_Tickets
 				                #"Resolution Date" = nullable datetime,
 				                #"Resolution Date Only" = nullable date,
 				                #"Resolution Hours" = nullable number,
-				                #"SLA Respuesta Meta Horas" = nullable number,
-				                #"SLA Respuesta Horas" = nullable number,
-				                #"SLA Respuesta Estado" = text,
-				                #"SLA Resolución Meta Horas" = nullable number,
-				                #"SLA Resolución Horas" = nullable number,
-				                #"SLA Resolución Estado" = text
+				                #"JSM Respuesta Meta Horas" = nullable number,
+				                #"JSM Respuesta Horas" = nullable number,
+				                #"JSM Respuesta Estado" = text,
+				                #"JSM Resolución Meta Horas" = nullable number,
+				                #"JSM Resolución Horas" = nullable number,
+				                #"JSM Resolución Estado" = text,
+				                #"Primer Comentario" = nullable datetime,
+				                #"Horas RAM a Primer Comentario" = nullable number
 				            ]
 				        )
 				

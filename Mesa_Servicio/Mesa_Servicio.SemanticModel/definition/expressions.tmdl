@@ -1,0 +1,144 @@
+/// Única consulta a Jira (no se carga): UNA búsqueda paginada con los campos mínimos, los comentarios y el historial de cambios.
+expression Jira_Fuente =
+			let
+			
+			    // ========================================
+			    // CONFIGURACIÓN
+			    // ========================================
+			
+			    JiraBaseUrl = "https://secureopsmx.atlassian.net",
+			    // Todo el histórico de la mesa, sin los tickets cuyo estado actual es Cerrada (en JQL: Closed)
+			    JQL = "project = MDSC AND status != Closed ORDER BY created DESC",
+			    // Jira entrega como máximo 100 tickets por página
+			    PageSize = "100",
+			
+			    // Solo los campos que usa el modelo. La misma página trae los comentarios (primera respuesta) y el historial de
+			    // cambios (expand=changelog): UNA sola búsqueda para todo. (El historial en bloque, POST changelog/bulkfetch,
+			    // no se puede usar: Power BI solo permite POST con conexión anónima.)
+			    // customfield_10010 = Request Type · customfield_10002 = Organizations · customfield_11042 = Técnico(s) asignado(s)
+			    Campos = Text.Combine({
+			        "summary", "status", "issuetype", "assignee", "reporter", "created", "resolutiondate", "comment",
+			        "customfield_10010", "customfield_10002", "customfield_11042"
+			    }, ","),
+			
+			
+			    // ========================================
+			    // BÚSQUEDA PAGINADA (con historial)
+			    // ========================================
+			
+			    GetPage = (NextToken as nullable text) as record =>
+			        let
+			            Base = [jql = JQL, maxResults = PageSize, fields = Campos, expand = "changelog"],
+			            Query = if NextToken = null then Base else Record.AddField(Base, "nextPageToken", NextToken)
+			        in
+			            Json.Document(
+			                Web.Contents(JiraBaseUrl, [RelativePath = "rest/api/3/search/jql", Query = Query, Headers = [Accept = "application/json"]])
+			            ),
+			
+			    // List.Buffer: la lista queda en memoria y no se vuelve a pedir a Jira al recorrerla
+			    RawIssues =
+			        List.Buffer(
+			            List.Combine(
+			                List.Generate(
+			                    () => GetPage(null),
+			                    each _ <> null,
+			                    each let Token = Record.FieldOrDefault(_, "nextPageToken", null) in if Token = null then null else GetPage(Token),
+			                    each [issues]
+			                )
+			            )
+			        ),
+			
+			
+			    // ========================================
+			    // HISTORIAL COMPLETO
+			    // ========================================
+			
+			    // La búsqueda trae hasta 100 cambios por ticket; solo si un ticket tiene más se pide su historial completo
+			    GetChangelogPage = (IssueKey as text, StartAt as number) as record =>
+			        Json.Document(
+			            Web.Contents(
+			                JiraBaseUrl,
+			                [
+			                    RelativePath = "rest/api/3/issue/" & IssueKey & "/changelog",
+			                    Query = [startAt = Text.From(StartAt), maxResults = "100"],
+			                    Headers = [Accept = "application/json"]
+			                ]
+			            )
+			        ),
+			    GetFullChangelog = (IssueKey as text) as list =>
+			        List.Combine(
+			            List.Generate(
+			                () => GetChangelogPage(IssueKey, 0),
+			                each _ <> null,
+			                each
+			                    let Next = [startAt] + List.Count([values])
+			                    in if List.IsEmpty([values]) or Next >= [total] then null else GetChangelogPage(IssueKey, Next),
+			                each [values]
+			            )
+			        ),
+			    Cambios = (Issue as record) as list =>
+			        let
+			            Changelog = Record.FieldOrDefault(Issue, "changelog", null),
+			            Incluidos = if Changelog = null then {} else Record.FieldOrDefault(Changelog, "histories", {}),
+			            Completo = List.Count(Incluidos) >= Record.FieldOrDefault(Changelog ?? [], "total", 0)
+			        in
+			            if Completo then Incluidos else GetFullChangelog(Issue[key]),
+			
+			
+			    // ========================================
+			    // RESULTADO
+			    // ========================================
+			
+			    // "histories" se evalúa solo cuando la tabla Historial lo usa
+			    Issues =
+			        List.Transform(
+			            RawIssues,
+			            each [id = [id], key = [key], fields = [fields], histories = Cambios(_)]
+			        )
+			in
+			    Issues
+	lineageTag: f8913045-25fb-4a3f-bb4b-7cbd45713b10
+
+	annotation PBI_ResultType = List
+
+/// Horas dentro del calendario operativo RAM (L-V 7:00-23:00, sáb y dom 8:00-18:00) entre dos fechas.
+expression HorasLaborales =
+			(Inicio as nullable datetime, Fin as nullable datetime) as number =>
+			    if Inicio = null or Fin = null or Fin <= Inicio then 0
+			    else
+			        let
+			            // Calendario operativo RAM: lunes a viernes 7-23, sábado y domingo 8-18 (Date.DayOfWeek con lunes = 0)
+			            Ventana = (Dia as date) as list => if Date.DayOfWeek(Dia, Day.Monday) <= 4 then {7, 23} else {8, 18},
+			            // Horas de una semana completa: 5 x 16 h + 10 h del sábado + 10 h del domingo
+			            HorasSemana = 100,
+			            HorasEnDia = (Dia as date, Desde as datetime, Hasta as datetime) as number =>
+			                let
+			                    W = Ventana(Dia),
+			                    Abre = Dia & #time(W{0}, 0, 0),
+			                    Cierra = Dia & #time(W{1}, 0, 0),
+			                    D = if Desde > Abre then Desde else Abre,
+			                    H = if Hasta < Cierra then Hasta else Cierra
+			                in
+			                    if H > D then Duration.TotalHours(H - D) else 0,
+			            Dia1 = Date.From(Inicio),
+			            DiaN = Date.From(Fin),
+			            TotalDias = Duration.Days(DiaN - Dia1) + 1
+			        in
+			            if TotalDias <= 14 then
+			                List.Sum(List.Transform(List.Dates(Dia1, TotalDias, #duration(1, 0, 0, 0)), (Dia) => HorasEnDia(Dia, Inicio, Fin)))
+			            else
+			                // tramo largo: primer y último día parciales + semanas completas + días sueltos
+			                let
+			                    Intermedios = TotalDias - 2,
+			                    Semanas = Number.IntegerDivide(Intermedios, 7),
+			                    Sueltos = List.Dates(Date.AddDays(Dia1, 1 + Semanas * 7), Number.Mod(Intermedios, 7), #duration(1, 0, 0, 0)),
+			                    HorasSueltos = List.Sum(List.Transform(Sueltos, (Dia) => HorasEnDia(Dia, Dia & #time(0, 0, 0), Date.AddDays(Dia, 1) & #time(0, 0, 0))))
+			                in
+			                    HorasEnDia(Dia1, Inicio, Date.AddDays(Dia1, 1) & #time(0, 0, 0))
+			                        + Semanas * HorasSemana
+			                        + (if HorasSueltos = null then 0 else HorasSueltos)
+			                        + HorasEnDia(DiaN, DiaN & #time(0, 0, 0), Fin)
+	lineageTag: f736be60-c691-4442-9edd-786179156dba
+
+	annotation PBI_ResultType = Function
+

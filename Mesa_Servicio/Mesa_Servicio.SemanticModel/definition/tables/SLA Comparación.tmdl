@@ -1,0 +1,29 @@
+/// Eje de la gráfica 'Cumplimiento de los SLA'. Sin relaciones.
+table 'SLA Comparación'
+	lineageTag: 48e381c6-0752-4a0c-8eba-4a531ac2cdca
+
+	column 'SLA'
+		dataType: string
+		lineageTag: 6a8bf3a4-5bf6-4bd1-acc5-65ee30a0ee4b
+		summarizeBy: none
+		isNameInferred
+		sourceColumn: [SLA]
+		sortByColumn: 'Orden SLA'
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Orden SLA'
+		dataType: int64
+		isHidden
+		formatString: 0
+		lineageTag: 1a18d3f2-f7a4-4583-a47d-eba92a52ae60
+		summarizeBy: none
+		isNameInferred
+		sourceColumn: [Orden SLA]
+
+		annotation SummarizationSetBy = Automatic
+
+	partition 'SLA Comparación' = calculated
+		mode: import
+		source = DATATABLE("SLA", STRING, "Orden SLA", INTEGER, { { "Primera respuesta", 1 }, { "Resolución", 2 } })
+

@@ -1,0 +1,22 @@
+model Model
+	culture: es-MX
+	defaultPowerBIDataSourceVersion: powerBI_V3
+	sourceQueryCulture: es-MX
+	valueFilterBehavior: independent
+	dataAccessOptions
+		legacyRedirects
+		returnErrorValuesAsNull
+
+annotation __PBI_TimeIntelligenceEnabled = 0
+
+annotation PBI_ProTooling = ["DevMode"]
+
+ref table _Medidas
+ref table Tickets
+ref table Historial
+ref table DimFecha
+ref table 'Calendario SLA'
+ref table 'Horario Cálculo'
+ref table 'SLA Comparación'
+ref table 'Estado SLA'
+

@@ -1,0 +1,39 @@
+/// Selector de horario de Time in Status: operativo RAM (predeterminado) o 24/7. Sin relaciones.
+table 'Horario Cálculo'
+	lineageTag: 33719c75-4736-4b07-8602-db9a9f89b7f7
+
+	column 'Horario'
+		dataType: string
+		lineageTag: 787e10d7-2b58-49b7-8b0c-97c31c535b04
+		summarizeBy: none
+		isNameInferred
+		sourceColumn: [Horario]
+		sortByColumn: 'Orden'
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Clave'
+		dataType: string
+		isHidden
+		lineageTag: 07785801-43bb-49b3-a061-3bc0e21d328a
+		summarizeBy: none
+		isNameInferred
+		sourceColumn: [Clave]
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Orden'
+		dataType: int64
+		isHidden
+		formatString: 0
+		lineageTag: cb62e7fe-c652-41f3-adb4-ae3b2341ca3e
+		summarizeBy: none
+		isNameInferred
+		sourceColumn: [Orden]
+
+		annotation SummarizationSetBy = Automatic
+
+	partition 'Horario Cálculo' = calculated
+		mode: import
+		source = DATATABLE("Horario", STRING, "Clave", STRING, "Orden", INTEGER, { { "Horario laboral", "laboral", 1 }, { "24/7 (reloj)", "247", 2 } })
+
