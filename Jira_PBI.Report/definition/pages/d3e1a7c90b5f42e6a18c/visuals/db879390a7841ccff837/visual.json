@@ -2,12 +2,12 @@
   "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/visualContainer/2.13.0/schema.json",
   "name": "db879390a7841ccff837",
   "position": {
-    "x": 1080,
-    "y": 340,
-    "z": 36000,
-    "height": 662,
-    "width": 820,
-    "tabOrder": 22000
+    "x": 264.22018348623851,
+    "y": 652.29357798165131,
+    "z": 20000,
+    "height": 411.92660550458714,
+    "width": 695.41284403669715,
+    "tabOrder": 15000
   },
   "visual": {
     "visualType": "clusteredBarChart",
@@ -84,6 +84,19 @@
             }
           }
         }
+      ],
+      "valueAxis": [
+        {
+          "properties": {
+            "show": {
+              "expr": {
+                "Literal": {
+                  "Value": "false"
+                }
+              }
+            }
+          }
+        }
       ]
     },
     "visualContainerObjects": {
@@ -100,7 +113,7 @@
             "text": {
               "expr": {
                 "Literal": {
-                  "Value": "'Tiempo en estado'"
+                  "Value": "'Tiempo promedio en estado por ticket'"
                 }
               }
             }
@@ -113,7 +126,7 @@
             "show": {
               "expr": {
                 "Literal": {
-                  "Value": "true"
+                  "Value": "false"
                 }
               }
             },

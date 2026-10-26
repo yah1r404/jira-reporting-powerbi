@@ -4,29 +4,8 @@
     "x": 90,
     "y": 0,
     "z": 6,
-    "width": 230,
     "height": 30,
+    "width": 230,
     "tabOrder": 6
-  },
-  "objects": {
-    "icon": [],
-    "text": [
-      {
-        "properties": {
-          "horizontalAlignment": {
-            "expr": {
-              "Literal": {
-                "Value": "'right'"
-              }
-            }
-          }
-        },
-        "selector": {
-          "id": "default"
-        }
-      }
-    ],
-    "fill": [],
-    "outline": []
   }
 }

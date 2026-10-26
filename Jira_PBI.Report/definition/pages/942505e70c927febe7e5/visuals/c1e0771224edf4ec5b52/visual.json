@@ -3,11 +3,11 @@
   "name": "c1e0771224edf4ec5b52",
   "position": {
     "x": 264,
-    "y": 16,
-    "z": 16000,
-    "height": 42,
-    "width": 1100,
-    "tabOrder": 20000
+    "y": 10,
+    "z": 19000,
+    "height": 44,
+    "width": 400,
+    "tabOrder": 23000
   },
   "visual": {
     "visualType": "textbox",
@@ -23,7 +23,7 @@
                     "textStyle": {
                       "fontFamily": "Segoe UI Semibold",
                       "fontSize": "22pt",
-                      "color": "#0A2E5C"
+                      "color": "#0a2e5c"
                     }
                   }
                 ]

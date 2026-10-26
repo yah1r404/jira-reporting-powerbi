@@ -19,26 +19,15 @@
               {
                 "textRuns": [
                   {
-                    "value": "Mesa de Servicio · MDSC",
+                    "value": "Mesa de Servicio ",
                     "textStyle": {
                       "fontFamily": "Segoe UI Semibold",
                       "fontSize": "11pt",
-                      "color": "#FFFFFF"
+                      "color": "#ffffff"
                     }
                   }
-                ]
-              },
-              {
-                "textRuns": [
-                  {
-                    "value": "Tablero de SLA y eficiencia",
-                    "textStyle": {
-                      "fontFamily": "Segoe UI",
-                      "fontSize": "9pt",
-                      "color": "#D5E0F0"
-                    }
-                  }
-                ]
+                ],
+                "horizontalTextAlignment": "center"
               }
             ]
           }

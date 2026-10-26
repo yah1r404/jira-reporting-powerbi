@@ -2,12 +2,12 @@
   "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/visualContainer/2.13.0/schema.json",
   "name": "e9877cd0a9ffcc9f0aa6",
   "position": {
-    "x": 1040,
-    "y": 98,
-    "z": 22000,
-    "height": 64,
-    "width": 228,
-    "tabOrder": 31000
+    "x": 1480,
+    "y": 4,
+    "z": 19000,
+    "height": 58,
+    "width": 204,
+    "tabOrder": 20000
   },
   "visual": {
     "visualType": "slicer",
@@ -28,7 +28,8 @@
               },
               "queryRef": "SLA_Tickets.Request Type",
               "nativeQueryRef": "Request Type",
-              "active": true
+              "active": true,
+              "displayName": "Tipo de solicitud"
             }
           ]
         }

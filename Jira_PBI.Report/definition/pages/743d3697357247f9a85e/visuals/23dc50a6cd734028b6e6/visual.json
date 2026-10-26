@@ -28,7 +28,8 @@
               },
               "queryRef": "SLA_Tickets.Request Type",
               "nativeQueryRef": "Request Type",
-              "active": true
+              "active": true,
+              "displayName": "Tipo de solicitud"
             }
           ]
         },
@@ -164,7 +165,7 @@
             "text": {
               "expr": {
                 "Literal": {
-                  "Value": "'Global: horas promedio por ticket en cada estado vs. meta del SLA (línea roja), por request type'"
+                  "Value": "'Global: horas promedio por ticket en cada estado vs. meta del SLA (línea roja), por tipo de solicitud'"
                 }
               }
             }

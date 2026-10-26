@@ -4,10 +4,10 @@
   "position": {
     "x": 1040,
     "y": 98,
-    "z": 21000,
+    "z": 24000,
     "height": 64,
     "width": 228,
-    "tabOrder": 22000
+    "tabOrder": 25000
   },
   "visual": {
     "visualType": "slicer",
@@ -28,7 +28,8 @@
               },
               "queryRef": "SLA_Tickets.Request Type",
               "nativeQueryRef": "Request Type",
-              "active": true
+              "active": true,
+              "displayName": "Tipo de solicitud"
             }
           ]
         }

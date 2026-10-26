@@ -4,10 +4,10 @@
   "position": {
     "x": 264,
     "y": 748,
-    "z": 35000,
+    "z": 39000,
     "height": 312,
     "width": 1636,
-    "tabOrder": 22000
+    "tabOrder": 25000
   },
   "visual": {
     "visualType": "pivotTable",
@@ -264,7 +264,7 @@
             "text": {
               "expr": {
                 "Literal": {
-                  "Value": "'N1 / N2 RAM / N2 QCOM / Otro (IEP Incident): en qué horas desde la creación estuvo cada ticket en cada grupo (azul = N1, verde claro = N2 RAM, verde oscuro = N2 QCOM, gris = Otro: Planta externa, Escalado, esperas, etc.)'"
+                  "Value": "'N1 / N2 RAM / N2 QCOM / Otro (IEP): en qué horas desde la creación estuvo cada ticket en cada grupo (azul = N1, verde claro = N2 RAM, verde oscuro = N2 QCOM, gris = Otro: Planta externa, Escalado, esperas, etc.)'"
                 }
               }
             }

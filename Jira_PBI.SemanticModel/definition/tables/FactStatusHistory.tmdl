@@ -27,7 +27,6 @@ table FactStatusHistory
 
 		annotation SummarizationSetBy = Automatic
 
-	/// Orden del estado en el flujo, para ordenar ejes y tablas. Se define en la lista OrdenEstados de la consulta.
 	column 'Orden Estado'
 		dataType: int64
 		isHidden
@@ -139,10 +138,10 @@ table FactStatusHistory
 
 		annotation SummarizationSetBy = Automatic
 
-	/// Agrupa el estado para la línea de tiempo, solo para el flujo "IEP Incident": N1 (Nueva solicitud, N1, Reabierta), N2 RAM, N2 QCOM, y "Otro" para el resto (Planta externa, Escalado y variantes, esperas, etc.). Vacío solo para el otro flujo.
+	/// Agrupa el estado para la línea de tiempo, solo para "Proyecto Internet en Parques (IEP)": N1 (Nueva solicitud, N1, Reabierta), N2 RAM, N2 QCOM, y "Otro" para el resto (Planta externa, Escalado y variantes, esperas, etc.). Vacío solo para el otro flujo.
 	column 'Grupo N1 N2' =
 			IF(
-			    FactStatusHistory[Flujo] = "IEP Incident",
+			    FactStatusHistory[Flujo] = "Proyecto Internet en Parques (IEP)",
 			    SWITCH(
 			        TRUE(),
 			        FactStatusHistory[Estado] IN {"Nueva solicitud", "N1", "Reabierta"}, "N1",
@@ -157,6 +156,26 @@ table FactStatusHistory
 
 		annotation SummarizationSetBy = Automatic
 
+	/// Orden del estado en el flujo, para ordenar ejes y tablas. Se define en la lista OrdenEstados de la consulta.
+	/// Nombre del estado tal como viene de Jira (antes de normalizar inglés -> español).
+	column 'Estado Jira'
+		dataType: string
+		lineageTag: 1ff42426-36a7-4979-8190-801042483626
+		summarizeBy: none
+		sourceColumn: Estado Jira
+
+		annotation SummarizationSetBy = Automatic
+
+	/// TRUE si el estado (ya pasado a su equivalente actual) existe hoy en algún flujo; FALSE si no tiene equivalente.
+	column Vigente
+		dataType: boolean
+		formatString: """TRUE"";""TRUE"";""FALSE"""
+		lineageTag: 979f28bf-e1b2-4516-bc75-09fbc5e96db3
+		summarizeBy: none
+		sourceColumn: Vigente
+
+		annotation SummarizationSetBy = Automatic
+
 	partition FactStatusHistory = m
 		mode: import
 		source =
@@ -165,12 +184,12 @@ table FactStatusHistory
 				    JiraBaseUrl = "https://secureopsmx.atlassian.net",
 				    Issues = Jira_MDSC_Issues,
 				
-				    // Orden de los estados de ambos flujos (IEP Incident y Mesa de Servicio - Clientes).
+				    // Orden de los estados de ambos tipos de servicio (Proyecto Internet en Parques (IEP) y Mesa de Servicio).
 				    // Un estado que no esté aquí se ordena al final.
 				    OrdenEstados = {
 				        "Nueva solicitud", "Reabierta", "N1", "En curso", "N2 RAM", "N2 QCOM",
 				        "Escalado a N2", "Escalado", "Escalado a N3", "Escalado QCOM",
-				        "Esperando al proveedor", "Esperando por el cliente", "Resuelta", "Cerrada"
+				        "N3 RAM", "Esperando al proveedor", "Esperando por el cliente", "Planta externa", "Resuelta", "Cerrada"
 				    },
 				
 				
@@ -215,14 +234,14 @@ table FactStatusHistory
 				        ),
 				
 				    FlujoDe = (IssueType as nullable text) as text =>
-				        if IssueType = "IEP INCIDENT" then "IEP Incident" else "Mesa de Servicio - Clientes",
+				        if IssueType = "IEP INCIDENT" then "Proyecto Internet en Parques (IEP)" else "Mesa de Servicio",
 				
 				    Vigentes =
 				        Table.Distinct(
 				            Table.FromRecords(
 				                List.Combine(
 				                    List.Transform(
-				                        List.Select(ProjectStatuses, each [name] <> "Emailed request"),
+				                        ProjectStatuses,
 				                        (t) =>
 				                            List.Transform(
 				                                t[statuses],
@@ -264,7 +283,9 @@ table FactStatusHistory
 				                                    (it) => [
 				                                        At = ToLocal(h[created]),
 				                                        FromId = Text.From(Record.FieldOrDefault(it, "from", null)),
-				                                        ToId = Text.From(Record.FieldOrDefault(it, "to", null))
+				                                        ToId = Text.From(Record.FieldOrDefault(it, "to", null)),
+				                                        FromName = Record.FieldOrDefault(it, "fromString", null),
+				                                        ToName = Record.FieldOrDefault(it, "toString", null)
 				                                    ]
 				                                )
 				                        )
@@ -275,9 +296,13 @@ table FactStatusHistory
 				                if List.IsEmpty(Changes)
 				                then Text.From(NameOf(CurrentStatus, "id"))
 				                else Changes{0}[FromId],
+				            InitialName =
+				                if List.IsEmpty(Changes)
+				                then NameOf(CurrentStatus, "name")
+				                else Changes{0}[FromName],
 				            Starts =
-				                {[IdTramo = InitialId, InicioTramo = CreatedAt]}
-				                & List.Transform(Changes, each [IdTramo = [ToId], InicioTramo = [At]]),
+				                {[IdTramo = InitialId, NombreTramo = InitialName, InicioTramo = CreatedAt]}
+				                & List.Transform(Changes, each [IdTramo = [ToId], NombreTramo = [ToName], InicioTramo = [At]]),
 				            Total = List.Count(Starts)
 				        in
 				            List.Transform(
@@ -292,6 +317,7 @@ table FactStatusHistory
 				                            Key = i[key],
 				                            Flujo = FlujoTicket,
 				                            EstadoId = s[IdTramo],
+				                            EstadoHistorial = s[NombreTramo],
 				                            Visita = n + 1,
 				                            Inicio = s[InicioTramo],
 				                            Fin = FinTramo,
@@ -310,6 +336,7 @@ table FactStatusHistory
 				                Key = text,
 				                Flujo = text,
 				                EstadoId = nullable text,
+				                EstadoHistorial = nullable text,
 				                Visita = Int64.Type,
 				                Inicio = datetime,
 				                Fin = datetime,
@@ -321,16 +348,60 @@ table FactStatusHistory
 				            ]
 				        ),
 				
-				    // Unión interna: solo se quedan los tramos en estados vigentes del flujo del ticket
+				    // Unión izquierda: se conservan TODOS los tramos (el SLA necesita el tiempo completo del ticket).
+				    // Los estados que ya no existen en el flujo se pasan al estado actual que los representa (ver Normaliza).
 				    // Table.Buffer: los tramos (y sus horas laborales) se calculan una sola vez antes de la unión
-				    Joined = Table.NestedJoin(Table.Buffer(Base), {"Flujo", "EstadoId"}, Vigentes, {"Flujo", "EstadoId"}, "Vig", JoinKind.Inner),
+				    Joined = Table.NestedJoin(Table.Buffer(Base), {"Flujo", "EstadoId"}, Vigentes, {"Flujo", "EstadoId"}, "Vig", JoinKind.LeftOuter),
 				    Expanded = Table.ExpandTableColumn(Joined, "Vig", {"EstadoNombre", "CategoriaNombre", "CategoriaKey"}),
 				
-				    WithEstado = Table.AddColumn(Expanded, "Estado", each [EstadoNombre], type text),
+				    // Nombre del estado actual que representa a cada nombre de Jira: inglés -> español y estados de flujos
+				    // anteriores -> su equivalente de hoy (su tiempo se mide en ese estado). Se compara en minúsculas.
+				    Normaliza = (n as nullable text) as nullable text =>
+				        let
+				            Mapa = [
+				                // inicio del ticket
+				                #"open" = "Nueva solicitud", #"abierto" = "Nueva solicitud", #"abierta" = "Nueva solicitud",
+				                #"abiertos" = "Nueva solicitud", #"nuevo" = "Nueva solicitud", #"nueva" = "Nueva solicitud",
+				                #"new" = "Nueva solicitud", #"to do" = "Nueva solicitud", #"por hacer" = "Nueva solicitud",
+				                #"waiting for support" = "Nueva solicitud", #"esperando soporte" = "Nueva solicitud", #"esperando por ayuda" = "Nueva solicitud",
+				                // atención de primer nivel
+				                #"in progress" = "N1", #"en curso" = "N1", #"trabajo en curso" = "N1", #"en progreso" = "N1",
+				                #"pendiente" = "N1", #"pending" = "N1", #"n1 qcom" = "N1", #"n1 ram" = "N1",
+				                // segundo y tercer nivel
+				                #"escalado a n2" = "N2 RAM", #"n2" = "N2 RAM",
+				                #"escalado a n3" = "N3 RAM", #"n3" = "N3 RAM",
+				                // espera, escalamiento, reapertura y cierre
+				                #"waiting for customer" = "Esperando por el cliente", #"esperando al solicitante" = "Esperando por el cliente",
+				                #"escalated" = "Escalado",
+				                #"resolved" = "Resuelta", #"resuelto" = "Resuelta", #"completado" = "Resuelta", #"completada" = "Resuelta", #"completed" = "Resuelta",
+				                #"reopened" = "Reabierta",
+				                #"closed" = "Cerrada"
+				            ]
+				        in
+				            if n = null then null else Record.FieldOrDefault(Mapa, Text.Lower(Text.Trim(n)), Text.Trim(n)),
+				
+				    // Nombres de los estados que existen hoy en algún flujo
+				    Actuales = List.Buffer(List.Distinct(Vigentes[EstadoNombre])),
+				
+				    WithJira = Table.AddColumn(Expanded, "Estado Jira", each [EstadoNombre] ?? [EstadoHistorial] ?? "Sin estado", type text),
+				    WithEstado =
+				        Table.AddColumn(
+				            WithJira,
+				            "Estado",
+				            each
+				                let
+				                    e = Normaliza([#"Estado Jira"])
+				                in
+				                    // cualquier estado inicial (primer tramo) de un flujo anterior, salvo Reabierta, es Nueva solicitud
+				                    if [Visita] = 1 and not List.Contains(Actuales, e) and e <> "Reabierta" then "Nueva solicitud" else e,
+				            type text
+				        ),
+				    // TRUE si el estado (ya normalizado) existe hoy en algún flujo; los que no tienen equivalente quedan en FALSE
+				    WithVigente = Table.AddColumn(WithEstado, "Vigente", each List.Contains(Actuales, [Estado]), type logical),
 				
 				    WithOrden =
 				        Table.AddColumn(
-				            WithEstado,
+				            WithVigente,
 				            "Orden Estado",
 				            each
 				                let
@@ -340,15 +411,21 @@ table FactStatusHistory
 				            Int64.Type
 				        ),
 				
-				    WithCategory = Table.AddColumn(WithOrden, "Categoría Estado", each [CategoriaNombre], type text),
+				    WithCategory = Table.AddColumn(WithOrden, "Categoría Estado", each [CategoriaNombre] ?? "Estado anterior", type text),
 				
-				    WithFinal = Table.AddColumn(WithCategory, "Es Estado Final", each [CategoriaKey] = "done", type logical),
+				    WithFinal =
+				        Table.AddColumn(
+				            WithCategory,
+				            "Es Estado Final",
+				            each if [CategoriaKey] = null then List.Contains({"Resuelta", "Cerrada"}, [Estado]) else [CategoriaKey] = "done",
+				            type logical
+				        ),
 				
 				    Result =
 				        Table.SelectColumns(
 				            WithFinal,
 				            {
-				                "Key", "Flujo", "Estado", "Orden Estado", "Categoría Estado", "Es Estado Final",
+				                "Key", "Flujo", "Estado", "Estado Jira", "Vigente", "Orden Estado", "Categoría Estado", "Es Estado Final",
 				                "Visita", "Inicio", "Fin", "Horas", "Horas Hábiles", "Es Actual", "Hora Inicio", "Hora Fin"
 				            }
 				        )

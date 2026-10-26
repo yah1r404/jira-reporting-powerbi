@@ -1,4 +1,4 @@
-/// Tickets de la mesa MDSC (últimos 6 meses, sin Emailed request ni tickets en Cerrada). Búsqueda ligera con solo los campos usados; el historial de estado y responsable se pide en bloque y solo lo calculan FactStatusHistory y FactAssigneeHistory. No se carga al modelo.
+/// Tickets de la mesa MDSC (todo el histórico, sin tickets en Cerrada; incluye Emailed request). Búsqueda ligera con solo los campos usados; el historial de estado y responsable se pide en bloque y solo lo calculan FactStatusHistory y FactAssigneeHistory. No se carga al modelo.
 expression Jira_MDSC_Issues =
 		let
 		
@@ -7,8 +7,8 @@ expression Jira_MDSC_Issues =
 		    // ========================================
 		
 		    JiraBaseUrl = "https://secureopsmx.atlassian.net",
-		    // Se excluyen los Emailed request y los tickets en estado Cerrada (en JQL: Closed)
-		    JQL = "project = MDSC AND issuetype != ""Emailed request"" AND status != Closed AND created >= startOfMonth(-5) ORDER BY created ASC",
+		    // Todo el histórico de la mesa, sin los tickets cuyo estado actual es Cerrada (en JQL: Closed)
+		    JQL = "project = MDSC AND status != Closed ORDER BY created DESC",
 		
 		    // Tamaño de página de la búsqueda: Jira entrega como máximo 100 tickets por página con estos campos (medido)
 		    PageSize = "100",
@@ -48,6 +48,7 @@ expression Jira_MDSC_Issues =
 		    TipoTicketFieldId =
 		        if List.IsEmpty(TipoTicketMatches) then null else TipoTicketMatches{0}[id],
 		
+		
 		    // Solo los campos que usa el modelo:
 		    // customfield_10010 = Request Type
 		    // customfield_10936 = Tiempo hasta primera respuesta (SLA JSM)
@@ -62,7 +63,7 @@ expression Jira_MDSC_Issues =
 		
 		    JiraFields =
 		        Text.Combine(
-		            if TipoTicketFieldId = null then BaseFields else BaseFields & {TipoTicketFieldId},
+		            BaseFields & List.RemoveNulls({TipoTicketFieldId}),
 		            ","
 		        ),
 		
@@ -71,9 +72,9 @@ expression Jira_MDSC_Issues =
 		    // BÚSQUEDA PAGINADA (ligera: sin historial)
 		    // ========================================
 		
-		    GetPage = (NextToken as nullable text, ConHistorial as logical) as record =>
+		    GetPage = (NextToken as nullable text, ConHistorial as logical, optional Campos as nullable text) as record =>
 		        let
-		            BaseQuery = [jql = JQL, maxResults = PageSize, fields = JiraFields],
+		            BaseQuery = [jql = JQL, maxResults = PageSize, fields = if Campos = null then JiraFields else Campos],
 		            ConExpand = if ConHistorial then Record.AddField(BaseQuery, "expand", "changelog") else BaseQuery,
 		            RequestQuery =
 		                if NextToken = null
@@ -91,16 +92,16 @@ expression Jira_MDSC_Issues =
 		                )
 		            ),
 		
-		    Search = (ConHistorial as logical) as list =>
+		    Search = (ConHistorial as logical, optional Campos as nullable text) as list =>
 		        List.Combine(
 		            List.Generate(
-		                () => GetPage(null, ConHistorial),
+		                () => GetPage(null, ConHistorial, Campos),
 		                each _ <> null,
 		                each
 		                    let
 		                        Token = Record.FieldOrDefault(_, "nextPageToken", null)
 		                    in
-		                        if Token = null then null else GetPage(Token, ConHistorial),
+		                        if Token = null then null else GetPage(Token, ConHistorial, Campos),
 		                each [issues]
 		            )
 		        ),
@@ -213,6 +214,37 @@ expression Jira_MDSC_Issues =
 		
 		
 		    // ========================================
+		    // PRIMER COMENTARIO (primera respuesta)
+		    // ========================================
+		
+		    // Una búsqueda más, solo con comentarios y quien levantó el ticket (100 tickets por página, no una llamada por ticket).
+		    // Primera respuesta = el comentario más antiguo de alguien distinto a quien levantó el ticket.
+		    // Se calcula solo si una tabla lo pide (SLA_Tickets).
+		    PrimerComentario =
+		        let
+		            ConComentarios = List.Buffer(Search(false, "comment,reporter")),
+		            Primero = (i as record) as nullable text =>
+		                let
+		                    f = i[fields],
+		                    Reporter = Record.FieldOrDefault(Record.FieldOrDefault(f, "reporter", []) ?? [], "accountId", null),
+		                    Lista = Record.FieldOrDefault(Record.FieldOrDefault(f, "comment", []) ?? [], "comments", {}),
+		                    DeOtros =
+		                        List.Select(
+		                            Lista,
+		                            each Record.FieldOrDefault(Record.FieldOrDefault(_, "author", []) ?? [], "accountId", null) <> Reporter
+		                        ),
+		                    // todas las fechas vienen con la misma zona horaria: el orden de texto es el orden cronológico
+		                    Fechas = List.Sort(List.Transform(DeOtros, each [created]))
+		                in
+		                    if List.IsEmpty(Fechas) then null else Fechas{0}
+		        in
+		            Record.FromList(
+		                List.Transform(ConComentarios, Primero),
+		                List.Transform(ConComentarios, each Text.From([id]))
+		            ),
+		
+		
+		    // ========================================
 		    // RESULTADO
 		    // ========================================
 		
@@ -226,7 +258,8 @@ expression Jira_MDSC_Issues =
 		                key = [key],
 		                fields = [fields],
 		                tipoTicketFieldId = TipoTicketFieldId,
-		                histories = Record.FieldOrDefault(Historial, Text.From([id]), {})
+		                histories = Record.FieldOrDefault(Historial, Text.From([id]), {}),
+		                primerComentario = Record.FieldOrDefault(PrimerComentario, Text.From([id]), null)
 		            ]
 		        )
 		
@@ -238,7 +271,7 @@ expression Jira_MDSC_Issues =
 
 	annotation PBI_ResultType = List
 
-/// Horas laborales entre dos fechas según el horario de la mesa: lunes a viernes 6:00-23:00, sábado 9:00-19:00, domingo sin horario.
+/// Horas laborales entre dos fechas según el calendario operativo de RAM: lunes a viernes 7:00-23:00, sábado y domingo 8:00-18:00.
 /// Para cambiar el horario, editar la función Ventana.
 expression HorasLaborales =
 		(Inicio as nullable datetime, Fin as nullable datetime) as number =>
@@ -250,12 +283,11 @@ expression HorasLaborales =
 		                let
 		                    DiaSemana = Date.DayOfWeek(Dia, Day.Monday)
 		                in
-		                    if DiaSemana <= 4 then {6, 23}
-		                    else if DiaSemana = 5 then {9, 19}
-		                    else null,
+		                    if DiaSemana <= 4 then {7, 23}
+		                    else {8, 18},
 		
-		            // Horas laborales de una semana completa: 5 x 17 h + 10 h del sábado
-		            HorasSemana = 95,
+		            // Horas laborales de una semana completa: 5 x 16 h + 10 h del sábado + 10 h del domingo
+		            HorasSemana = 100,
 		
 		            HorasEnDia = (Dia as date, Desde as datetime, Hasta as datetime) as number =>
 		                let

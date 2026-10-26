@@ -68,9 +68,17 @@ table DimFecha
 
 		annotation SummarizationSetBy = Automatic
 
+	/// Semana del año de creación (lunes a domingo), ej. 2026-S42.
+	column Semana = YEAR([Date]) & "-S" & FORMAT(WEEKNUM([Date], 2), "00")
+		dataType: string
+		lineageTag: 1ef8b08b-dc9e-407d-8d7d-0c81f42bdd6a
+		summarizeBy: none
+
+		annotation SummarizationSetBy = Automatic
+
 	partition DimFecha = calculated
 		mode: import
-		source = CALENDAR(MIN('SLA_Tickets'[Created Date]), MAX('SLA_Tickets'[Created Date]))
+		source = CALENDAR(MIN('SLA_Tickets'[Created Date]), MAX(MAX('SLA_Tickets'[Created Date]), TODAY()))
 
 	annotation PBI_Id = DimFecha_CalendarioPrincipal
 
