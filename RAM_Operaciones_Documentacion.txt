@@ -103,16 +103,33 @@ Realizadas desde este entorno (sin acceso a Power BI Desktop):
 Pendientes — SOLO se pueden hacer en Power BI Desktop:
   - Refrescar el modelo contra Jira real y confirmar que las 7 claves
     de proyecto son correctas y que la cuenta tiene acceso a las 7.
-  - Confirmar visualmente que el panel "Sync slicers" realmente
-    sincroniza los 5 filtros globales entre páginas (el JSON se
-    escribió igual que un syncGroup real ya usado en Jira_PBI, pero
-    sync real entre páginas solo se confirma abriendo el panel en
-    Desktop).
-  - Revisión visual de los 122 visuales (alineación fina, tamaños de
-    fuente, que ningún texto se corte) — se generaron por posición
-    calculada, no fueron ajustados a mano en el lienzo de Desktop.
-  - Validar que [Horas Resolución] y las métricas de antigüedad dan
-    números razonables con datos reales.
+  - Revisión visual de los 14 visuales de la página única (alineación
+    fina, tamaños de fuente, que ningún texto se corte) — se generaron
+    por posición calculada, no fueron ajustados a mano en el lienzo de
+    Desktop.
+  - Validar que las métricas de antigüedad dan números razonables con
+    datos reales.
+
+8. REPORTE: UNA SOLA PÁGINA (simplificado 2026-10-28)
+----------------------------------------------------------
+Por solicitud del negocio, el reporte se redujo de 6 páginas (122
+visuales) a 1 página (14 visuales), con solo lo que se pidió:
+
+  - Barra superior: logo, título, tarjeta "Última Actualización".
+  - Fila de filtros: Periodo (Año Mes), Mesa, Tipo de Solicitud, Estado.
+  - Fila de KPIs: Tickets, Inventario Abierto, % Abiertos,
+    Mesas con Actividad.
+  - 3 gráficas de barras horizontales, mismo estilo, lado a lado:
+      Tickets por Mesa (DimMesa[Mesa])
+      Tickets por Tipo de Solicitud (FactTickets[Tipo de Solicitud])
+      Tickets por Estado (FactTickets[Estado])
+
+No se eliminó ninguna tabla ni medida del modelo semántico (todas las
+19 medidas y las 4 tablas siguen ahí): solo se simplificó el reporte.
+Si más adelante se necesita una página adicional (por ejemplo,
+tendencia temporal o calidad de datos), ya existe la medida y la
+columna correspondiente en el modelo para agregarla sin tocar el
+modelo semántico de nuevo.
 
 7. MANTENIMIENTO
 -------------------
