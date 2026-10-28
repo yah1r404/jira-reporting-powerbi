@@ -1,13 +1,13 @@
 {
   "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/visualContainer/2.13.0/schema.json",
-  "name": "9b90aa8d732a37cc7ae3",
+  "name": "5578e551b5f598392feb",
   "position": {
-    "x": 1450,
+    "x": 10,
     "y": 186,
-    "z": 10,
+    "z": 7,
     "height": 130,
     "width": 460,
-    "tabOrder": 10
+    "tabOrder": 7
   },
   "visual": {
     "visualType": "card",
@@ -23,12 +23,12 @@
                       "Entity": "_Medidas"
                     }
                   },
-                  "Property": "Mesas con Actividad"
+                  "Property": "Tickets"
                 }
               },
-              "queryRef": "_Medidas.Mesas con Actividad",
-              "nativeQueryRef": "Mesas con Actividad",
-              "displayName": "Mesas con Actividad"
+              "queryRef": "_Medidas.Tickets",
+              "nativeQueryRef": "Tickets",
+              "displayName": "Tickets"
             }
           ]
         }
@@ -180,7 +180,7 @@
             "show": {
               "expr": {
                 "Literal": {
-                  "Value": "false"
+                  "Value": "true"
                 }
               }
             }

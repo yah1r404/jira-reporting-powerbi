@@ -1,103 +1,51 @@
 {
   "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/visualContainer/2.13.0/schema.json",
-  "name": "efd68aee94d717090d32",
+  "name": "71f3588754cf8081ce6f",
   "position": {
-    "x": 970,
-    "y": 96,
-    "z": 5,
-    "height": 70,
+    "x": 1450,
+    "y": 186,
+    "z": 10,
+    "height": 130,
     "width": 460,
-    "tabOrder": 5
+    "tabOrder": 10
   },
   "visual": {
-    "visualType": "slicer",
+    "visualType": "card",
     "query": {
       "queryState": {
         "Values": {
           "projections": [
             {
               "field": {
-                "Column": {
+                "Measure": {
                   "Expression": {
                     "SourceRef": {
-                      "Entity": "FactTickets"
+                      "Entity": "_Medidas"
                     }
                   },
-                  "Property": "Tipo de Solicitud"
+                  "Property": "Mesas con Actividad"
                 }
               },
-              "queryRef": "FactTickets.Tipo de Solicitud",
-              "nativeQueryRef": "Tipo de Solicitud",
-              "active": true,
-              "displayName": "Tipo de Solicitud"
+              "queryRef": "_Medidas.Mesas con Actividad",
+              "nativeQueryRef": "Mesas con Actividad",
+              "displayName": "Mesas con Actividad"
             }
           ]
         }
       }
     },
     "objects": {
-      "data": [
+      "labels": [
         {
           "properties": {
-            "mode": {
+            "fontSize": {
               "expr": {
                 "Literal": {
-                  "Value": "'Dropdown'"
-                }
-              }
-            }
-          }
-        }
-      ],
-      "header": [
-        {
-          "properties": {
-            "show": {
-              "expr": {
-                "Literal": {
-                  "Value": "true"
+                  "Value": "30D"
                 }
               }
             },
-            "text": {
-              "expr": {
-                "Literal": {
-                  "Value": "'Tipo de Solicitud'"
-                }
-              }
-            },
-            "fontColor": {
-              "solid": {
-                "color": {
-                  "expr": {
-                    "Literal": {
-                      "Value": "'#5B6B7F'"
-                    }
-                  }
-                }
-              }
-            },
-            "fontFamily": {
-              "expr": {
-                "Literal": {
-                  "Value": "'Segoe UI Semibold'"
-                }
-              }
-            },
-            "textSize": {
-              "expr": {
-                "Literal": {
-                  "Value": "9D"
-                }
-              }
-            }
-          }
-        }
-      ],
-      "items": [
-        {
-          "properties": {
-            "fontColor": {
+            "color": {
               "solid": {
                 "color": {
                   "expr": {
@@ -111,40 +59,59 @@
             "fontFamily": {
               "expr": {
                 "Literal": {
-                  "Value": "'Segoe UI'"
-                }
-              }
-            },
-            "textSize": {
-              "expr": {
-                "Literal": {
-                  "Value": "10D"
+                  "Value": "'Segoe UI Semibold'"
                 }
               }
             }
           }
         }
       ],
-      "general": [
-        {
-          "properties": {}
-        }
-      ]
-    },
-    "visualContainerObjects": {
-      "title": [
+      "categoryLabels": [
         {
           "properties": {
             "show": {
               "expr": {
                 "Literal": {
-                  "Value": "false"
+                  "Value": "true"
+                }
+              }
+            },
+            "fontSize": {
+              "expr": {
+                "Literal": {
+                  "Value": "10D"
+                }
+              }
+            },
+            "color": {
+              "solid": {
+                "color": {
+                  "expr": {
+                    "Literal": {
+                      "Value": "'#5B6B7F'"
+                    }
+                  }
                 }
               }
             }
           }
         }
       ],
+      "wordWrap": [
+        {
+          "properties": {
+            "show": {
+              "expr": {
+                "Literal": {
+                  "Value": "true"
+                }
+              }
+            }
+          }
+        }
+      ]
+    },
+    "visualContainerObjects": {
       "background": [
         {
           "properties": {
@@ -196,11 +163,31 @@
                   }
                 }
               }
+            },
+            "radius": {
+              "expr": {
+                "Literal": {
+                  "Value": "8D"
+                }
+              }
             }
           }
         }
       ],
       "dropShadow": [
+        {
+          "properties": {
+            "show": {
+              "expr": {
+                "Literal": {
+                  "Value": "true"
+                }
+              }
+            }
+          }
+        }
+      ],
+      "title": [
         {
           "properties": {
             "show": {
@@ -213,11 +200,6 @@
           }
         }
       ]
-    },
-    "syncGroup": {
-      "groupName": "RAM_TipoSolicitud",
-      "fieldChanges": true,
-      "filterChanges": true
     }
   }
 }

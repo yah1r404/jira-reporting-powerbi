@@ -1,13 +1,13 @@
 {
   "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/visualContainer/2.13.0/schema.json",
-  "name": "a39667d37fdf4525bbd7",
+  "name": "f5eda5269ab13d596ff1",
   "position": {
-    "x": 1610,
-    "y": 10,
-    "z": 2,
-    "height": 70,
-    "width": 300,
-    "tabOrder": 2
+    "x": 970,
+    "y": 186,
+    "z": 9,
+    "height": 130,
+    "width": 460,
+    "tabOrder": 9
   },
   "visual": {
     "visualType": "card",
@@ -23,12 +23,12 @@
                       "Entity": "_Medidas"
                     }
                   },
-                  "Property": "Última Actualización"
+                  "Property": "% Abiertos"
                 }
               },
-              "queryRef": "_Medidas.Última Actualización",
-              "nativeQueryRef": "Última Actualización",
-              "displayName": "Última Actualización"
+              "queryRef": "_Medidas.% Abiertos",
+              "nativeQueryRef": "% Abiertos",
+              "displayName": "% Abiertos"
             }
           ]
         }
@@ -41,7 +41,7 @@
             "fontSize": {
               "expr": {
                 "Literal": {
-                  "Value": "12D"
+                  "Value": "30D"
                 }
               }
             },
@@ -180,7 +180,7 @@
             "show": {
               "expr": {
                 "Literal": {
-                  "Value": "false"
+                  "Value": "true"
                 }
               }
             }

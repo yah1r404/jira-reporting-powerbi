@@ -1,34 +1,42 @@
 {
   "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/visualContainer/2.13.0/schema.json",
-  "name": "b4e7fe63dca5608ce977",
+  "name": "3dfa18728ce0a2d9d1f1",
   "position": {
-    "x": 96,
+    "x": 20,
     "y": 14,
-    "z": 1,
+    "z": 0,
     "height": 62,
-    "width": 1000,
-    "tabOrder": 1
+    "width": 62,
+    "tabOrder": 0
   },
   "visual": {
-    "visualType": "textbox",
+    "visualType": "image",
     "objects": {
       "general": [
         {
           "properties": {
-            "paragraphs": [
-              {
-                "textRuns": [
-                  {
-                    "value": "RAM — Tickets por Mesa, Tipo de Solicitud y Estado",
-                    "textStyle": {
-                      "fontFamily": "Segoe UI Semibold",
-                      "fontSize": "24pt",
-                      "color": "#1A1A1A"
-                    }
-                  }
-                ]
+            "imageUrl": {
+              "expr": {
+                "ResourcePackageItem": {
+                  "PackageName": "RegisteredResources",
+                  "PackageType": 1,
+                  "ItemName": "redesmayab_logo.jpg"
+                }
               }
-            ]
+            }
+          }
+        }
+      ],
+      "imageScaling": [
+        {
+          "properties": {
+            "imageScalingType": {
+              "expr": {
+                "Literal": {
+                  "Value": "'Fit'"
+                }
+              }
+            }
           }
         }
       ]
@@ -40,7 +48,25 @@
             "show": {
               "expr": {
                 "Literal": {
-                  "Value": "false"
+                  "Value": "true"
+                }
+              }
+            },
+            "color": {
+              "solid": {
+                "color": {
+                  "expr": {
+                    "Literal": {
+                      "Value": "'#FFFFFF'"
+                    }
+                  }
+                }
+              }
+            },
+            "transparency": {
+              "expr": {
+                "Literal": {
+                  "Value": "0D"
                 }
               }
             }

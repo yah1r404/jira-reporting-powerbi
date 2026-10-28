@@ -1,103 +1,51 @@
 {
   "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/visualContainer/2.13.0/schema.json",
-  "name": "7c51c1eb27d227b58476",
+  "name": "393c80fcec273242f72e",
   "position": {
-    "x": 490,
-    "y": 96,
-    "z": 4,
+    "x": 1610,
+    "y": 10,
+    "z": 2,
     "height": 70,
-    "width": 460,
-    "tabOrder": 4
+    "width": 300,
+    "tabOrder": 2
   },
   "visual": {
-    "visualType": "slicer",
+    "visualType": "card",
     "query": {
       "queryState": {
         "Values": {
           "projections": [
             {
               "field": {
-                "Column": {
+                "Measure": {
                   "Expression": {
                     "SourceRef": {
-                      "Entity": "DimMesa"
+                      "Entity": "_Medidas"
                     }
                   },
-                  "Property": "Mesa"
+                  "Property": "Última Actualización"
                 }
               },
-              "queryRef": "DimMesa.Mesa",
-              "nativeQueryRef": "Mesa",
-              "active": true,
-              "displayName": "Mesa"
+              "queryRef": "_Medidas.Última Actualización",
+              "nativeQueryRef": "Última Actualización",
+              "displayName": "Última Actualización"
             }
           ]
         }
       }
     },
     "objects": {
-      "data": [
+      "labels": [
         {
           "properties": {
-            "mode": {
+            "fontSize": {
               "expr": {
                 "Literal": {
-                  "Value": "'Dropdown'"
-                }
-              }
-            }
-          }
-        }
-      ],
-      "header": [
-        {
-          "properties": {
-            "show": {
-              "expr": {
-                "Literal": {
-                  "Value": "true"
+                  "Value": "12D"
                 }
               }
             },
-            "text": {
-              "expr": {
-                "Literal": {
-                  "Value": "'Mesa'"
-                }
-              }
-            },
-            "fontColor": {
-              "solid": {
-                "color": {
-                  "expr": {
-                    "Literal": {
-                      "Value": "'#5B6B7F'"
-                    }
-                  }
-                }
-              }
-            },
-            "fontFamily": {
-              "expr": {
-                "Literal": {
-                  "Value": "'Segoe UI Semibold'"
-                }
-              }
-            },
-            "textSize": {
-              "expr": {
-                "Literal": {
-                  "Value": "9D"
-                }
-              }
-            }
-          }
-        }
-      ],
-      "items": [
-        {
-          "properties": {
-            "fontColor": {
+            "color": {
               "solid": {
                 "color": {
                   "expr": {
@@ -111,40 +59,59 @@
             "fontFamily": {
               "expr": {
                 "Literal": {
-                  "Value": "'Segoe UI'"
-                }
-              }
-            },
-            "textSize": {
-              "expr": {
-                "Literal": {
-                  "Value": "10D"
+                  "Value": "'Segoe UI Semibold'"
                 }
               }
             }
           }
         }
       ],
-      "general": [
-        {
-          "properties": {}
-        }
-      ]
-    },
-    "visualContainerObjects": {
-      "title": [
+      "categoryLabels": [
         {
           "properties": {
             "show": {
               "expr": {
                 "Literal": {
-                  "Value": "false"
+                  "Value": "true"
+                }
+              }
+            },
+            "fontSize": {
+              "expr": {
+                "Literal": {
+                  "Value": "10D"
+                }
+              }
+            },
+            "color": {
+              "solid": {
+                "color": {
+                  "expr": {
+                    "Literal": {
+                      "Value": "'#5B6B7F'"
+                    }
+                  }
                 }
               }
             }
           }
         }
       ],
+      "wordWrap": [
+        {
+          "properties": {
+            "show": {
+              "expr": {
+                "Literal": {
+                  "Value": "true"
+                }
+              }
+            }
+          }
+        }
+      ]
+    },
+    "visualContainerObjects": {
       "background": [
         {
           "properties": {
@@ -196,11 +163,31 @@
                   }
                 }
               }
+            },
+            "radius": {
+              "expr": {
+                "Literal": {
+                  "Value": "8D"
+                }
+              }
             }
           }
         }
       ],
       "dropShadow": [
+        {
+          "properties": {
+            "show": {
+              "expr": {
+                "Literal": {
+                  "Value": "true"
+                }
+              }
+            }
+          }
+        }
+      ],
+      "title": [
         {
           "properties": {
             "show": {
@@ -213,11 +200,6 @@
           }
         }
       ]
-    },
-    "syncGroup": {
-      "groupName": "RAM_Mesa",
-      "fieldChanges": true,
-      "filterChanges": true
     }
   }
 }
