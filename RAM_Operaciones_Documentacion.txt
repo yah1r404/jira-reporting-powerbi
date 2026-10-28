@@ -59,9 +59,9 @@ FactTickets[Fecha Creación] -> DimFecha[Date] (muchos a uno).
 
 4. DEFINICIONES IMPORTANTES
 ------------------------------
-- [Tickets] y las medidas de "Ejecutivo"/"Por Mesa"/"Temporal" cuentan
+- [Total de tickets] y las medidas de "Ejecutivo"/"Por Mesa"/"Temporal" cuentan
   por FECHA DE CREACIÓN (respetan el filtro de DimFecha).
-- [Inventario Total] / [Inventario Abierto] ignoran el filtro de fecha
+- [Inventario Total] / [Tickets abiertos] ignoran el filtro de fecha
   de creación (REMOVEFILTERS(DimFecha)): muestran el estado ACTUAL de
   los tickets, sin importar cuándo se crearon. No confundir ambas
   perspectivas al leer el tablero.
@@ -117,7 +117,7 @@ visuales) a 1 página (14 visuales), con solo lo que se pidió:
 
   - Barra superior: logo, título, tarjeta "Última Actualización".
   - Fila de filtros: Periodo (Año Mes), Mesa, Tipo de Solicitud, Estado.
-  - Fila de KPIs: Tickets, Inventario Abierto, % Abiertos,
+  - Fila de KPIs: Total de tickets, Tickets abiertos, % Abiertos,
     Mesas con Actividad.
   - 3 gráficas de barras horizontales, mismo estilo, lado a lado:
       Tickets por Mesa (DimMesa[Mesa])
@@ -138,6 +138,15 @@ modelo semántico de nuevo.
   de proyectos, también el arreglo Proyectos en RAM_Issues.
 - Para agregar una medida: _Medidas.tmdl, con su displayFolder
   correspondiente.
+- IMPORTANTE: si renombras una medida directamente en Desktop (panel
+  de Modelo/Datos), el reporte NO se actualiza solo en un proyecto
+  PBIP: cada visual que la use queda apuntando al nombre viejo, y
+  Desktop lo vacía sin avisar (sin ícono de error) la próxima vez que
+  abre el proyecto. Ya pasó una vez: "Tickets" se renombró a
+  "Total de tickets" e "Inventario Abierto" a "Tickets abiertos", y
+  eso dejó 5 visuales en blanco hasta que se corrigieron los nombres
+  en el reporte. Si vas a renombrar una medida, avísalo para
+  actualizar también los visuales que la usan.
 - No se requieren tokens ni contraseñas en ningún archivo: la
   autenticación vive en el connector de Power BI (credenciales
   guardadas en Desktop/Service), nunca en el repositorio.

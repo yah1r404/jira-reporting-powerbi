@@ -1,6 +1,6 @@
 {
   "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/visualContainer/2.13.0/schema.json",
-  "name": "87cbe042d0d12fd2271b",
+  "name": "4c19bca3902669704876",
   "position": {
     "x": 1290,
     "y": 336,
@@ -42,12 +42,12 @@
                       "Entity": "_Medidas"
                     }
                   },
-                  "Property": "Tickets"
+                  "Property": "Total de tickets"
                 }
               },
-              "queryRef": "_Medidas.Tickets",
-              "nativeQueryRef": "Tickets",
-              "displayName": "Tickets"
+              "queryRef": "_Medidas.Total de tickets",
+              "nativeQueryRef": "Total de tickets",
+              "displayName": "Total de tickets"
             }
           ]
         }
@@ -62,7 +62,7 @@
                     "Entity": "_Medidas"
                   }
                 },
-                "Property": "Tickets"
+                "Property": "Total de tickets"
               }
             },
             "direction": "Descending"

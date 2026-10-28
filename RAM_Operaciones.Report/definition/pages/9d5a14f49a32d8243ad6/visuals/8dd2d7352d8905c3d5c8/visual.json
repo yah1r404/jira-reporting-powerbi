@@ -1,13 +1,13 @@
 {
   "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/visualContainer/2.13.0/schema.json",
-  "name": "b1126ebfc72dc5267708",
+  "name": "8dd2d7352d8905c3d5c8",
   "position": {
-    "x": 490,
+    "x": 1450,
     "y": 96,
-    "z": 4,
+    "z": 6,
     "height": 70,
     "width": 460,
-    "tabOrder": 4
+    "tabOrder": 6
   },
   "visual": {
     "visualType": "slicer",
@@ -20,16 +20,16 @@
                 "Column": {
                   "Expression": {
                     "SourceRef": {
-                      "Entity": "DimMesa"
+                      "Entity": "FactTickets"
                     }
                   },
-                  "Property": "Mesa"
+                  "Property": "Estado"
                 }
               },
-              "queryRef": "DimMesa.Mesa",
-              "nativeQueryRef": "Mesa",
+              "queryRef": "FactTickets.Estado",
+              "nativeQueryRef": "Estado",
               "active": true,
-              "displayName": "Mesa"
+              "displayName": "Estado"
             }
           ]
         }
@@ -62,7 +62,7 @@
             "text": {
               "expr": {
                 "Literal": {
-                  "Value": "'Mesa'"
+                  "Value": "'Estado'"
                 }
               }
             },
@@ -215,7 +215,7 @@
       ]
     },
     "syncGroup": {
-      "groupName": "RAM_Mesa",
+      "groupName": "RAM_Estado",
       "fieldChanges": true,
       "filterChanges": true
     }

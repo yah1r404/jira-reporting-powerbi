@@ -1,13 +1,13 @@
 {
   "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/visualContainer/2.13.0/schema.json",
-  "name": "5578e551b5f598392feb",
+  "name": "2e204b4850e909d9cbd1",
   "position": {
-    "x": 10,
+    "x": 490,
     "y": 186,
-    "z": 7,
+    "z": 8,
     "height": 130,
     "width": 460,
-    "tabOrder": 7
+    "tabOrder": 8
   },
   "visual": {
     "visualType": "card",
@@ -23,12 +23,12 @@
                       "Entity": "_Medidas"
                     }
                   },
-                  "Property": "Tickets"
+                  "Property": "Tickets abiertos"
                 }
               },
-              "queryRef": "_Medidas.Tickets",
-              "nativeQueryRef": "Tickets",
-              "displayName": "Tickets"
+              "queryRef": "_Medidas.Tickets abiertos",
+              "nativeQueryRef": "Tickets abiertos",
+              "displayName": "Tickets abiertos"
             }
           ]
         }
