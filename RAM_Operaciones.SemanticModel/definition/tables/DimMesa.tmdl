@@ -1,0 +1,43 @@
+/// Dimensión de las 7 mesas de RAM. Úsala en los visuales (en vez de FactTickets[Mesa]) para que el orden de despliegue sea siempre el mismo.
+table DimMesa
+	lineageTag: 4f5a6b7c-8d9e-4f0a-1b2c-3d4e5f6a7b8c
+
+	column Clave
+		dataType: string
+		lineageTag: 5a6b7c8d-9e0f-4a1b-2c3d-4e5f6a7b8c9d
+		summarizeBy: none
+		sourceColumn: Clave
+
+		annotation SummarizationSetBy = Automatic
+
+	column Mesa
+		dataType: string
+		isKey
+		lineageTag: 6b7c8d9e-0f1a-4b2c-3d4e-5f6a7b8c9d0e
+		summarizeBy: none
+		sourceColumn: Mesa
+		sortByColumn: Orden
+
+		annotation SummarizationSetBy = Automatic
+
+	column Orden
+		dataType: int64
+		formatString: 0
+		lineageTag: 7c8d9e0f-1a2b-4c3d-4e5f-6a7b8c9d0e1f
+		summarizeBy: none
+		sourceColumn: Orden
+		isHidden
+
+		annotation SummarizationSetBy = Automatic
+
+	partition DimMesa = m
+		mode: import
+		source =
+				Table.Sort(
+				    Table.FromRecords(MesaMap, type table [Clave = text, Mesa = text, Orden = Int64.Type]),
+				    {{"Orden", Order.Ascending}}
+				)
+
+	annotation PBI_ResultType = Table
+
+	annotation PBI_NavigationStepName = Navegación

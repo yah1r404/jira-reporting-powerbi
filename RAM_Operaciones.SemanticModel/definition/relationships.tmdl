@@ -1,0 +1,7 @@
+relationship 8f9a0b1c-2d3e-4f4a-5b6c-7d8e9f0a1b32
+	fromColumn: FactTickets.Mesa
+	toColumn: DimMesa.Mesa
+
+relationship 9a0b1c2d-3e4f-4a5b-6c7d-8e9f0a1b2c33
+	fromColumn: FactTickets.'Fecha Creación'
+	toColumn: DimFecha.Date
