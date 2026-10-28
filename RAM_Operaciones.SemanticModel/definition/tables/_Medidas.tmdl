@@ -1,10 +1,6 @@
 table _Medidas
 	lineageTag: 7c8d9e0f-1a2b-4c3d-4e5f-6a7b8c9d0e11
 
-	// ========================================
-	// INDICADORES EJECUTIVOS
-	// ========================================
-
 	/// Tickets únicos en el contexto de filtros actual (mesa, estado, prioridad, fecha de creación, etc.).
 	measure Tickets = DISTINCTCOUNT(FactTickets[Key])
 		formatString: #,##0
@@ -70,10 +66,6 @@ table _Medidas
 		displayFolder: Ejecutivo
 		lineageTag: 5e6f7a8b-9c0d-4e1f-2a3b-4c5d6e7f8a19
 
-	// ========================================
-	// INVENTARIO ACTUAL (estado de hoy, independiente del filtro de fecha de creación)
-	// ========================================
-
 	/// Tickets totales existentes según su estado actual, ignorando el filtro de fecha de creación (pero respetando mesa/estado/prioridad).
 	measure 'Inventario Total' = CALCULATE([Tickets], REMOVEFILTERS(DimFecha))
 		formatString: #,##0
@@ -96,10 +88,6 @@ table _Medidas
 		displayFolder: Inventario
 		lineageTag: 8b9c0d1e-2f3a-4b4c-5d6e-7f8a9b0c1d22
 
-	// ========================================
-	// ANÁLISIS POR MESA
-	// ========================================
-
 	/// Participación de la mesa (o del contexto actual) sobre el total de tickets, ignorando el filtro de mesa.
 	measure '% del Total' = DIVIDE([Tickets], CALCULATE([Tickets], REMOVEFILTERS(DimMesa)))
 		formatString: 0.0%
@@ -112,10 +100,6 @@ table _Medidas
 		displayFolder: Por Mesa
 		lineageTag: 0d1e2f3a-4b5c-4d6e-7f8a-9b0c1d2e3f24
 
-	// ========================================
-	// ANÁLISIS TEMPORAL
-	// ========================================
-
 	/// Tickets creados en el mismo periodo de calendario, un mes antes del periodo seleccionado (día/mes/trimestre/año, según el nivel de DimFecha en el visual).
 	measure 'Tickets Periodo Anterior' = CALCULATE([Tickets], DATEADD(DimFecha[Date], -1, MONTH))
 		formatString: #,##0
@@ -126,10 +110,6 @@ table _Medidas
 		formatString: +0.0%;-0.0%;0.0%
 		displayFolder: Temporal
 		lineageTag: 2f3a4b5c-6d7e-4f8a-9b0c-1d2e3f4a5b26
-
-	// ========================================
-	// CALIDAD Y COBERTURA DE DATOS
-	// ========================================
 
 	/// Igual que [Tickets], con nombre explícito para la página de calidad.
 	measure 'Tickets Únicos (Control)' = DISTINCTCOUNT(FactTickets[Key])
