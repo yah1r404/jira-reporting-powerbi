@@ -1,0 +1,126 @@
+RAM_Operaciones — Tablero corporativo de tickets de las 7 mesas de RAM
+========================================================================
+
+Proyecto independiente de Power BI (PBIP). No modifica ni depende de
+Jira_PBI ni de IEP_Incident; vive en su propia carpeta y su propio
+archivo RAM_Operaciones.pbip.
+
+1. FUENTE DE DATOS Y COBERTURA
+--------------------------------
+- Sitio Jira: https://secureopsmx.atlassian.net
+- JQL único (sin filtro de estado ni de fecha): todo el histórico,
+  todos los estados, de los 7 proyectos siguientes:
+
+    project in (GFIN, ALMCN, MDSI, COT, MDSC, MDSIT, PRYECT)
+    ORDER BY created DESC
+
+- No se descarga el changelog/historial de cambios de cada ticket:
+  este tablero mide VOLUMEN y CLASIFICACIÓN de tickets, no tiempos
+  por estado. Eso mantiene la extracción ligera (una sola búsqueda
+  paginada, sin llamadas adicionales por ticket).
+
+2. CLASIFICACIÓN DE MESA (confirmada con el negocio)
+--------------------------------------------------------
+La regla vive en un solo lugar: la expresión MesaMap en
+RAM_Operaciones.SemanticModel/definition/expressions.tmdl. La usan
+tanto FactTickets (para clasificar cada ticket) como DimMesa (para
+la dimensión). Si alguna vez cambia, solo hay que editarla ahí.
+
+    GFIN   -> RAM - Administración y Finanzas
+    ALMCN  -> RAM - Almacén
+    MDSI   -> RAM - Comercial / Órdenes de Clientes   (un solo proyecto
+                                                        de Jira cubre
+                                                        ambas mesas)
+    COT    -> RAM - Cotizaciones Internas
+    MDSC   -> RAM - Mesa de Servicio
+    MDSIT  -> RAM - Mesa de Soporte Interna
+    PRYECT -> RAM - Proyectos
+
+Cualquier ticket cuya clave de proyecto no esté en esta lista cae en
+"Sin clasificar" (no debería pasar nunca con el JQL actual: es un
+control de calidad, visible en la página 05, no un caso esperado).
+
+3. MODELO DE DATOS
+--------------------
+- FactTickets: un renglón por ticket (Key único). Se deduplica por
+  Key al final de la consulta (Table.Distinct) como control de calidad.
+- DimMesa: las 7 mesas, con su orden de despliegue (columna Orden).
+  Úsala en los visuales (DimMesa[Mesa]) en vez de FactTickets[Mesa]
+  para que el orden sea siempre el mismo.
+- DimFecha: calendario desde la primera creación hasta hoy, basado en
+  FactTickets[Fecha Creación]. Año, Trimestre, Mes, Semana, Día.
+- Actualizacion: 1 fila con la fecha/hora del último refresh, para la
+  página de Calidad y Cobertura.
+- _Medidas: todas las medidas DAX, organizadas en carpetas (Ejecutivo,
+  Inventario, Por Mesa, Temporal, Calidad).
+
+Relaciones: FactTickets[Mesa] -> DimMesa[Mesa] (muchos a uno),
+FactTickets[Fecha Creación] -> DimFecha[Date] (muchos a uno).
+
+4. DEFINICIONES IMPORTANTES
+------------------------------
+- [Tickets] y las medidas de "Ejecutivo"/"Por Mesa"/"Temporal" cuentan
+  por FECHA DE CREACIÓN (respetan el filtro de DimFecha).
+- [Inventario Total] / [Inventario Abierto] ignoran el filtro de fecha
+  de creación (REMOVEFILTERS(DimFecha)): muestran el estado ACTUAL de
+  los tickets, sin importar cuándo se crearon. No confundir ambas
+  perspectivas al leer el tablero.
+
+5. LIMITACIONES CONOCIDAS (documentadas, no ocultas)
+--------------------------------------------------------
+- "Tipo de Solicitud" (customfield_10010) puede venir vacío si el
+  proyecto no es una mesa de servicio (JSM) o si el solicitante no lo
+  llenó. La API de Jira no permite distinguir ambos casos; ambos se
+  etiquetan "Sin request type".
+- La cobertura depende de los permisos de la cuenta de Jira que usa
+  Power BI: un ticket de un proyecto sin acceso simplemente no
+  aparece, y no hay forma de distinguirlo de "no existe". Si algún
+  número se ve bajo, lo primero a revisar es el acceso de esa cuenta
+  a los 7 proyectos.
+- El tamaño de página (100) se tomó de lo medido en otros tableros de
+  este entorno con un conjunto de campos similar; la paginación usa
+  nextPageToken, así que sigue funcionando aunque Jira cambie ese
+  límite.
+- No hay medida de "errores de extracción": si Jira devuelve un error
+  HTTP, Power BI Desktop lo muestra directamente como error de refresh
+  (no se simula ni se oculta).
+
+6. VALIDACIONES REALIZADAS VS. PENDIENTES
+----------------------------------------------
+Realizadas desde este entorno (sin acceso a Power BI Desktop):
+  - JSON de todas las páginas/visuales: válido.
+  - Nombres de carpeta de cada visual == campo "name" interno: OK.
+  - IDs de página y de visual: únicos en todo el reporte.
+  - Balance de paréntesis/llaves/corchetes en todo el DAX y M: OK.
+  - Cada "Entity.Columna"/"Entity.Medida" referenciado en los
+    visuales existe tal cual (mismo texto, acentos incluidos) en el
+    modelo semántico.
+  - Ninguna columna cargada al modelo es de tipo Variant/estructurado
+    (se aprendió de un error real en Jira_PBI: Analysis Services no
+    admite columnas Variant; aquí todas las columnas de FactTickets
+    son texto, fecha/hora, número o booleano).
+
+Pendientes — SOLO se pueden hacer en Power BI Desktop:
+  - Refrescar el modelo contra Jira real y confirmar que las 7 claves
+    de proyecto son correctas y que la cuenta tiene acceso a las 7.
+  - Confirmar visualmente que el panel "Sync slicers" realmente
+    sincroniza los 5 filtros globales entre páginas (el JSON se
+    escribió igual que un syncGroup real ya usado en Jira_PBI, pero
+    sync real entre páginas solo se confirma abriendo el panel en
+    Desktop).
+  - Revisión visual de los 122 visuales (alineación fina, tamaños de
+    fuente, que ningún texto se corte) — se generaron por posición
+    calculada, no fueron ajustados a mano en el lienzo de Desktop.
+  - Validar que [Horas Resolución] y las métricas de antigüedad dan
+    números razonables con datos reales.
+
+7. MANTENIMIENTO
+-------------------
+- Para agregar o quitar una mesa: editar únicamente MesaMap en
+  expressions.tmdl (una sola fuente de verdad) y, si cambia la lista
+  de proyectos, también el arreglo Proyectos en RAM_Issues.
+- Para agregar una medida: _Medidas.tmdl, con su displayFolder
+  correspondiente.
+- No se requieren tokens ni contraseñas en ningún archivo: la
+  autenticación vive en el connector de Power BI (credenciales
+  guardadas en Desktop/Service), nunca en el repositorio.
