@@ -42,7 +42,7 @@
             "text": {
               "expr": {
                 "Literal": {
-                  "Value": "'Time in Status'"
+                  "Value": "'Tiempo en estado'"
                 }
               }
             },
@@ -95,7 +95,7 @@
             "text": {
               "expr": {
                 "Literal": {
-                  "Value": "'Time in Status'"
+                  "Value": "'Tiempo en estado'"
                 }
               }
             },
@@ -148,7 +148,7 @@
             "text": {
               "expr": {
                 "Literal": {
-                  "Value": "'Time in Status'"
+                  "Value": "'Tiempo en estado'"
                 }
               }
             },

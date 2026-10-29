@@ -26,6 +26,7 @@ ref table 'Calendario SLA'
 ref table 'SLA Comparación'
 ref table 'Estado SLA'
 ref table 'Grupo de Tiempo'
+ref table 'Fila Línea de Tiempo'
 
 ref cultureInfo es-MX
 

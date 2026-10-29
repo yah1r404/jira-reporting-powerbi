@@ -6,7 +6,7 @@
     "y": 212,
     "z": 34000,
     "height": 410,
-    "width": 532,
+    "width": 536,
     "tabOrder": 19000
   },
   "visual": {
@@ -30,25 +30,6 @@
               "nativeQueryRef": "Responsable",
               "active": true,
               "displayName": "Persona"
-            }
-          ]
-        },
-        "Y": {
-          "projections": [
-            {
-              "field": {
-                "Measure": {
-                  "Expression": {
-                    "SourceRef": {
-                      "Entity": "_Medidas"
-                    }
-                  },
-                  "Property": "Tickets Asignados"
-                }
-              },
-              "queryRef": "_Medidas.Tickets Asignados",
-              "nativeQueryRef": "Tickets Asignados",
-              "displayName": "Tickets asignados"
             }
           ]
         },
@@ -85,6 +66,25 @@
               "displayName": "Veces por ticket"
             }
           ]
+        },
+        "Y": {
+          "projections": [
+            {
+              "field": {
+                "Measure": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "_Medidas"
+                    }
+                  },
+                  "Property": "Tickets Asignados"
+                }
+              },
+              "queryRef": "_Medidas.Tickets Asignados",
+              "nativeQueryRef": "Tickets Asignados",
+              "displayName": "Tickets asignados"
+            }
+          ]
         }
       },
       "sortDefinition": {
@@ -116,6 +116,31 @@
                   "Value": "true"
                 }
               }
+            },
+            "labelDisplayUnits": {
+              "expr": {
+                "Literal": {
+                  "Value": "1D"
+                }
+              }
+            },
+            "fontSize": {
+              "expr": {
+                "Literal": {
+                  "Value": "9D"
+                }
+              }
+            },
+            "color": {
+              "solid": {
+                "color": {
+                  "expr": {
+                    "Literal": {
+                      "Value": "'#1A1A1A'"
+                    }
+                  }
+                }
+              }
             }
           }
         }
@@ -131,6 +156,50 @@
                       "Value": "'#06519A'"
                     }
                   }
+                }
+              }
+            }
+          }
+        }
+      ],
+      "valueAxis": [
+        {
+          "properties": {
+            "show": {
+              "expr": {
+                "Literal": {
+                  "Value": "false"
+                }
+              }
+            }
+          }
+        }
+      ],
+      "categoryAxis": [
+        {
+          "properties": {
+            "labelColor": {
+              "solid": {
+                "color": {
+                  "expr": {
+                    "Literal": {
+                      "Value": "'#1A1A1A'"
+                    }
+                  }
+                }
+              }
+            },
+            "fontSize": {
+              "expr": {
+                "Literal": {
+                  "Value": "9D"
+                }
+              }
+            },
+            "showAxisTitle": {
+              "expr": {
+                "Literal": {
+                  "Value": "false"
                 }
               }
             }
@@ -152,7 +221,7 @@
             "text": {
               "expr": {
                 "Literal": {
-                  "Value": "'Tickets asignados por persona (cada ticket cuenta 1)'"
+                  "Value": "'Tickets asignados por persona'"
                 }
               }
             }

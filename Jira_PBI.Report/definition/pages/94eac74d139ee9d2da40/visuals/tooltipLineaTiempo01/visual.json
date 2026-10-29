@@ -1,0 +1,225 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/visualContainer/2.13.0/schema.json",
+  "name": "tooltipLineaTiempo01",
+  "position": {
+    "x": 0,
+    "y": 0,
+    "z": 0,
+    "width": 460,
+    "height": 300,
+    "tabOrder": 0
+  },
+  "visual": {
+    "visualType": "multiRowCard",
+    "query": {
+      "queryState": {
+        "Values": {
+          "projections": [
+            {
+              "field": {
+                "Measure": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "_Medidas"
+                    }
+                  },
+                  "Property": "Tooltip Ticket"
+                }
+              },
+              "queryRef": "_Medidas.Tooltip Ticket",
+              "nativeQueryRef": "Tooltip Ticket",
+              "displayName": "Ticket"
+            },
+            {
+              "field": {
+                "Measure": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "_Medidas"
+                    }
+                  },
+                  "Property": "Tooltip Hora"
+                }
+              },
+              "queryRef": "_Medidas.Tooltip Hora",
+              "nativeQueryRef": "Tooltip Hora",
+              "displayName": "Hora"
+            },
+            {
+              "field": {
+                "Measure": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "_Medidas"
+                    }
+                  },
+                  "Property": "Tooltip Equipo"
+                }
+              },
+              "queryRef": "_Medidas.Tooltip Equipo",
+              "nativeQueryRef": "Tooltip Equipo",
+              "displayName": "Equipo"
+            },
+            {
+              "field": {
+                "Measure": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "_Medidas"
+                    }
+                  },
+                  "Property": "Tooltip Estados en la Hora"
+                }
+              },
+              "queryRef": "_Medidas.Tooltip Estados en la Hora",
+              "nativeQueryRef": "Tooltip Estados en la Hora",
+              "displayName": "Estado(s) en esa hora"
+            },
+            {
+              "field": {
+                "Measure": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "_Medidas"
+                    }
+                  },
+                  "Property": "Tooltip SLA Consumido"
+                }
+              },
+              "queryRef": "_Medidas.Tooltip SLA Consumido",
+              "nativeQueryRef": "Tooltip SLA Consumido",
+              "displayName": "SLA consumido"
+            },
+            {
+              "field": {
+                "Measure": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "_Medidas"
+                    }
+                  },
+                  "Property": "Tooltip Situación SLA"
+                }
+              },
+              "queryRef": "_Medidas.Tooltip Situación SLA",
+              "nativeQueryRef": "Tooltip Situación SLA",
+              "displayName": "Situación del SLA"
+            }
+          ]
+        }
+      }
+    },
+    "objects": {
+      "dataLabels": [
+        {
+          "properties": {
+            "fontSize": {
+              "expr": {
+                "Literal": {
+                  "Value": "10D"
+                }
+              }
+            },
+            "color": {
+              "solid": {
+                "color": {
+                  "expr": {
+                    "Literal": {
+                      "Value": "'#1A1A1A'"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      ],
+      "categoryLabels": [
+        {
+          "properties": {
+            "fontSize": {
+              "expr": {
+                "Literal": {
+                  "Value": "8D"
+                }
+              }
+            },
+            "color": {
+              "solid": {
+                "color": {
+                  "expr": {
+                    "Literal": {
+                      "Value": "'#5B6B7F'"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      ],
+      "card": [
+        {
+          "properties": {
+            "barShow": {
+              "expr": {
+                "Literal": {
+                  "Value": "false"
+                }
+              }
+            }
+          }
+        }
+      ]
+    },
+    "visualContainerObjects": {
+      "title": [
+        {
+          "properties": {
+            "show": {
+              "expr": {
+                "Literal": {
+                  "Value": "false"
+                }
+              }
+            }
+          }
+        }
+      ],
+      "padding": [
+        {
+          "properties": {
+            "top": {
+              "expr": {
+                "Literal": {
+                  "Value": "6D"
+                }
+              }
+            },
+            "bottom": {
+              "expr": {
+                "Literal": {
+                  "Value": "6D"
+                }
+              }
+            },
+            "left": {
+              "expr": {
+                "Literal": {
+                  "Value": "8D"
+                }
+              }
+            },
+            "right": {
+              "expr": {
+                "Literal": {
+                  "Value": "8D"
+                }
+              }
+            }
+          }
+        }
+      ]
+    }
+  }
+}

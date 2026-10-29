@@ -2,11 +2,11 @@
   "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/visualContainer/2.13.0/schema.json",
   "name": "140a0941fe3c4a4c8a50",
   "position": {
-    "x": 264,
-    "y": 98,
+    "x": 671.77474402730377,
+    "y": 6.4505119453924911,
     "z": 26000,
-    "height": 64,
-    "width": 284,
+    "height": 60.819112627986343,
+    "width": 246.0409556313993,
     "tabOrder": 29000
   },
   "visual": {
@@ -44,13 +44,6 @@
                   "Value": "'Between'"
                 }
               }
-            },
-            "startDate": {
-              "expr": {
-                "Literal": {
-                  "Value": "datetime'2026-06-11T00:00:00'"
-                }
-              }
             }
           }
         }
@@ -68,7 +61,7 @@
             "text": {
               "expr": {
                 "Literal": {
-                  "Value": "'Periodo (fecha de creación)'"
+                  "Value": "'Periodo '"
                 }
               }
             },
@@ -133,44 +126,7 @@
       ],
       "general": [
         {
-          "properties": {
-            "filter": {
-              "filter": {
-                "Version": 2,
-                "From": [
-                  {
-                    "Name": "d",
-                    "Entity": "DimFecha",
-                    "Type": 0
-                  }
-                ],
-                "Where": [
-                  {
-                    "Condition": {
-                      "Comparison": {
-                        "ComparisonKind": 2,
-                        "Left": {
-                          "Column": {
-                            "Expression": {
-                              "SourceRef": {
-                                "Source": "d"
-                              }
-                            },
-                            "Property": "Date"
-                          }
-                        },
-                        "Right": {
-                          "Literal": {
-                            "Value": "datetime'2026-06-11T00:00:00'"
-                          }
-                        }
-                      }
-                    }
-                  }
-                ]
-              }
-            }
-          }
+          "properties": {}
         }
       ]
     },

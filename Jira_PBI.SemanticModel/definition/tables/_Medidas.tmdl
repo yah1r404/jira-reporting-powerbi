@@ -148,7 +148,7 @@ table _Medidas
 		displayFolder: Time in Assignee
 		lineageTag: d3a60597-f4b8-4173-a071-e5a7e7b97d3a
 
-		formatStringDefinition = VAR Hrs = SELECTEDMEASURE() VAR M = ROUND(Hrs * 60, 0) VAR H = INT(M / 60) VAR Mi = MOD(M, 60) RETURN """" & IF(H > 0, H & "h " & FORMAT(Mi, "00") & "m", Mi & "m") & """"
+		formatStringDefinition = VAR Hrs = SELECTEDMEASURE() VAR M = ROUNDUP(Hrs * 60, 0) VAR H = INT(M / 60) VAR Mi = MOD(M, 60) RETURN """" & IF(H > 0, H & "h " & FORMAT(Mi, "00") & "m", Mi & "m") & """"
 
 	/// Tickets resueltos que la persona tuvo asignados en algún momento.
 	measure 'Tickets Atendidos' =
@@ -166,7 +166,7 @@ table _Medidas
 		displayFolder: Time in Assignee
 		lineageTag: f5c827b9-16da-4395-8c39-07c9d9019f5c
 
-		formatStringDefinition = VAR Hrs = SELECTEDMEASURE() VAR M = ROUND(Hrs * 60, 0) VAR H = INT(M / 60) VAR Mi = MOD(M, 60) RETURN """" & IF(H > 0, H & "h " & FORMAT(Mi, "00") & "m", Mi & "m") & """"
+		formatStringDefinition = VAR Hrs = SELECTEDMEASURE() VAR M = ROUNDUP(Hrs * 60, 0) VAR H = INT(M / 60) VAR Mi = MOD(M, 60) RETURN """" & IF(H > 0, H & "h " & FORMAT(Mi, "00") & "m", Mi & "m") & """"
 
 	/// Mediana por ticket de las horas asignado a la persona (tickets resueltos, sin "Sin asignar"). Menos sensible a casos extremos que el promedio.
 	measure 'Mediana Horas Asignado' =
@@ -178,7 +178,7 @@ table _Medidas
 		displayFolder: Time in Assignee
 		lineageTag: 06d938ca-27eb-44a6-9d4a-18c9fa1a0a6d
 
-		formatStringDefinition = VAR Hrs = SELECTEDMEASURE() VAR M = ROUND(Hrs * 60, 0) VAR H = INT(M / 60) VAR Mi = MOD(M, 60) RETURN """" & IF(H > 0, H & "h " & FORMAT(Mi, "00") & "m", Mi & "m") & """"
+		formatStringDefinition = VAR Hrs = SELECTEDMEASURE() VAR M = ROUNDUP(Hrs * 60, 0) VAR H = INT(M / 60) VAR Mi = MOD(M, 60) RETURN """" & IF(H > 0, H & "h " & FORMAT(Mi, "00") & "m", Mi & "m") & """"
 
 	/// Cambios de responsable en los tickets del contexto.
 	measure 'Total Reasignaciones' = SUM(SLA_Tickets[Reasignaciones])
@@ -186,11 +186,11 @@ table _Medidas
 		displayFolder: Time in Assignee
 		lineageTag: 17ea49db-38eb-4b5f-ae4b-29da1b2b1b7e
 
-	/// % SLA de resolución de los tickets que la persona tuvo asignados en algún momento.
+	/// % SLA de resolución de los tickets que la persona tuvo asignados en algún momento (sin "Sin asignar").
 	measure '% SLA Resolución Tickets Atendidos' =
 			CALCULATE(
 			    [% SLA Resolución],
-			    TREATAS(VALUES(FactAssigneeHistory[Key]), SLA_Tickets[Key])
+			    TREATAS(CALCULATETABLE(VALUES(FactAssigneeHistory[Key]), KEEPFILTERS(FactAssigneeHistory[Responsable] <> "Sin asignar")), SLA_Tickets[Key])
 			)
 		formatString: 0.0%;-0.0%;0.0%
 		displayFolder: Time in Assignee
@@ -413,14 +413,16 @@ table _Medidas
 
 		formatStringDefinition = VAR Hrs = SELECTEDMEASURE() VAR M = ROUND(Hrs * 60, 0) VAR H = INT(M / 60) VAR Mi = MOD(M, 60) RETURN """" & IF(H > 0, H & "h " & FORMAT(Mi, "00") & "m", Mi & "m") & """"
 
-	/// Promedio de personas distintas que atendieron cada ticket resuelto.
+	/// Promedio de personas distintas que atendieron cada ticket resuelto, redondeado hacia arriba (1.1 = 2).
 	measure 'Personas por Ticket' =
-			CALCULATE(
-			    AVERAGEX(VALUES(FactAssigneeHistory[Key]), CALCULATE(DISTINCTCOUNT(FactAssigneeHistory[Responsable]))),
-			    FactAssigneeHistory[Ticket Resuelto] = TRUE(),
-			    FactAssigneeHistory[Responsable] <> "Sin asignar"
-			)
-		formatString: #,##0.0
+			VAR Promedio =
+			    CALCULATE(
+			        AVERAGEX(VALUES(FactAssigneeHistory[Key]), CALCULATE(DISTINCTCOUNT(FactAssigneeHistory[Responsable]))),
+			        FactAssigneeHistory[Ticket Resuelto] = TRUE(),
+			        FactAssigneeHistory[Responsable] <> "Sin asignar"
+			    )
+			RETURN IF(ISBLANK(Promedio), BLANK(), ROUNDUP(Promedio, 0))
+		formatString: #,##0
 		displayFolder: Time in Assignee
 		lineageTag: 45f60718-293a-44b5-8fc6-0718293a4b5c
 
@@ -434,7 +436,7 @@ table _Medidas
 		displayFolder: Time in Assignee
 		lineageTag: 5607182a-3a4b-45c6-80d7-18293a4b5c6d
 
-		formatStringDefinition = VAR Hrs = SELECTEDMEASURE() VAR M = ROUND(Hrs * 60, 0) VAR H = INT(M / 60) VAR Mi = MOD(M, 60) RETURN """" & IF(H > 0, H & "h " & FORMAT(Mi, "00") & "m", Mi & "m") & """"
+		formatStringDefinition = VAR Hrs = SELECTEDMEASURE() VAR M = ROUNDUP(Hrs * 60, 0) VAR H = INT(M / 60) VAR Mi = MOD(M, 60) RETURN """" & IF(H > 0, H & "h " & FORMAT(Mi, "00") & "m", Mi & "m") & """"
 
 	/// Línea de tiempo: 1 si la persona tenía asignado el ticket durante esa hora desde su creación.
 	measure 'Gantt Responsable' =
@@ -839,7 +841,7 @@ table _Medidas
 		displayFolder: Línea de Tiempo
 		lineageTag: 4dd47767-b2f0-4596-880f-9e780d040ab1
 
-	/// Color de la celda de la línea de tiempo agrupada (IEP): azul N1, verde claro N2 RAM, verde oscuro N2 QCOM, gris el resto (Otro).
+	/// Color de la celda de la línea de tiempo por equipo: azul N1, verde claro N2 RAM, verde oscuro N2 QCOM, azul marino N3 RAM, gris el resto (Otro).
 	measure 'Color Gantt N1 N2' =
 			VAR Grupo = SELECTEDVALUE(FactStatusHistory[Grupo N1 N2])
 			RETURN
@@ -850,6 +852,7 @@ table _Medidas
 			            Grupo = "N1", "#06519A",
 			            Grupo = "N2 RAM", "#2ECC71",
 			            Grupo = "N2 QCOM", "#145A32",
+			            Grupo = "N3 RAM", "#0A2E5C",
 			            "#9AA5B1"
 			        )
 			    )
@@ -1380,9 +1383,13 @@ table _Medidas
 		displayFolder: Time in Assignee
 		lineageTag: 40a0707d-02f7-4e1c-8b33-e647a92e8c82
 
-	/// Veces promedio que una persona participa (queda asignada) en un mismo ticket.
-	measure 'Participaciones por Ticket' = DIVIDE([Participaciones], [Tickets Asignados])
-		formatString: #,##0.0
+	/// Veces promedio que una persona participa (queda asignada) en un mismo ticket: participaciones / pares persona-ticket
+	/// (en el total no se divide entre tickets distintos, porque eso mezclaría a varias personas). Redondeado hacia arriba (1.1 = 2).
+	measure 'Participaciones por Ticket' =
+			VAR ParesPersonaTicket = SUMX(VALUES(FactAssigneeHistory[Responsable]), [Tickets Asignados])
+			VAR Promedio = DIVIDE([Participaciones], ParesPersonaTicket)
+			RETURN IF(ISBLANK(Promedio), BLANK(), ROUNDUP(Promedio, 0))
+		formatString: #,##0
 		displayFolder: Time in Assignee
 		lineageTag: 703a6ca0-00e5-428e-97a1-bcb332ce2571
 
@@ -1392,19 +1399,251 @@ table _Medidas
 		displayFolder: Time in Assignee
 		lineageTag: a5d66710-f8f1-4c8c-b303-1caea18c3888
 
-	/// Personas distintas que en promedio participan en un ticket.
-	measure 'Personas por Ticket Asignado' = AVERAGEX(FILTER(VALUES(FactAssigneeHistory[Key]), [Tickets Asignados] > 0), CALCULATE(DISTINCTCOUNT(FactAssigneeHistory[Responsable]), KEEPFILTERS(FactAssigneeHistory[Responsable] <> "Sin asignar")))
-		formatString: #,##0.0
+	/// Personas distintas que en promedio participan en un ticket, redondeado hacia arriba (1.1 = 2).
+	measure 'Personas por Ticket Asignado' =
+			VAR Promedio = AVERAGEX(FILTER(VALUES(FactAssigneeHistory[Key]), [Tickets Asignados] > 0), CALCULATE(DISTINCTCOUNT(FactAssigneeHistory[Responsable]), KEEPFILTERS(FactAssigneeHistory[Responsable] <> "Sin asignar")))
+			RETURN IF(ISBLANK(Promedio), BLANK(), ROUNDUP(Promedio, 0))
+		formatString: #,##0
 		displayFolder: Time in Assignee
 		lineageTag: 968aa2ea-a8cc-4089-b61f-89fc68fc08ba
 
 	/// Horas promedio que una persona tiene asignado un ticket en el que participa (solo tickets resueltos), como texto.
 	measure 'Tiempo Promedio de Participación' =
 			VAR Hrs = [Prom Horas Asignado por Ticket]
-			VAR M = ROUND(Hrs * 60, 0)
+			VAR M = ROUNDUP(Hrs * 60, 0)
 			RETURN IF(ISBLANK(Hrs), BLANK(), IF(INT(M / 60) > 0, INT(M / 60) & "h " & FORMAT(MOD(M, 60), "00") & "m", MOD(M, 60) & "m"))
 		displayFolder: Time in Assignee
 		lineageTag: 8b9e7836-38c4-45b3-b5f8-73e78ece8d9a
+
+	/// Título de 'Tickets asignados por persona' con el total: suma de las barras (un ticket con 2 personas cuenta en
+	/// ambas) y tickets distintos.
+	measure 'Título Tickets Asignados por Persona' =
+			VAR SumaBarras = SUMX(VALUES(FactAssigneeHistory[Responsable]), [Tickets Asignados])
+			VAR Distintos = [Tickets Asignados]
+			RETURN
+			    "Tickets asignados por persona · Total: " & FORMAT(SumaBarras + 0, "#,##0") & " tickets ("
+			        & FORMAT(Distintos + 0, "#,##0") & " distintos)"
+		displayFolder: Time in Assignee
+		lineageTag: 5e0b8a2f-3c1d-4a7e-9b62-1f4d8c0e7a35
+
+	/// Horas de SLA de resolución consumidas por el ticket al cierre de esa hora de la línea de tiempo (sin pausas; en calendario
+	/// operativo RAM cuenta la parte proporcional de las horas hábiles del tramo).
+	measure 'SLA Consumido a la Hora' =
+			VAR H = SELECTEDVALUE('Línea de Tiempo'[Hora])
+			VAR Corte = IF(H >= 48, 1E9, H + 1)
+			VAR RAM = [Calendario Es RAM]
+			RETURN
+			    IF(
+			        NOT ISBLANK(H) && HASONEVALUE(SLA_Tickets[Key]),
+			        CALCULATE(
+			            SUMX(
+			                FILTER(FactStatusHistory, NOT (FactStatusHistory[Estado] IN {"Esperando por el cliente", "Esperando al proveedor", "Resuelta", "Cerrada"}) && FactStatusHistory[Hora Inicio] < Corte),
+			                VAR Dur = FactStatusHistory[Hora Fin] - FactStatusHistory[Hora Inicio]
+			                VAR Sol = MIN(FactStatusHistory[Hora Fin], Corte) - FactStatusHistory[Hora Inicio]
+			                RETURN IF(RAM, DIVIDE(Sol, Dur) * FactStatusHistory[Horas Hábiles], Sol)
+			            ),
+			            REMOVEFILTERS(FactStatusHistory[Grupo N1 N2])
+			        ) + 0
+			    )
+		displayFolder: Línea de Tiempo
+		lineageTag: b1e23bfe-df38-41b4-b95a-607669d57f82
+
+	/// 1 = dentro del SLA, 2 = el SLA vence en esa hora, 3 = SLA ya vencido (por ticket y hora de la línea de tiempo).
+	measure 'Posición SLA en la Hora' =
+			VAR H = SELECTEDVALUE('Línea de Tiempo'[Hora])
+			VAR Meta = [Meta SLA Ticket]
+			VAR Fin = [SLA Consumido a la Hora]
+			VAR Ini = IF(H = 0, 0, CALCULATE([SLA Consumido a la Hora], REMOVEFILTERS('Línea de Tiempo'), 'Línea de Tiempo'[Hora] = H - 1))
+			RETURN
+			    IF(
+			        NOT ISBLANK(H) && NOT ISBLANK(Meta) && HASONEVALUE(SLA_Tickets[Key]),
+			        SWITCH(TRUE(), Fin < Meta, 1, Ini < Meta, 2, 3)
+			    )
+		formatString: 0
+		displayFolder: Línea de Tiempo
+		lineageTag: 1e7ac713-cb94-44bb-bba3-1cb965dc5d1c
+
+	/// Celda de 'Tiempo por estado en los equipos': en el renglón de un equipo, 1 si tenía el ticket en esa hora; en el renglón
+	/// SLA, 0 mientras el ticket sigue abierto (el color marca dentro / vence / vencido).
+	measure 'Gantt Equipo SLA' =
+			VAR H = SELECTEDVALUE('Línea de Tiempo'[Hora])
+			VAR Fila = SELECTEDVALUE('Fila Línea de Tiempo'[Fila])
+			VAR FinTicket = CALCULATE(MAX(FactStatusHistory[Hora Fin]), FactStatusHistory[Es Estado Final] = FALSE())
+			RETURN
+			    IF(
+			        NOT ISBLANK(H) && NOT ISBLANK(Fila) && HASONEVALUE(SLA_Tickets[Key]),
+			        IF(
+			            Fila = "SLA",
+			            IF(FinTicket > H, 0),
+			            IF(CALCULATE([Gantt Estado], TREATAS({ Fila }, FactStatusHistory[Grupo N1 N2])) = 1, 1)
+			        )
+			    )
+		formatString: 0
+		displayFolder: Línea de Tiempo
+		lineageTag: d833566b-c3bc-401f-af5d-5590feacfb9b
+
+	/// Color de la celda: renglón SLA verde claro = dentro del SLA, rojo = hora en que vence, rosa = vencido; renglón de equipo con
+	/// su color (azul N1, verde claro N2 RAM, verde oscuro N2 QCOM, azul marino N3 RAM, gris Otro).
+	measure 'Color Gantt Equipo SLA' =
+			VAR V = [Gantt Equipo SLA]
+			VAR Fila = SELECTEDVALUE('Fila Línea de Tiempo'[Fila])
+			RETURN
+			    IF(
+			        NOT ISBLANK(V),
+			        IF(
+			            Fila = "SLA",
+			            SWITCH([Posición SLA en la Hora], 1, "#8FCB9B", 2, "#C8382E", "#F4B6AE"),
+			            SWITCH(Fila, "N1", "#06519A", "N2 RAM", "#2ECC71", "N2 QCOM", "#145A32", "N3 RAM", "#0A2E5C", "#9AA5B1")
+			        )
+			    )
+		displayFolder: Línea de Tiempo
+		lineageTag: af585a4d-456d-462b-a45e-fc206a7b4e09
+
+	/// Tooltip de la línea de tiempo: clave y resumen del ticket.
+	measure 'Tooltip Ticket' = IF(HASONEVALUE(SLA_Tickets[Key]), VALUES(SLA_Tickets[Key]) & " · " & SELECTEDVALUE(SLA_Tickets[Summary]))
+		displayFolder: Línea de Tiempo
+		lineageTag: f92ca3cf-4062-440e-a390-9a38bd37f75e
+
+	/// Tooltip de la línea de tiempo: hora desde la creación y fecha/hora real.
+	measure 'Tooltip Hora' =
+			VAR H = SELECTEDVALUE('Línea de Tiempo'[Hora])
+			VAR C = MIN(SLA_Tickets[Created])
+			RETURN
+			    IF(
+			        NOT ISBLANK(H) && HASONEVALUE(SLA_Tickets[Key]),
+			        IF(
+			            H >= 48,
+			            "48h o más desde la creación (desde " & FORMAT(C + H / 24, "dd/mm/yyyy hh:mm") & ")",
+			            "Hora " & H & " desde la creación · " & FORMAT(C + H / 24, "dd/mm/yyyy hh:mm") & " a " & FORMAT(C + (H + 1) / 24, "hh:mm")
+			        )
+			    )
+		displayFolder: Línea de Tiempo
+		lineageTag: bb5a3b11-215a-4b3e-ae43-e209bdcb72a6
+
+	/// Tooltip de la línea de tiempo: renglón (equipo o SLA).
+	measure 'Tooltip Equipo' =
+			VAR Fila = SELECTEDVALUE('Fila Línea de Tiempo'[Fila])
+			RETURN IF(Fila = "SLA", "Renglón del SLA (tiempo de resolución)", Fila)
+		displayFolder: Línea de Tiempo
+		lineageTag: 1660f2ed-42cd-4886-8415-77dbe272be2d
+
+	/// Tooltip de la línea de tiempo: estados del ticket en esa hora (con el nombre original de Jira si se homologó), desde/hasta y duración.
+	measure 'Tooltip Estados en la Hora' =
+			VAR H = SELECTEDVALUE('Línea de Tiempo'[Hora])
+			VAR Corte = IF(H >= 48, 1E9, H + 1)
+			VAR T =
+			    CALCULATETABLE(
+			        FILTER(FactStatusHistory, FactStatusHistory[Hora Inicio] < Corte && FactStatusHistory[Hora Fin] > H),
+			        REMOVEFILTERS(FactStatusHistory[Grupo N1 N2])
+			    )
+			RETURN
+			    IF(
+			        NOT ISBLANK(H) && HASONEVALUE(SLA_Tickets[Key]),
+			        CONCATENATEX(
+			            T,
+			            FactStatusHistory[Estado]
+			                & IF(FactStatusHistory[Estado Jira] <> FactStatusHistory[Estado], " (Jira: " & FactStatusHistory[Estado Jira] & ")")
+			                & ": " & FORMAT(FactStatusHistory[Inicio], "dd/mm hh:mm") & " a " & FORMAT(FactStatusHistory[Fin], "dd/mm hh:mm")
+			                & " (" & IF(INT(ROUND(FactStatusHistory[Horas] * 60, 0) / 60) > 0, INT(ROUND(FactStatusHistory[Horas] * 60, 0) / 60) & "h " & FORMAT(MOD(ROUND(FactStatusHistory[Horas] * 60, 0), 60), "00") & "m", MOD(ROUND(FactStatusHistory[Horas] * 60, 0), 60) & "m") & ")",
+			            " | ",
+			            FactStatusHistory[Hora Inicio], ASC
+			        )
+			    )
+		displayFolder: Línea de Tiempo
+		lineageTag: e98144f8-0d5d-47e5-8e34-d9f6d0cb7d72
+
+	/// Tooltip de la línea de tiempo: SLA consumido al cierre de la hora contra la meta.
+	measure 'Tooltip SLA Consumido' =
+			VAR Cons = [SLA Consumido a la Hora]
+			VAR Meta = [Meta SLA Ticket]
+			RETURN
+			    IF(
+			        NOT ISBLANK(Cons) && NOT ISBLANK(Meta),
+			        IF(INT(ROUND(Cons * 60, 0) / 60) > 0, INT(ROUND(Cons * 60, 0) / 60) & "h " & FORMAT(MOD(ROUND(Cons * 60, 0), 60), "00") & "m", MOD(ROUND(Cons * 60, 0), 60) & "m") & " de " & IF(INT(ROUND(Meta * 60, 0) / 60) > 0, INT(ROUND(Meta * 60, 0) / 60) & "h" & IF(MOD(ROUND(Meta * 60, 0), 60) > 0, " " & FORMAT(MOD(ROUND(Meta * 60, 0), 60), "00") & "m"), MOD(ROUND(Meta * 60, 0), 60) & "m") & " (" & FORMAT(DIVIDE(Cons, Meta), "0%") & ") · calendario "
+			            & IF([Calendario Es RAM], "operativo RAM", "24/7") & ", sin pausas"
+			    )
+		displayFolder: Línea de Tiempo
+		lineageTag: 5a513f8d-2c75-4bd3-934c-7cefbc3b394b
+
+	/// Tooltip de la línea de tiempo: dentro del SLA (cuánto queda), vence en esa hora o vencido (por cuánto).
+	measure 'Tooltip Situación SLA' =
+			VAR P = [Posición SLA en la Hora]
+			VAR Dif = ABS([Meta SLA Ticket] - [SLA Consumido a la Hora])
+			RETURN
+			    SWITCH(
+			        P,
+			        1, "Dentro del SLA · quedan " & IF(INT(ROUND(Dif * 60, 0) / 60) > 0, INT(ROUND(Dif * 60, 0) / 60) & "h " & FORMAT(MOD(ROUND(Dif * 60, 0), 60), "00") & "m", MOD(ROUND(Dif * 60, 0), 60) & "m"),
+			        2, "El SLA vence en esta hora",
+			        3, "SLA vencido · excedido por " & IF(INT(ROUND(Dif * 60, 0) / 60) > 0, INT(ROUND(Dif * 60, 0) / 60) & "h " & FORMAT(MOD(ROUND(Dif * 60, 0), 60), "00") & "m", MOD(ROUND(Dif * 60, 0), 60) & "m")
+			    )
+		displayFolder: Línea de Tiempo
+		lineageTag: dad0984e-0665-43b9-b4f8-9f9c823ee07f
+
+	/// % de los tickets (con historial de estados) en los que participó N1.
+	measure '% Participación N1' = DIVIDE(CALCULATE([Tickets en Estado], FactStatusHistory[Grupo N1 N2] = "N1"), CALCULATE([Tickets en Estado], REMOVEFILTERS(FactStatusHistory[Grupo N1 N2])))
+		formatString: 0%
+		displayFolder: Línea de Tiempo
+		lineageTag: 5c1ddbbe-19ff-4677-83fb-6e8423218f06
+
+	/// Tiempo promedio que N1 tuvo cada ticket en el que participó (suma de todas sus vueltas), como texto.
+	measure 'Tiempo Participación N1' =
+			VAR Hrs = DIVIDE(CALCULATE([Horas en Estado], FactStatusHistory[Grupo N1 N2] = "N1"), CALCULATE([Tickets en Estado], FactStatusHistory[Grupo N1 N2] = "N1"))
+			RETURN IF(ISBLANK(Hrs), BLANK(), IF(INT(ROUND(Hrs * 60, 0) / 60) > 0, INT(ROUND(Hrs * 60, 0) / 60) & "h " & FORMAT(MOD(ROUND(Hrs * 60, 0), 60), "00") & "m", MOD(ROUND(Hrs * 60, 0), 60) & "m"))
+		displayFolder: Línea de Tiempo
+		lineageTag: d0ea72fc-1fc7-491f-b1eb-e9dba5c23cca
+
+	/// % de los tickets (con historial de estados) en los que participó N2 RAM.
+	measure '% Participación N2 RAM' = DIVIDE(CALCULATE([Tickets en Estado], FactStatusHistory[Grupo N1 N2] = "N2 RAM"), CALCULATE([Tickets en Estado], REMOVEFILTERS(FactStatusHistory[Grupo N1 N2])))
+		formatString: 0%
+		displayFolder: Línea de Tiempo
+		lineageTag: 810fe8b4-7288-4a3d-9922-29adb1f16f87
+
+	/// Tiempo promedio que N2 RAM tuvo cada ticket en el que participó (suma de todas sus vueltas), como texto.
+	measure 'Tiempo Participación N2 RAM' =
+			VAR Hrs = DIVIDE(CALCULATE([Horas en Estado], FactStatusHistory[Grupo N1 N2] = "N2 RAM"), CALCULATE([Tickets en Estado], FactStatusHistory[Grupo N1 N2] = "N2 RAM"))
+			RETURN IF(ISBLANK(Hrs), BLANK(), IF(INT(ROUND(Hrs * 60, 0) / 60) > 0, INT(ROUND(Hrs * 60, 0) / 60) & "h " & FORMAT(MOD(ROUND(Hrs * 60, 0), 60), "00") & "m", MOD(ROUND(Hrs * 60, 0), 60) & "m"))
+		displayFolder: Línea de Tiempo
+		lineageTag: 40314f85-7ae7-4b20-b7c8-32caaa33e7fa
+
+	/// % de los tickets (con historial de estados) en los que participó N2 QCOM.
+	measure '% Participación N2 QCOM' = DIVIDE(CALCULATE([Tickets en Estado], FactStatusHistory[Grupo N1 N2] = "N2 QCOM"), CALCULATE([Tickets en Estado], REMOVEFILTERS(FactStatusHistory[Grupo N1 N2])))
+		formatString: 0%
+		displayFolder: Línea de Tiempo
+		lineageTag: 090240a3-7b6d-4e89-ae3c-710973ac58b0
+
+	/// Tiempo promedio que N2 QCOM tuvo cada ticket en el que participó (suma de todas sus vueltas), como texto.
+	measure 'Tiempo Participación N2 QCOM' =
+			VAR Hrs = DIVIDE(CALCULATE([Horas en Estado], FactStatusHistory[Grupo N1 N2] = "N2 QCOM"), CALCULATE([Tickets en Estado], FactStatusHistory[Grupo N1 N2] = "N2 QCOM"))
+			RETURN IF(ISBLANK(Hrs), BLANK(), IF(INT(ROUND(Hrs * 60, 0) / 60) > 0, INT(ROUND(Hrs * 60, 0) / 60) & "h " & FORMAT(MOD(ROUND(Hrs * 60, 0), 60), "00") & "m", MOD(ROUND(Hrs * 60, 0), 60) & "m"))
+		displayFolder: Línea de Tiempo
+		lineageTag: 7f06c557-e555-4b2d-b51a-e375fc98a74c
+
+	/// Parte de las horas de N1 + N2 RAM + N2 QCOM que le tocó al equipo (para el reparto por tipo de solicitud).
+	measure '% Tiempo del Equipo' = DIVIDE([Horas en Estado], CALCULATE([Horas en Estado], REMOVEFILTERS(FactStatusHistory[Grupo N1 N2]), FactStatusHistory[Grupo N1 N2] IN {"N1", "N2 RAM", "N2 QCOM"}))
+		formatString: 0%
+		displayFolder: Línea de Tiempo
+		lineageTag: ee04a8ee-bd4f-48ef-900e-e2255070dd70
+
+	/// Tickets con historial de estados en el contexto (base de los % de participación por equipo).
+	measure 'Tickets Línea de Tiempo' = CALCULATE([Tickets en Estado], REMOVEFILTERS(FactStatusHistory[Grupo N1 N2]))
+		formatString: #,##0
+		displayFolder: Línea de Tiempo
+		lineageTag: 2617b344-9586-4f15-8589-c86c055d77f2
+
+	/// Tickets en los que participó N1 contra el total, como texto ('1,980 de 2,020 tickets').
+	measure 'Texto Tickets N1' = FORMAT(CALCULATE([Tickets en Estado], FactStatusHistory[Grupo N1 N2] = "N1") + 0, "#,##0") & " de " & FORMAT([Tickets Línea de Tiempo] + 0, "#,##0") & " tickets"
+		displayFolder: Línea de Tiempo
+		lineageTag: 63acedcb-03c9-4945-9185-fc0ff11e8108
+
+	/// Tickets en los que participó N2 RAM contra el total, como texto ('1,980 de 2,020 tickets').
+	measure 'Texto Tickets N2 RAM' = FORMAT(CALCULATE([Tickets en Estado], FactStatusHistory[Grupo N1 N2] = "N2 RAM") + 0, "#,##0") & " de " & FORMAT([Tickets Línea de Tiempo] + 0, "#,##0") & " tickets"
+		displayFolder: Línea de Tiempo
+		lineageTag: b06488de-0dbd-426e-8507-716d5c3eb279
+
+	/// Tickets en los que participó N2 QCOM contra el total, como texto ('1,980 de 2,020 tickets').
+	measure 'Texto Tickets N2 QCOM' = FORMAT(CALCULATE([Tickets en Estado], FactStatusHistory[Grupo N1 N2] = "N2 QCOM") + 0, "#,##0") & " de " & FORMAT([Tickets Línea de Tiempo] + 0, "#,##0") & " tickets"
+		displayFolder: Línea de Tiempo
+		lineageTag: 5364240f-4c8a-4f73-99d9-237f954afad8
 
 	partition _Medidas = m
 		mode: import

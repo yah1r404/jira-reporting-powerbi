@@ -1,4 +1,4 @@
-JIRA_PBI - EQUIVALENCIAS DE ESTADOS (Time in Status y SLA)
+JIRA_PBI - EQUIVALENCIAS DE ESTADOS (Tiempo en estado y SLA)
 =====================================================================
 Los estados que ya no existen en los flujos actuales (o que vienen en inglés)
 se miden en el estado actual que los representa. El nombre original se
@@ -73,9 +73,12 @@ Los nombres se comparan sin distinguir mayúsculas ni espacios al inicio/final.
 
 CÓMO CUENTAN
 ---------------------------------------------------------------------------------------
-- Time in Status: muestra los estados actuales con el tiempo de sus equivalentes.
+- Tiempo en estado: muestra los estados actuales con el tiempo de sus equivalentes.
   No incluye Resuelta ni Cerrada.
 - SLA de resolución: Esperando por el cliente, Esperando al proveedor, Resuelta y
   Cerrada son pausa (no suman). Todo lo demás suma.
+- Línea de tiempo 'Tiempo por estado en los equipos' (hoja 04): usa los mismos estados ya
+  homologados, en todos los tipos de servicio. Equipos: N1, N2 RAM, N2 QCOM y N3 RAM; todo lo
+  demás (Nueva solicitud, Reabierta, esperas, Planta externa, Escalado) va en "Otro".
 - Si aparece un estado nuevo sin equivalente, cuenta para el SLA pero no se muestra
-  en Time in Status (columna Vigente = FALSE) hasta agregarlo a esta lista.
+  en Tiempo en estado (columna Vigente = FALSE) hasta agregarlo a esta lista.

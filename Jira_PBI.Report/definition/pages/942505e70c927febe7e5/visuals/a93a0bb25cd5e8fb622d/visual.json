@@ -2,11 +2,11 @@
   "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/visualContainer/2.13.0/schema.json",
   "name": "a93a0bb25cd5e8fb622d",
   "position": {
-    "x": 1360,
+    "x": 1364,
     "y": 212,
     "z": 33000,
     "height": 410,
-    "width": 540,
+    "width": 536,
     "tabOrder": 17000
   },
   "visual": {
@@ -33,25 +33,6 @@
             }
           ]
         },
-        "Y": {
-          "projections": [
-            {
-              "field": {
-                "Measure": {
-                  "Expression": {
-                    "SourceRef": {
-                      "Entity": "_Medidas"
-                    }
-                  },
-                  "Property": "Prom Horas Asignado por Ticket"
-                }
-              },
-              "queryRef": "_Medidas.Prom Horas Asignado por Ticket",
-              "nativeQueryRef": "Prom Horas Asignado por Ticket",
-              "displayName": "Tiempo promedio"
-            }
-          ]
-        },
         "Tooltips": {
           "projections": [
             {
@@ -68,6 +49,25 @@
               "queryRef": "_Medidas.Tickets Atendidos",
               "nativeQueryRef": "Tickets Atendidos",
               "displayName": "Tickets resueltos en los que participó"
+            }
+          ]
+        },
+        "Y": {
+          "projections": [
+            {
+              "field": {
+                "Measure": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "_Medidas"
+                    }
+                  },
+                  "Property": "Prom Horas Asignado por Ticket"
+                }
+              },
+              "queryRef": "_Medidas.Prom Horas Asignado por Ticket",
+              "nativeQueryRef": "Prom Horas Asignado por Ticket",
+              "displayName": "Tiempo promedio"
             }
           ]
         }
@@ -101,6 +101,31 @@
                   "Value": "true"
                 }
               }
+            },
+            "labelDisplayUnits": {
+              "expr": {
+                "Literal": {
+                  "Value": "1D"
+                }
+              }
+            },
+            "fontSize": {
+              "expr": {
+                "Literal": {
+                  "Value": "9D"
+                }
+              }
+            },
+            "color": {
+              "solid": {
+                "color": {
+                  "expr": {
+                    "Literal": {
+                      "Value": "'#1A1A1A'"
+                    }
+                  }
+                }
+              }
             }
           }
         }
@@ -126,9 +151,40 @@
                 "color": {
                   "expr": {
                     "Literal": {
-                      "Value": "'#34734A'"
+                      "Value": "'#06519A'"
                     }
                   }
+                }
+              }
+            }
+          }
+        }
+      ],
+      "categoryAxis": [
+        {
+          "properties": {
+            "labelColor": {
+              "solid": {
+                "color": {
+                  "expr": {
+                    "Literal": {
+                      "Value": "'#1A1A1A'"
+                    }
+                  }
+                }
+              }
+            },
+            "fontSize": {
+              "expr": {
+                "Literal": {
+                  "Value": "9D"
+                }
+              }
+            },
+            "showAxisTitle": {
+              "expr": {
+                "Literal": {
+                  "Value": "false"
                 }
               }
             }
@@ -150,7 +206,7 @@
             "text": {
               "expr": {
                 "Literal": {
-                  "Value": "'Tiempo promedio de participación por persona (tickets resueltos)'"
+                  "Value": "'Tiempo promedio de participación por persona '"
                 }
               }
             }

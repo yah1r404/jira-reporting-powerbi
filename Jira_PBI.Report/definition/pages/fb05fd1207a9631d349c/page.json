@@ -1,8 +1,9 @@
 {
   "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/page/2.1.0/schema.json",
   "name": "fb05fd1207a9631d349c",
-  "displayName": "04 - Detalle SLA",
+  "displayName": "06 - Detalle SLA",
   "displayOption": "FitToWidth",
   "height": 1800,
-  "width": 1920
+  "width": 1920,
+  "visibility": "HiddenInViewMode"
 }

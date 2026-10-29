@@ -1,0 +1,29 @@
+/// Renglones de 'Tiempo por estado en los equipos': el renglón del SLA y un renglón por equipo. Sin relaciones.
+table 'Fila Línea de Tiempo'
+	lineageTag: bddd62ab-1663-42d5-b625-c5ff794264f6
+
+	column Fila
+		dataType: string
+		lineageTag: 12e4b6f2-d1c0-48ae-80a7-72a996b36619
+		summarizeBy: none
+		isNameInferred
+		sourceColumn: [Fila]
+		sortByColumn: Orden
+
+		annotation SummarizationSetBy = Automatic
+
+	column Orden
+		dataType: int64
+		isHidden
+		formatString: 0
+		lineageTag: 9076f881-1d0a-450c-bcee-a9d65ee71637
+		summarizeBy: none
+		isNameInferred
+		sourceColumn: [Orden]
+
+		annotation SummarizationSetBy = Automatic
+
+	partition 'Fila Línea de Tiempo' = calculated
+		mode: import
+		source = DATATABLE("Fila", STRING, "Orden", INTEGER, { { "SLA", 0 }, { "N1", 1 }, { "N2 RAM", 2 }, { "N2 QCOM", 3 }, { "N3 RAM", 4 }, { "Otro", 5 } })
+

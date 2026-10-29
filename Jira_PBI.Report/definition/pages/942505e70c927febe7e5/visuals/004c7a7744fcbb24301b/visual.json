@@ -129,28 +129,6 @@
         }
       }
     },
-    "visualContainerObjects": {
-      "title": [
-        {
-          "properties": {
-            "show": {
-              "expr": {
-                "Literal": {
-                  "Value": "true"
-                }
-              }
-            },
-            "text": {
-              "expr": {
-                "Literal": {
-                  "Value": "'Participación por persona'"
-                }
-              }
-            }
-          }
-        }
-      ]
-    },
     "objects": {
       "columnHeaders": [
         {
@@ -380,6 +358,137 @@
           }
         }
       ]
+    },
+    "visualContainerObjects": {
+      "title": [
+        {
+          "properties": {
+            "show": {
+              "expr": {
+                "Literal": {
+                  "Value": "true"
+                }
+              }
+            },
+            "text": {
+              "expr": {
+                "Literal": {
+                  "Value": "'Participación por persona'"
+                }
+              }
+            }
+          }
+        }
+      ]
     }
+  },
+  "filterConfig": {
+    "filters": [
+      {
+        "name": "e20cd71a12035dcecaca",
+        "field": {
+          "Column": {
+            "Expression": {
+              "SourceRef": {
+                "Entity": "FactAssigneeHistory"
+              }
+            },
+            "Property": "Responsable"
+          }
+        },
+        "type": "Categorical",
+        "objects": {
+          "general": [
+            {
+              "properties": {}
+            }
+          ]
+        }
+      },
+      {
+        "name": "95fcae71f20e1ed49377",
+        "field": {
+          "Measure": {
+            "Expression": {
+              "SourceRef": {
+                "Entity": "_Medidas"
+              }
+            },
+            "Property": "Tickets Asignados"
+          }
+        },
+        "type": "Advanced"
+      },
+      {
+        "name": "765a72550221a8e1ea79",
+        "field": {
+          "Measure": {
+            "Expression": {
+              "SourceRef": {
+                "Entity": "_Medidas"
+              }
+            },
+            "Property": "Participaciones por Ticket"
+          }
+        },
+        "type": "Advanced"
+      },
+      {
+        "name": "29a009080363b1109bec",
+        "field": {
+          "Measure": {
+            "Expression": {
+              "SourceRef": {
+                "Entity": "_Medidas"
+              }
+            },
+            "Property": "Tickets Atendidos"
+          }
+        },
+        "type": "Advanced"
+      },
+      {
+        "name": "67a3cb23e155809cf439",
+        "field": {
+          "Measure": {
+            "Expression": {
+              "SourceRef": {
+                "Entity": "_Medidas"
+              }
+            },
+            "Property": "Prom Horas Asignado por Ticket"
+          }
+        },
+        "type": "Advanced"
+      },
+      {
+        "name": "55625c68fa4fd9e2ed37",
+        "field": {
+          "Measure": {
+            "Expression": {
+              "SourceRef": {
+                "Entity": "_Medidas"
+              }
+            },
+            "Property": "Mediana Horas Asignado"
+          }
+        },
+        "type": "Advanced"
+      },
+      {
+        "name": "afecb2c8802df796c083",
+        "field": {
+          "Measure": {
+            "Expression": {
+              "SourceRef": {
+                "Entity": "_Medidas"
+              }
+            },
+            "Property": "% SLA Resolución Tickets Atendidos"
+          }
+        },
+        "type": "Advanced"
+      }
+    ]
   }
 }

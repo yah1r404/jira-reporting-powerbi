@@ -6,7 +6,7 @@
     "y": 10,
     "z": 19000,
     "height": 44,
-    "width": 400,
+    "width": 480,
     "tabOrder": 23000
   },
   "visual": {
@@ -19,7 +19,7 @@
               {
                 "textRuns": [
                   {
-                    "value": "Time in Assignee",
+                    "value": "Tiempo en asignación",
                     "textStyle": {
                       "fontFamily": "Segoe UI Semibold",
                       "fontSize": "22pt",

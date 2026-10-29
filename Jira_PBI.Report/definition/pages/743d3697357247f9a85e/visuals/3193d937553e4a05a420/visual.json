@@ -2,11 +2,11 @@
   "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/visualContainer/2.13.0/schema.json",
   "name": "3193d937553e4a05a420",
   "position": {
-    "x": 264,
-    "y": 748,
+    "x": 263.54948805460748,
+    "y": 280.13651877133105,
     "z": 39000,
-    "height": 312,
-    "width": 1636,
+    "height": 417.44027303754262,
+    "width": 1636.5870307167233,
     "tabOrder": 25000
   },
   "visual": {
@@ -54,15 +54,16 @@
                 "Column": {
                   "Expression": {
                     "SourceRef": {
-                      "Entity": "FactStatusHistory"
+                      "Entity": "Fila Línea de Tiempo"
                     }
                   },
-                  "Property": "Grupo N1 N2"
+                  "Property": "Fila"
                 }
               },
-              "queryRef": "FactStatusHistory.Grupo N1 N2",
-              "nativeQueryRef": "Grupo N1 N2",
-              "active": true
+              "queryRef": "Fila Línea de Tiempo.Fila",
+              "nativeQueryRef": "Fila",
+              "active": true,
+              "displayName": "Equipo / SLA"
             }
           ]
         },
@@ -76,11 +77,12 @@
                       "Entity": "_Medidas"
                     }
                   },
-                  "Property": "Gantt Estado"
+                  "Property": "Gantt Equipo SLA"
                 }
               },
-              "queryRef": "_Medidas.Gantt Estado",
-              "nativeQueryRef": "Gantt Estado"
+              "queryRef": "_Medidas.Gantt Equipo SLA",
+              "nativeQueryRef": "Gantt Equipo SLA",
+              "displayName": " "
             }
           ]
         }
@@ -105,10 +107,10 @@
               "Column": {
                 "Expression": {
                   "SourceRef": {
-                    "Entity": "FactStatusHistory"
+                    "Entity": "Fila Línea de Tiempo"
                   }
                 },
-                "Property": "Grupo N1 N2"
+                "Property": "Fila"
               }
             },
             "direction": "Ascending"
@@ -130,7 +132,7 @@
                           "Entity": "_Medidas"
                         }
                       },
-                      "Property": "Color Gantt N1 N2"
+                      "Property": "Color Gantt Equipo SLA"
                     }
                   }
                 }
@@ -146,7 +148,7 @@
                           "Entity": "_Medidas"
                         }
                       },
-                      "Property": "Color Gantt N1 N2"
+                      "Property": "Color Gantt Equipo SLA"
                     }
                   }
                 }
@@ -168,7 +170,7 @@
                 }
               }
             ],
-            "metadata": "_Medidas.Gantt Estado"
+            "metadata": "_Medidas.Gantt Equipo SLA"
           }
         }
       ],
@@ -264,7 +266,34 @@
             "text": {
               "expr": {
                 "Literal": {
-                  "Value": "'N1 / N2 RAM / N2 QCOM / Otro (IEP): en qué horas desde la creación estuvo cada ticket en cada grupo (azul = N1, verde claro = N2 RAM, verde oscuro = N2 QCOM, gris = Otro: Planta externa, Escalado, esperas, etc.)'"
+                  "Value": "'Tiempo por estado en los equipos '"
+                }
+              }
+            }
+          }
+        }
+      ],
+      "visualTooltip": [
+        {
+          "properties": {
+            "show": {
+              "expr": {
+                "Literal": {
+                  "Value": "true"
+                }
+              }
+            },
+            "type": {
+              "expr": {
+                "Literal": {
+                  "Value": "'Canvas'"
+                }
+              }
+            },
+            "section": {
+              "expr": {
+                "Literal": {
+                  "Value": "'94eac74d139ee9d2da40'"
                 }
               }
             }

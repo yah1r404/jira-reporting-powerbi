@@ -39,9 +39,9 @@ Para abrirlo, abre `Jira_PBI.pbip` con Power BI Desktop.
 | `SLA_Tickets` | Un renglón por ticket: flujo, request type, tipo de ticket, **organización**, estado, responsable, fechas y el **SLA calculado con reglas propias** (24/7 y calendario operativo RAM). Los valores de SLA de JSM se conservan ocultos como `JSM …` solo como referencia. | Sí |
 | `Calendario SLA` | Tabla calculada del selector *Calendario SLA*: 24/7 (contractual, predeterminado) u Operativo RAM. Sin relaciones. | Sí |
 | `SLA Objetivo` | Tabla calculada con las opciones del filtro de SLA del cliente: Según cada ticket (meta en horas de cada ticket), 4, 6, 15 y 18 hrs. No tiene relaciones. | Sí |
-| `FactStatusHistory` | Un renglón por cada tramo que un ticket pasó en un estado (**Time in Status**). | Sí |
+| `FactStatusHistory` | Un renglón por cada tramo que un ticket pasó en un estado (**Tiempo en estado**). | Sí |
 | `FactTecnicos` | Un renglón por ticket y **técnico de campo** (campo *Técnico(s) asignado(s)*). Excluye cuentas de equipo (*Servicios Equipo…*) y agrupa por nombre (una persona puede tener dos cuentas). | Sí |
-| `FactAssigneeHistory` | Un renglón por cada tramo que un ticket estuvo asignado a una persona (**Time in Assignee**). | Sí |
+| `FactAssigneeHistory` | Un renglón por cada tramo que un ticket estuvo asignado a una persona (**Tiempo en asignación**). | Sí |
 
 ### Campos de Jira usados
 
@@ -114,11 +114,11 @@ Todas las relaciones son de uno a muchos y en una sola dirección. `DimFecha` es
   - In progress, En curso, Trabajo en curso, Pendiente, Pending, N1 QCOM, N1 RAM → **N1**
   - Escalado a N2, N2 → **N2 RAM** · Escalado a N3, N3 → **N3 RAM**
   - Esperando al solicitante, Waiting for customer → **Esperando por el cliente** · Completado, Resolved → **Resuelta**
-  Los que no tienen equivalente quedan con `Vigente` = FALSE: cuentan para el SLA pero no aparecen en *Time in Status*. El tiempo en Resuelta y Cerrada no cuenta ni para el SLA ni para Time in Status.
-- **Horario de cálculo** de Time in Status y Time in Assignee: **operativo RAM** (L-V 7:00-23:00, sáb-dom 8:00-18:00; predeterminado) o **24/7**. Se define en la función `HorasLaborales` (columna `Horas Hábiles` de cada historial).
-- **Time in Status** está en horas y no incluye estados finales (Resuelta, Cerrada). Si un ticket sigue en un estado, su tramo cuenta hasta la hora del último refresh.
+  Los que no tienen equivalente quedan con `Vigente` = FALSE: cuentan para el SLA pero no aparecen en *Tiempo en estado*. El tiempo en Resuelta y Cerrada no cuenta ni para el SLA ni para Tiempo en estado.
+- **Horario de cálculo** de Tiempo en estado y Tiempo en asignación: **operativo RAM** (L-V 7:00-23:00, sáb-dom 8:00-18:00; predeterminado) o **24/7**. Se define en la función `HorasLaborales` (columna `Horas Hábiles` de cada historial).
+- **Tiempo en estado** está en horas y no incluye estados finales (Resuelta, Cerrada). Si un ticket sigue en un estado, su tramo cuenta hasta la hora del último refresh.
 - **Técnicos de campo**: un ticket con varios técnicos cuenta **una vez por técnico** (participaciones) y **una sola vez** en *Tickets con Técnico* (únicos). El SLA y los tiempos se **atribuyen por participación**, no por responsabilidad (el responsable es el Assignee). Abiertos = categoría *Por hacer*; en proceso = sin resolver y ya en atención; resueltos = con fecha de resolución.
-- **Time in Assignee** está en horas según el horario de cálculo, desde la creación hasta la resolución, y **solo cuenta tickets resueltos**. El tiempo sin responsable no se atribuye a nadie (se ve aparte en *Prom Horas Sin Asignar*).
+- **Tiempo en asignación** está en horas según el horario de cálculo, desde la creación hasta la resolución, y **solo cuenta tickets resueltos**. El tiempo sin responsable no se atribuye a nadie (se ve aparte en *Prom Horas Sin Asignar*).
 - **Reasignaciones**: cambios de responsable, sin contar la primera asignación.
 - **Vista Ejecutiva consistente con el resto:** con *SLA objetivo* = "Según cada ticket" (predeterminado), cumple/no cumple es el **mismo estado del SLA calculado** que usan las demás páginas, así que los números coinciden. Solo al elegir una meta del cliente (4, 6, 15 o 18 h) se recalcula contra esas horas.
 - **SLA objetivo (filtro)**: cada ticket se compara contra las horas elegidas en el filtro *SLA objetivo*; con "Según cada ticket" se usa la meta en horas de cada ticket (ej. 15 h o 24 h), y la tarjeta muestra esas horas. Las horas comparadas (`Horas SLA Base` / `Horas SLA Base RAM`) son el tiempo de SLA de resolución calculado, sin pausas, en el calendario elegido. Un ticket abierto que ya pasó la meta cuenta como incumplido.
@@ -131,20 +131,21 @@ Todas las relaciones son de uno a muchos y en una sola dirección. `DimFecha` es
 |---|---|---|
 | **00 - Resumen** | Mesa MDSC | 1920 × 1080. Pirámides de volumen, SLA de primera respuesta y de resolución (con metas, cumplen / no cumplen y tiempos), cumplimiento por estado, mensual, creados vs. resueltos, por hora y por día |
 | **01 - SLA** | Mesa MDSC | 1920 × 1080. Total, % SLA 1ª respuesta y resolución (con metas y cumplen / no cumplen), tiempos promedio; cumplimiento por mes y por día de la semana; % por tipo de solicitud y por tipo de servicio; tabla por tipo de solicitud |
-| **02 - Time in Status** | Mesa MDSC | 1920 × 1080. Tickets analizados, tiempo promedio en estados, estado con más tiempo, % en espera, tiempo sin atender; horas por estado y tipo de servicio, tendencia por semana y mes, tablas por tipo de servicio y por request type. Solo estados vigentes; selector de horario |
-| **04 - Detalle SLA** | Mesa MDSC | Tabla ticket por ticket con estado de SLA y link a Jira |
-| **06 - Time in Assignee** | Mesa MDSC | Horas promedio asignado por ticket resuelto y tickets atendidos por persona. Filtro propio: responsable |
-| **07 - Técnicos de Campo** | Mesa MDSC | Participación individual de los técnicos de campo según *Técnicos asignados* (complementa a Time in Assignee, que mide por Assignee): KPIs, tickets por técnico, abiertos/en proceso/resueltos, tipo de trabajo por request type, tendencia mensual, SLA y tiempos de sus tickets y detalle de tickets por técnico. Filtros propios: técnico de campo y estado del ticket. Página más alta (1800 px, con scroll) |
-| **08 - Línea de Tiempo** | Mesa MDSC | Diagrama tipo Gantt por ticket, hora por hora desde la creación (0h a 48h+): quién lo tuvo y en qué estado estuvo. Filtro propio: ticket |
+| **02 - Tiempo en estado** | Mesa MDSC | 1920 × 1080. Tickets analizados, tiempo promedio en estados, estado con más tiempo, % en espera, tiempo sin atender; horas por estado y tipo de servicio, tendencia por semana y mes, tablas por tipo de servicio y por request type. Solo estados vigentes; selector de horario |
+| **03 - Tiempo en asignación** | Mesa MDSC | 1920 × 1080. Personas asignadas, tickets asignados (con total), personas y participaciones por ticket (enteros, redondeados hacia arriba), tiempo promedio de participación; por persona y por tipo de solicitud. Sin "Sin asignar" |
+| **04 - Línea de Tiempo** | Mesa MDSC | 1920 × 1080. Sin tabla de tickets (está en la 07). Diagrama tipo Gantt por ticket, hora por hora desde la creación (0h a 48h+): en qué grupo estuvo (N1, N2 RAM, N2 QCOM u Otro); horas por estado vs. meta del SLA (global y por ticket) y consumo del SLA. Filtros propios: ticket y SLA objetivo del cliente |
+| **05 - Técnicos de Campo** | Mesa MDSC | Participación individual de los técnicos de campo según *Técnicos asignados* (complementa a Tiempo en asignación, que mide por Assignee): KPIs, tickets por técnico, abiertos/en proceso/resueltos, tipo de trabajo por request type, tendencia mensual, SLA y tiempos de sus tickets y detalle de tickets por técnico. Filtros propios: técnico de campo y estado del ticket. Página más alta (1800 px, con scroll) |
+| **06 - Detalle SLA** *(oculta)* | Mesa MDSC | Tabla ticket por ticket con estado de SLA y link a Jira |
+| **07 - Tickets seleccionados** *(oculta)* | Mesa MDSC | 1920 × 1080. Tabla de los tickets elegidos en la Línea de tiempo (el filtro de ticket está sincronizado entre las dos hojas) |
 
-Todas las páginas comparten la misma estructura: barra lateral con el logo y el menú (página activa en amarillo), encabezado con título y descripción, barra de filtros y una línea con los **filtros activos**.
+Las hojas 06 y 07 están ocultas (no salen en el menú ni en las pestañas al publicar). Todas las páginas comparten la misma estructura: barra lateral con el logo y el menú (página activa en amarillo), encabezado con título y descripción, barra de filtros y una línea con los **filtros activos**.
 
 ### Filtros
 
 | Tipo | Filtros | Dónde aplican |
 |---|---|---|
 | **Globales sincronizados** | Periodo (fecha de creación), Cliente (organización), Tipo de Servicio (flujo), Tipo de Solicitud (request type) | Todas las páginas. Al cambiar de página se conservan. |
-| **Propios de la página** | Responsable (06), Técnico de campo (07), Ticket (08) | Solo en su página; no modifican los globales |
+| **Propios de la página** | Ticket y SLA objetivo (04; el de ticket también en 07), Técnico de campo (05) | Solo en su página; no modifican los globales |
 
 - Todas las fechas son de **creación del ticket**, en hora de Mérida (UTC-6). El rango incluye el último día.
 

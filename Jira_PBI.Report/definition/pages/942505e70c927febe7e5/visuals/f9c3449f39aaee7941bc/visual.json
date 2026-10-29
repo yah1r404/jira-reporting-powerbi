@@ -2,11 +2,11 @@
   "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/visualContainer/2.13.0/schema.json",
   "name": "f9c3449f39aaee7941bc",
   "position": {
-    "x": 812,
+    "x": 814,
     "y": 212,
     "z": 33000,
     "height": 410,
-    "width": 532,
+    "width": 536,
     "tabOrder": 17000
   },
   "visual": {
@@ -30,25 +30,6 @@
               "nativeQueryRef": "Responsable",
               "active": true,
               "displayName": "Persona"
-            }
-          ]
-        },
-        "Y": {
-          "projections": [
-            {
-              "field": {
-                "Measure": {
-                  "Expression": {
-                    "SourceRef": {
-                      "Entity": "_Medidas"
-                    }
-                  },
-                  "Property": "Participaciones por Ticket"
-                }
-              },
-              "queryRef": "_Medidas.Participaciones por Ticket",
-              "nativeQueryRef": "Participaciones por Ticket",
-              "displayName": "Veces por ticket"
             }
           ]
         },
@@ -85,6 +66,25 @@
               "displayName": "Participaciones"
             }
           ]
+        },
+        "Y": {
+          "projections": [
+            {
+              "field": {
+                "Measure": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "_Medidas"
+                    }
+                  },
+                  "Property": "Participaciones por Ticket"
+                }
+              },
+              "queryRef": "_Medidas.Participaciones por Ticket",
+              "nativeQueryRef": "Participaciones por Ticket",
+              "displayName": "Veces por ticket"
+            }
+          ]
         }
       },
       "sortDefinition": {
@@ -116,6 +116,31 @@
                   "Value": "true"
                 }
               }
+            },
+            "labelDisplayUnits": {
+              "expr": {
+                "Literal": {
+                  "Value": "1D"
+                }
+              }
+            },
+            "fontSize": {
+              "expr": {
+                "Literal": {
+                  "Value": "9D"
+                }
+              }
+            },
+            "color": {
+              "solid": {
+                "color": {
+                  "expr": {
+                    "Literal": {
+                      "Value": "'#1A1A1A'"
+                    }
+                  }
+                }
+              }
             }
           }
         }
@@ -141,9 +166,40 @@
                 "color": {
                   "expr": {
                     "Literal": {
-                      "Value": "'#0A2E5C'"
+                      "Value": "'#06519A'"
                     }
                   }
+                }
+              }
+            }
+          }
+        }
+      ],
+      "categoryAxis": [
+        {
+          "properties": {
+            "labelColor": {
+              "solid": {
+                "color": {
+                  "expr": {
+                    "Literal": {
+                      "Value": "'#1A1A1A'"
+                    }
+                  }
+                }
+              }
+            },
+            "fontSize": {
+              "expr": {
+                "Literal": {
+                  "Value": "9D"
+                }
+              }
+            },
+            "showAxisTitle": {
+              "expr": {
+                "Literal": {
+                  "Value": "false"
                 }
               }
             }
@@ -165,7 +221,7 @@
             "text": {
               "expr": {
                 "Literal": {
-                  "Value": "'Participaciones promedio por ticket (veces que entra al mismo ticket)'"
+                  "Value": "'Participaciones promedio por ticket '"
                 }
               }
             }

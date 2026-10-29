@@ -6,7 +6,7 @@
     "y": 80,
     "z": 60030,
     "height": 120,
-    "width": 314,
+    "width": 316,
     "tabOrder": 60030
   },
   "visual": {
@@ -42,6 +42,13 @@
               "expr": {
                 "Literal": {
                   "Value": "26D"
+                }
+              }
+            },
+            "labelDisplayUnits": {
+              "expr": {
+                "Literal": {
+                  "Value": "1D"
                 }
               }
             }

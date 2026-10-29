@@ -3,7 +3,7 @@
   "name": "c422bf6fb0dcfb430a14",
   "position": {
     "x": 16,
-    "y": 426,
+    "y": 323,
     "z": 12000,
     "height": 38,
     "width": 208,
@@ -42,7 +42,7 @@
             "text": {
               "expr": {
                 "Literal": {
-                  "Value": "'Time in Assignee'"
+                  "Value": "'Tiempo en asignación'"
                 }
               }
             },
@@ -95,7 +95,7 @@
             "text": {
               "expr": {
                 "Literal": {
-                  "Value": "'Time in Assignee'"
+                  "Value": "'Tiempo en asignación'"
                 }
               }
             },
@@ -148,7 +148,7 @@
             "text": {
               "expr": {
                 "Literal": {
-                  "Value": "'Time in Assignee'"
+                  "Value": "'Tiempo en asignación'"
                 }
               }
             },
