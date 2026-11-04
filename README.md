@@ -3,15 +3,15 @@
 Proyecto de Power BI en formato **PBIP/PBIR** con datos de **Jira Cloud** (`https://secureopsmx.atlassian.net`) a través de la REST API.
 Mide el SLA y la eficiencia de la Mesa de Servicio **MDSC** de RAM (Redes y Asesorías del Mayab).
 
-Para abrirlo, abre `Jira_PBI.pbip` con Power BI Desktop.
+Para abrirlo, abre `Seguimiento_Eficiencias/Seguimiento_Eficiencias.pbip` con Power BI Desktop (antes se llamaba `Jira_PBI`).
 
 ### Estructura del repositorio
 
 | Ruta | Contenido |
 |---|---|
-| `Jira_PBI.pbip`, `Jira_PBI.Report/`, `Jira_PBI.SemanticModel/` | Tablero principal de la Mesa de Servicio MDSC (secciones 1 a 6) |
+| `Seguimiento_Eficiencias/` | Tablero principal de la Mesa de Servicio MDSC: `Seguimiento_Eficiencias.pbip`, su reporte, su modelo y `Seguimiento_Eficiencias_Equivalencias_de_Estados.txt` (secciones 1 a 6) |
 | `IEP_Incident/` | Tablero ejecutivo QuattroCom: `IEP_Incident.pbip`, su reporte, su modelo y `IEP_Incident_Graficas.txt` (títulos y significado de cada gráfica) (sección 7) |
-| `Mesa_Servicio/` | **Dashboard nuevo de la Mesa de Servicio** (`Mesa_Servicio.pbip`), reconstruido y optimizado: por ahora *00 - Resumen* y *01 - Time in Status* (sección 8) |
+| `Presentaciones/` | Presentaciones de resultados (por ejemplo, `Evolucion_Integracion_Operativa_2026_ACT.pptx`) |
 | `assets/` | Logos originales de RAM y QuattroCom (cada reporte guarda su propia copia en `StaticResources`) |
 | `CLAUDE.md` | Reglas de trabajo del proyecto (Jira solo lectura, sin secretos, etc.) |
 
@@ -151,7 +151,7 @@ Las hojas 06 y 07 están ocultas (no salen en el menú ni en las pestañas al pu
 
 ## 5. Diseño
 
-- Tema corporativo **RAM** en `Jira_PBI.Report/StaticResources/RegisteredResources/RAM_Tema.json`. Es la fuente única de colores, tipografía, tarjetas, tablas y gráficos de todo el reporte.
+- Tema corporativo **RAM** en `Seguimiento_Eficiencias/Seguimiento_Eficiencias.Report/StaticResources/RegisteredResources/RAM_Tema.json`. Es la fuente única de colores, tipografía, tarjetas, tablas y gráficos de todo el reporte.
 - Colores tomados del logo: azul `#06519A` (principal), amarillo `#F1D72C` (acento), azul oscuro `#0A2E5C` (títulos) y grises neutros.
 - **Tipografía única: Segoe UI** (regular, Semibold y Bold). Power BI no permite fuentes externas como Inter.
 - **Botones**, con contraste WCAG AA en sus estados normal, hover y presionado:
@@ -170,7 +170,7 @@ Las hojas 06 y 07 están ocultas (no salen en el menú ni en las pestañas al pu
   | Sin dato | Gris `#A9B4C2` | Sin SLA |
 
   Las reglas viven en las medidas de la carpeta *Colores* (`Color Estado SLA Resolución`, `Color Estado SLA Respuesta`, `Color Alerta`) y *SLA \ Semáforo*.
-- Logo en `Jira_PBI.Report/StaticResources/RegisteredResources/redesmayab_logo.jpg`.
+- Logo en `Seguimiento_Eficiencias/Seguimiento_Eficiencias.Report/StaticResources/RegisteredResources/redesmayab_logo.jpg`.
 
 ## 6. Pendientes
 
@@ -204,27 +204,3 @@ Proyecto aparte en la carpeta `IEP_Incident/`. Usa las mismas credenciales de Ji
 | Vida total | Tiempo natural de la creación a la fecha de resolución, sin descontar pausas |
 
 **Pendiente de confirmar:** las fechas de diagnóstico y de atención del servicio todavía no están en la tabla. Falta identificar en Jira qué campos son y qué tan llenos están.
-
-## 8. Dashboard de Mesa de Servicio optimizado (`Mesa_Servicio/Mesa_Servicio.pbip`)
-
-Reconstrucción de `Jira_PBI` con solo lo necesario, para que actualice más rápido y sea fácil de ampliar. Mismas reglas de SLA que la sección 3 (24/7 y operativo RAM, pausas, primer comentario, Resolved con respaldo en el historial).
-
-**Páginas (1920 × 1080):** *00 - Resumen* (pirámides de volumen y SLA, cumplimiento por estado, mensual, creados vs. resueltos, por hora y por día) y *01 - Time in Status* (horas promedio por estado y flujo, tabla por flujo/estado y por request type; selector de horario laboral/24/7).
-
-**Modelo (8 tablas, 54 medidas):**
-
-```
-DimFecha ──1:*──> Tickets ──1:*──> Historial
-'Calendario SLA', 'Horario Cálculo', 'SLA Comparación', 'Estado SLA'  (selectores, sin relaciones)
-```
-
-| Elemento | Qué es | Optimización frente a Jira_PBI |
-|---|---|---|
-| `Jira_Fuente` (no se carga) | Única consulta a Jira: **una búsqueda paginada** con 11 campos, los comentarios y el historial (`expand=changelog`); solo los tickets con más de 100 cambios piden su historial aparte | Una búsqueda en vez de tres; sin `/field` ni campos de JSM/tipo de ticket. (El historial en bloque por POST no se usa: Power BI no permite POST con usuario y token.) |
-| `Tickets` | Un renglón por ticket: atributos, **Assignee** (y su ID), **Técnicos Asignados** (texto y ruta `a|b`), primer comentario, metas y SLA calculado | Metas y horas RAM a la primera respuesta se calculan en Power Query, no en DAX |
-| `Historial` | Un renglón por tramo, con columna `Campo` (*Estado*; *Responsable* cuando se active) | **Una sola tabla** para estado y, después, responsable (en Jira_PBI eran dos tablas con su propia descarga del historial) |
-
-**Para crecer sin rehacer la base:**
-- *Time in Assignee*: en `Historial` cambiar `CamposCargados = {"status"}` por `{"status", "assignee"}` (el historial ya viene con ambos campos); los tramos de responsable entran a `Historial` con `Campo = "Responsable"` y `Valor` = persona.
-- *Técnicos asignados*: la columna `Técnicos Ruta` ya trae los técnicos separados por `|` para generar una tabla puente (un renglón por ticket y técnico) sin otra llamada a Jira. Son una dimensión distinta del assignee (el assignee puede ser una cuenta de equipo como *Servicios Equipo*).
-
