@@ -11,6 +11,7 @@ Para abrirlo, abre `Mesa_Servicio/Mesa_Servicio.pbip` con Power BI Desktop (ante
 |---|---|
 | `Mesa_Servicio/` | Tablero principal de la Mesa de Servicio MDSC: `Mesa_Servicio.pbip`, su reporte, su modelo y `Mesa_Servicio_Equivalencias_de_Estados.txt` (secciones 1 a 6) |
 | `IEP_Incident/` | Tablero ejecutivo QuattroCom: `IEP_Incident.pbip`, su reporte, su modelo y `IEP_Incident_Graficas.txt` (títulos y significado de cada gráfica) (sección 7) |
+| `Documentacion/` | Documentación de Jira Cloud: `General/` (inventario, estructura general, campos, flujos y roles, automatizaciones) y una carpeta por espacio: `MDSC_Mesa_de_servicio/`, `MDSIT_Mesa_de_soporte_interna/`, `MDSI_Comercial_Ordenes_de_Clientes/`, `GFIN_Administracion_y_finanzas/` |
 | `Presentaciones/` | Presentaciones de resultados (por ejemplo, `Evolucion_Integracion_Operativa_2026_ACT.pptx`) |
 | `assets/` | Logos originales de RAM y QuattroCom (cada reporte guarda su propia copia en `StaticResources`) |
 | `CLAUDE.md` | Reglas de trabajo del proyecto (Jira solo lectura, sin secretos, etc.) |
