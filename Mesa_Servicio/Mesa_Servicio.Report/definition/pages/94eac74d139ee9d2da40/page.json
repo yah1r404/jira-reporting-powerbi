@@ -1,0 +1,15 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/page/2.1.0/schema.json",
+  "name": "94eac74d139ee9d2da40",
+  "displayName": "Tooltip - Línea de tiempo",
+  "displayOption": "ActualSize",
+  "height": 300,
+  "width": 460,
+  "pageBinding": {
+    "name": "tip94eac74d139e",
+    "type": "Tooltip",
+    "parameters": []
+  },
+  "type": "Tooltip",
+  "visibility": "HiddenInViewMode"
+}
