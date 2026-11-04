@@ -139,7 +139,7 @@ table FactStatusHistory
 		annotation SummarizationSetBy = Automatic
 
 	/// Equipo que tenía el ticket, para la línea de tiempo 'Tiempo por estado en los equipos' (todos los flujos). Usa el estado ya
-	/// homologado (Seguimiento_Eficiencias_Equivalencias_de_Estados.txt): N1 incluye N1 RAM, N1 QCOM, In Progress, Pending, Trabajo en curso...;
+	/// homologado (Mesa_Servicio_Equivalencias_de_Estados.txt): N1 incluye N1 RAM, N1 QCOM, In Progress, Pending, Trabajo en curso...;
 	/// N2 RAM incluye N2 y Escalado a N2; N3 RAM incluye Escalado a N3. "Otro": Nueva solicitud, Reabierta, esperas, Planta externa, Escalado.
 	column 'Grupo N1 N2' =
 			SWITCH(

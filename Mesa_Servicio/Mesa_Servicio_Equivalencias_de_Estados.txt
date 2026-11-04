@@ -4,7 +4,7 @@ Los estados que ya no existen en los flujos actuales (o que vienen en inglés)
 se miden en el estado actual que los representa. El nombre original se
 conserva en la columna FactStatusHistory[Estado Jira].
 
-Cifras tomadas del historial cargado en Seguimiento_Eficiencias (antes Jira_PBI) el 22/10/2026
+Cifras tomadas del historial cargado en Mesa_Servicio (antes Jira_PBI) el 22/10/2026
 (tramos = veces que un ticket estuvo en ese estado).
 
 

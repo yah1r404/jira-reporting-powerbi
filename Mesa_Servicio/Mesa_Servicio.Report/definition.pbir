@@ -3,7 +3,7 @@
   "version": "4.0",
   "datasetReference": {
     "byPath": {
-      "path": "../Seguimiento_Eficiencias.SemanticModel"
+      "path": "../Mesa_Servicio.SemanticModel"
     }
   }
 }

@@ -4,7 +4,7 @@
   "artifacts": [
     {
       "report": {
-        "path": "Seguimiento_Eficiencias.Report"
+        "path": "Mesa_Servicio.Report"
       }
     }
   ],

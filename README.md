@@ -3,13 +3,13 @@
 Proyecto de Power BI en formato **PBIP/PBIR** con datos de **Jira Cloud** (`https://secureopsmx.atlassian.net`) a través de la REST API.
 Mide el SLA y la eficiencia de la Mesa de Servicio **MDSC** de RAM (Redes y Asesorías del Mayab).
 
-Para abrirlo, abre `Seguimiento_Eficiencias/Seguimiento_Eficiencias.pbip` con Power BI Desktop (antes se llamaba `Jira_PBI`).
+Para abrirlo, abre `Mesa_Servicio/Mesa_Servicio.pbip` con Power BI Desktop (antes se llamaba `Jira_PBI`).
 
 ### Estructura del repositorio
 
 | Ruta | Contenido |
 |---|---|
-| `Seguimiento_Eficiencias/` | Tablero principal de la Mesa de Servicio MDSC: `Seguimiento_Eficiencias.pbip`, su reporte, su modelo y `Seguimiento_Eficiencias_Equivalencias_de_Estados.txt` (secciones 1 a 6) |
+| `Mesa_Servicio/` | Tablero principal de la Mesa de Servicio MDSC: `Mesa_Servicio.pbip`, su reporte, su modelo y `Mesa_Servicio_Equivalencias_de_Estados.txt` (secciones 1 a 6) |
 | `IEP_Incident/` | Tablero ejecutivo QuattroCom: `IEP_Incident.pbip`, su reporte, su modelo y `IEP_Incident_Graficas.txt` (títulos y significado de cada gráfica) (sección 7) |
 | `Presentaciones/` | Presentaciones de resultados (por ejemplo, `Evolucion_Integracion_Operativa_2026_ACT.pptx`) |
 | `assets/` | Logos originales de RAM y QuattroCom (cada reporte guarda su propia copia en `StaticResources`) |
@@ -151,7 +151,7 @@ Las hojas 06 y 07 están ocultas (no salen en el menú ni en las pestañas al pu
 
 ## 5. Diseño
 
-- Tema corporativo **RAM** en `Seguimiento_Eficiencias/Seguimiento_Eficiencias.Report/StaticResources/RegisteredResources/RAM_Tema.json`. Es la fuente única de colores, tipografía, tarjetas, tablas y gráficos de todo el reporte.
+- Tema corporativo **RAM** en `Mesa_Servicio/Mesa_Servicio.Report/StaticResources/RegisteredResources/RAM_Tema.json`. Es la fuente única de colores, tipografía, tarjetas, tablas y gráficos de todo el reporte.
 - Colores tomados del logo: azul `#06519A` (principal), amarillo `#F1D72C` (acento), azul oscuro `#0A2E5C` (títulos) y grises neutros.
 - **Tipografía única: Segoe UI** (regular, Semibold y Bold). Power BI no permite fuentes externas como Inter.
 - **Botones**, con contraste WCAG AA en sus estados normal, hover y presionado:
@@ -170,7 +170,7 @@ Las hojas 06 y 07 están ocultas (no salen en el menú ni en las pestañas al pu
   | Sin dato | Gris `#A9B4C2` | Sin SLA |
 
   Las reglas viven en las medidas de la carpeta *Colores* (`Color Estado SLA Resolución`, `Color Estado SLA Respuesta`, `Color Alerta`) y *SLA \ Semáforo*.
-- Logo en `Seguimiento_Eficiencias/Seguimiento_Eficiencias.Report/StaticResources/RegisteredResources/redesmayab_logo.jpg`.
+- Logo en `Mesa_Servicio/Mesa_Servicio.Report/StaticResources/RegisteredResources/redesmayab_logo.jpg`.
 
 ## 6. Pendientes
 
