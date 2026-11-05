@@ -1,0 +1,91 @@
+/// Tickets de las 7 mesas de RAM (GFIN, ALMCN, MDSI, COT, MDSC, MDSIT, PRYECT): todo el histórico, todos los estados. Búsqueda ligera, un solo JQL combinado, sin historial de cambios (no es el objetivo de este tablero). No se carga al modelo; FactTickets le da forma de tabla y clasifica cada ticket en su mesa.
+expression RAM_Issues =
+		let
+
+		    // ========================================
+		    // CONFIGURACIÓN
+		    // ========================================
+
+		    JiraBaseUrl = "https://secureopsmx.atlassian.net",
+
+		    // Las 7 claves de proyecto de RAM. La clasificación clave -> nombre de mesa vive en FactTickets (MesaMap),
+		    // confirmada con el negocio: MDSI agrupa "Comercial" y "Órdenes de clientes" en un solo proyecto.
+		    Proyectos = {"GFIN", "ALMCN", "MDSI", "COT", "MDSC", "MDSIT", "PRYECT"},
+		    JQL = "project in (" & Text.Combine(Proyectos, ",") & ") ORDER BY created DESC",
+
+		    // Tamaño de página medido para este conjunto de campos (límite real de Jira observado en otros tableros del entorno)
+		    PageSize = "100",
+
+		    // Solo los campos que usa el modelo. customfield_10010 = Request Type (JSM); puede venir vacío en proyectos
+		    // que no son mesa de servicio (ej. Proyectos, Almacén) y se etiqueta "Sin request type" al transformar.
+		    BaseFields = {
+		        "summary", "issuetype", "status", "priority", "created", "updated",
+		        "resolutiondate", "assignee", "reporter", "project", "customfield_10010"
+		    },
+		    JiraFields = Text.Combine(BaseFields, ","),
+
+
+		    // ========================================
+		    // BÚSQUEDA PAGINADA (las 7 mesas en un solo JQL combinado)
+		    // ========================================
+
+		    GetPage = (NextToken as nullable text) as record =>
+		        let
+		            BaseQuery = [jql = JQL, maxResults = PageSize, fields = JiraFields],
+		            RequestQuery =
+		                if NextToken = null
+		                then BaseQuery
+		                else Record.AddField(BaseQuery, "nextPageToken", NextToken)
+		        in
+		            Json.Document(
+		                Web.Contents(
+		                    JiraBaseUrl,
+		                    [
+		                        RelativePath = "rest/api/3/search/jql",
+		                        Query = RequestQuery,
+		                        Headers = [Accept = "application/json"]
+		                    ]
+		                )
+		            ),
+
+		    Search =
+		        List.Combine(
+		            List.Generate(
+		                () => GetPage(null),
+		                each _ <> null,
+		                each
+		                    let
+		                        Token = Record.FieldOrDefault(_, "nextPageToken", null)
+		                    in
+		                        if Token = null then null else GetPage(Token),
+		                each [issues]
+		            )
+		        ),
+
+		    // List.Buffer: la lista se guarda en memoria y no se vuelve a pedir a Jira al recorrerla otra vez
+		    RawIssues = List.Buffer(Search)
+		in
+		    RawIssues
+	lineageTag: 1a2b3c4d-5e6f-4a7b-8c9d-0e1f2a3b4c5d
+
+	annotation PBI_NavigationStepName = Navegación
+
+	annotation PBI_ResultType = List
+
+/// Regla de clasificación de mesa, única fuente de verdad (la usan FactTickets y DimMesa). Confirmada con el negocio:
+/// MDSI agrupa "Comercial" y "Órdenes de clientes" en un solo proyecto de Jira. El orden de la lista define el orden de despliegue de las mesas en los reportes.
+expression MesaMap =
+		{
+		    [Clave = "GFIN", Mesa = "RAM - Administración y Finanzas", Orden = 1],
+		    [Clave = "ALMCN", Mesa = "RAM - Almacén", Orden = 2],
+		    [Clave = "MDSI", Mesa = "RAM - Comercial / Órdenes de Clientes", Orden = 3],
+		    [Clave = "COT", Mesa = "RAM - Cotizaciones Internas", Orden = 4],
+		    [Clave = "MDSC", Mesa = "RAM - Mesa de Servicio", Orden = 5],
+		    [Clave = "MDSIT", Mesa = "RAM - Mesa de Soporte Interna", Orden = 6],
+		    [Clave = "PRYECT", Mesa = "RAM - Proyectos", Orden = 7]
+		}
+	lineageTag: 3e4f5a6b-7c8d-4e9f-0a1b-2c3d4e5f6a7b
+
+	annotation PBI_NavigationStepName = Navegación
+
+	annotation PBI_ResultType = List

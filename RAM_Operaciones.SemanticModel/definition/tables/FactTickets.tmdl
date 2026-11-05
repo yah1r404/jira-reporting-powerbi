@@ -1,0 +1,314 @@
+table FactTickets
+	lineageTag: 2b3c4d5e-6f7a-4b8c-9d0e-1f2a3b4c5d6e
+
+	/// Clave del ticket en Jira (ej. GFIN-123). Identificador natural, único por ticket.
+	column Key
+		dataType: string
+		isKey
+		lineageTag: 3c4d5e6f-7a8b-4c9d-0e1f-2a3b4c5d6e7f
+		summarizeBy: none
+		sourceColumn: Key
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Issue ID'
+		dataType: string
+		lineageTag: 4d5e6f7a-8b9c-4d0e-1f2a-3b4c5d6e7f8a
+		summarizeBy: none
+		sourceColumn: Issue ID
+
+		annotation SummarizationSetBy = Automatic
+
+	/// Mesa normalizada (regla documentada en la partición: MesaMap). "Sin clasificar" si la clave de proyecto no corresponde a ninguna de las 7 mesas conocidas.
+	column Mesa
+		dataType: string
+		lineageTag: 5e6f7a8b-9c0d-4e1f-2a3b-4c5d6e7f8a9b
+		summarizeBy: none
+		sourceColumn: Mesa
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Proyecto Clave'
+		dataType: string
+		lineageTag: 6f7a8b9c-0d1e-4f2a-3b4c-5d6e7f8a9b0c
+		summarizeBy: none
+		sourceColumn: Proyecto Clave
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Proyecto Nombre'
+		dataType: string
+		lineageTag: 7a8b9c0d-1e2f-4a3b-4c5d-6e7f8a9b0c1d
+		summarizeBy: none
+		sourceColumn: Proyecto Nombre
+
+		annotation SummarizationSetBy = Automatic
+
+	column Summary
+		dataType: string
+		lineageTag: 8b9c0d1e-2f3a-4b4c-5d6e-7f8a9b0c1d2e
+		summarizeBy: none
+		sourceColumn: Summary
+
+		annotation SummarizationSetBy = Automatic
+
+	/// Tipo de incidencia de Jira (issuetype). Distinto del tipo de solicitud del portal; no se mezclan.
+	column 'Tipo de Incidencia'
+		dataType: string
+		lineageTag: 9c0d1e2f-3a4b-4c5d-6e7f-8a9b0c1d2e3f
+		summarizeBy: none
+		sourceColumn: Tipo de Incidencia
+
+		annotation SummarizationSetBy = Automatic
+
+	/// Tipo de solicitud del portal (customfield_10010). "Sin request type" cuando el campo viene vacío: puede ser porque
+	/// el proyecto no es una mesa de servicio (JSM) o porque el solicitante no lo llenó; no se puede distinguir desde la API.
+	column 'Tipo de Solicitud'
+		dataType: string
+		lineageTag: 0d1e2f3a-4b5c-4d6e-7f8a-9b0c1d2e3f4a
+		summarizeBy: none
+		sourceColumn: Tipo de Solicitud
+
+		annotation SummarizationSetBy = Automatic
+
+	column Estado
+		dataType: string
+		lineageTag: 1e2f3a4b-5c6d-4e7f-8a9b-0c1d2e3f4a5b
+		summarizeBy: none
+		sourceColumn: Estado
+
+		annotation SummarizationSetBy = Automatic
+
+	/// Categoría del estado normalizada desde statusCategory.key de Jira (independiente del idioma del estado): Nuevo, En curso, Cerrado.
+	column 'Categoría Estado'
+		dataType: string
+		lineageTag: 2f3a4b5c-6d7e-4f8a-9b0c-1d2e3f4a5b6c
+		summarizeBy: none
+		sourceColumn: Categoría Estado
+
+		annotation SummarizationSetBy = Automatic
+
+	column Prioridad
+		dataType: string
+		lineageTag: 3a4b5c6d-7e8f-4a9b-0c1d-2e3f4a5b6c7d
+		summarizeBy: none
+		sourceColumn: Prioridad
+
+		annotation SummarizationSetBy = Automatic
+
+	column Asignado
+		dataType: string
+		lineageTag: 4b5c6d7e-8f9a-4b0c-1d2e-3f4a5b6c7d8e
+		summarizeBy: none
+		sourceColumn: Asignado
+
+		annotation SummarizationSetBy = Automatic
+
+	column Solicitante
+		dataType: string
+		lineageTag: 5c6d7e8f-9a0b-4c1d-2e3f-4a5b6c7d8e9f
+		summarizeBy: none
+		sourceColumn: Solicitante
+
+		annotation SummarizationSetBy = Automatic
+
+	column Creado
+		dataType: dateTime
+		formatString: General Date
+		lineageTag: 6d7e8f9a-0b1c-4d2e-3f4a-5b6c7d8e9f0a
+		summarizeBy: none
+		sourceColumn: Creado
+
+		annotation SummarizationSetBy = Automatic
+
+	/// Solo la fecha de creación (sin hora), usada para relacionar con DimFecha.
+	column 'Fecha Creación'
+		dataType: dateTime
+		formatString: Short Date
+		lineageTag: 7e8f9a0b-1c2d-4e3f-4a5b-6c7d8e9f0a1b
+		summarizeBy: none
+		sourceColumn: Fecha Creación
+
+		annotation SummarizationSetBy = Automatic
+
+	column Actualizado
+		dataType: dateTime
+		formatString: General Date
+		lineageTag: 8f9a0b1c-2d3e-4f4a-5b6c-7d8e9f0a1b2c
+		summarizeBy: none
+		sourceColumn: Actualizado
+
+		annotation SummarizationSetBy = Automatic
+
+	column Resuelto
+		dataType: dateTime
+		formatString: General Date
+		lineageTag: 9a0b1c2d-3e4f-4a5b-6c7d-8e9f0a1b2c3d
+		summarizeBy: none
+		sourceColumn: Resuelto
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Horas Resolución'
+		dataType: double
+		formatString: 0.0
+		lineageTag: 0b1c2d3e-4f5a-4b6c-7d8e-9f0a1b2c3d4e
+		summarizeBy: average
+		sourceColumn: Horas Resolución
+
+		annotation SummarizationSetBy = Automatic
+
+	/// FALSE si Mesa = "Sin clasificar" (la clave de proyecto no se reconoció). Debe ser siempre TRUE con el JQL actual; queda como control de calidad.
+	column 'Es Clasificado'
+		dataType: boolean
+		formatString: """Sí"";""Sí"";""No"""
+		lineageTag: 1c2d3e4f-5a6b-4c7d-8e9f-0a1b2c3d4e5f
+		summarizeBy: none
+		sourceColumn: Es Clasificado
+
+		annotation SummarizationSetBy = Automatic
+
+	/// TRUE si la categoría del estado actual no es "Cerrado" (inventario abierto/pendiente).
+	column 'Está Abierto'
+		dataType: boolean
+		formatString: """Sí"";""Sí"";""No"""
+		lineageTag: 2d3e4f5a-6b7c-4d8e-9f0a-1b2c3d4e5f6a
+		summarizeBy: none
+		sourceColumn: Está Abierto
+
+		annotation SummarizationSetBy = Automatic
+
+	partition FactTickets = m
+		mode: import
+		source =
+				let
+
+				    Issues = RAM_Issues,
+
+
+				    // ========================================
+				    // CLASIFICACIÓN DE MESA (regla única en MesaMap, compartida con DimMesa)
+				    // ========================================
+
+				    MesaDe = (ClaveProyecto as nullable text) as text =>
+				        let
+				            Match = List.Select(MesaMap, each [Clave] = ClaveProyecto)
+				        in
+				            if List.IsEmpty(Match) then "Sin clasificar" else Match{0}[Mesa],
+
+
+				    // ========================================
+				    // AYUDANTES
+				    // ========================================
+
+				    // Jira devuelve fechas con zona ("-0600"); se pasan a hora de Mérida (UTC-6, sin horario de verano)
+				    ToLocal = (t as nullable text) as nullable datetime =>
+				        if t = null then null
+				        else
+				            let
+				                Len = Text.Length(t),
+				                Iso =
+				                    if Len > 5 and List.Contains({"+", "-"}, Text.At(t, Len - 5))
+				                    then Text.Insert(t, Len - 2, ":")
+				                    else t
+				            in
+				                DateTimeZone.RemoveZone(DateTimeZone.SwitchZone(DateTimeZone.FromText(Iso), -6)),
+
+				    NameOf = (r as any, f as text) as any =>
+				        if r is record then Record.FieldOrDefault(r, f, null) else null,
+
+				    // Normaliza statusCategory.key (independiente del idioma): new / indeterminate / done
+				    CategoriaDe = (StatusRec as any) as text =>
+				        let
+				            CatKey = NameOf(NameOf(StatusRec, "statusCategory"), "key")
+				        in
+				            if CatKey = "done" then "Cerrado"
+				            else if CatKey = "indeterminate" then "En curso"
+				            else if CatKey = "new" then "Nuevo"
+				            else "Sin categoría",
+
+
+				    // ========================================
+				    // UN RENGLÓN POR TICKET
+				    // ========================================
+
+				    Rows =
+				        List.Transform(
+				            Issues,
+				            (i) =>
+				                let
+				                    f = i[fields],
+				                    ProjectRec = Record.FieldOrDefault(f, "project", null),
+				                    ClaveProyecto = NameOf(ProjectRec, "key"),
+				                    StatusRec = Record.FieldOrDefault(f, "status", null),
+				                    AssigneeName = NameOf(Record.FieldOrDefault(f, "assignee", null), "displayName"),
+				                    ReporterName = NameOf(Record.FieldOrDefault(f, "reporter", null), "displayName"),
+				                    RequestType =
+				                        NameOf(
+				                            NameOf(Record.FieldOrDefault(f, "customfield_10010", null), "requestType"),
+				                            "name"
+				                        ),
+				                    CreatedAt = ToLocal(f[created]),
+				                    UpdatedAt = ToLocal(Record.FieldOrDefault(f, "updated", null)),
+				                    ResolvedAt = ToLocal(Record.FieldOrDefault(f, "resolutiondate", null)),
+				                    Categoria = CategoriaDe(StatusRec)
+				                in
+				                    [
+				                        Key = i[key],
+				                        #"Issue ID" = Text.From(i[id]),
+				                        Mesa = MesaDe(ClaveProyecto),
+				                        #"Proyecto Clave" = if ClaveProyecto = null then "Desconocido" else ClaveProyecto,
+				                        #"Proyecto Nombre" = if NameOf(ProjectRec, "name") = null then "Desconocido" else NameOf(ProjectRec, "name"),
+				                        Summary = Record.FieldOrDefault(f, "summary", null),
+				                        #"Tipo de Incidencia" = NameOf(Record.FieldOrDefault(f, "issuetype", null), "name"),
+				                        #"Tipo de Solicitud" = if RequestType = null then "Sin request type" else RequestType,
+				                        Estado = NameOf(StatusRec, "name"),
+				                        #"Categoría Estado" = Categoria,
+				                        Prioridad = NameOf(Record.FieldOrDefault(f, "priority", null), "name"),
+				                        Asignado = if AssigneeName = null then "Sin asignar" else AssigneeName,
+				                        Solicitante = if ReporterName = null then "Sin solicitante" else ReporterName,
+				                        Creado = CreatedAt,
+				                        #"Fecha Creación" = if CreatedAt = null then null else DateTime.From(Date.From(CreatedAt)),
+				                        Actualizado = UpdatedAt,
+				                        Resuelto = ResolvedAt,
+				                        #"Horas Resolución" = if ResolvedAt = null or CreatedAt = null then null else Duration.TotalHours(ResolvedAt - CreatedAt),
+				                        #"Es Clasificado" = MesaDe(ClaveProyecto) <> "Sin clasificar",
+				                        #"Está Abierto" = Categoria <> "Cerrado"
+				                    ]
+				        ),
+
+				    Tickets =
+				        Table.FromRecords(
+				            Rows,
+				            type table [
+				                Key = text,
+				                #"Issue ID" = text,
+				                Mesa = text,
+				                #"Proyecto Clave" = text,
+				                #"Proyecto Nombre" = text,
+				                Summary = nullable text,
+				                #"Tipo de Incidencia" = nullable text,
+				                #"Tipo de Solicitud" = text,
+				                Estado = nullable text,
+				                #"Categoría Estado" = text,
+				                Prioridad = nullable text,
+				                Asignado = text,
+				                Solicitante = text,
+				                Creado = datetime,
+				                #"Fecha Creación" = nullable datetime,
+				                Actualizado = nullable datetime,
+				                Resuelto = nullable datetime,
+				                #"Horas Resolución" = nullable number,
+				                #"Es Clasificado" = logical,
+				                #"Está Abierto" = logical
+				            ]
+				        ),
+
+				    // Quita duplicados por Key (control de calidad: un ticket no debe contarse dos veces)
+				    SinDuplicados = Table.Distinct(Tickets, {"Key"})
+				in
+				    SinDuplicados
+
+	annotation PBI_ResultType = Table
+
+	annotation PBI_NavigationStepName = Navegación

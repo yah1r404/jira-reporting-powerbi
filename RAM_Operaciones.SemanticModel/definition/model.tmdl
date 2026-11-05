@@ -1,0 +1,22 @@
+model Model
+	culture: es-MX
+	defaultPowerBIDataSourceVersion: powerBI_V3
+	sourceQueryCulture: es-MX
+	valueFilterBehavior: independent
+	dataAccessOptions
+		legacyRedirects
+		returnErrorValuesAsNull
+
+annotation __PBI_TimeIntelligenceEnabled = 0
+
+annotation PBI_ProTooling = ["DevMode"]
+
+annotation PBI_QueryOrder = ["RAM_Issues","MesaMap","_Medidas","FactTickets","DimMesa","DimFecha","Actualizacion"]
+
+ref table _Medidas
+ref table FactTickets
+ref table DimMesa
+ref table DimFecha
+ref table Actualizacion
+
+ref cultureInfo es-MX
