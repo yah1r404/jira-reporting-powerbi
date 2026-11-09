@@ -963,7 +963,7 @@ cultureInfo es-MX
 			      "Definition": {
 			        "Binding": {
 			          "ConceptualEntity": "_Medidas",
-			          "ConceptualProperty": "Tiempo Promedio a Primera Respuesta"
+			          "ConceptualProperty": "Tiempo promedio de SLA de primera respuesta"
 			        }
 			      },
 			      "State": "Generated",

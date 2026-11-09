@@ -1,5 +1,5 @@
 {
-  "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/visualContainer/2.13.0/schema.json",
+  "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/visualContainer/2.14.0/schema.json",
   "name": "bf11d782f385339a9fed",
   "position": {
     "x": 816.04278074866306,
@@ -23,12 +23,11 @@
                       "Entity": "_Medidas"
                     }
                   },
-                  "Property": "Tiempo Promedio a Primera Respuesta"
+                  "Property": "Tiempo promedio de SLA de primera respuesta"
                 }
               },
-              "queryRef": "_Medidas.Tiempo Promedio a Primera Respuesta",
-              "nativeQueryRef": "Tiempo Promedio a Primera Respuesta",
-              "displayName": "Tiempo promedio a primera respuesta"
+              "queryRef": "_Medidas.Tiempo promedio de SLA de primera respuesta",
+              "nativeQueryRef": "Tiempo promedio de SLA de primera respuesta"
             }
           ]
         }

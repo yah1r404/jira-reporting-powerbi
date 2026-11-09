@@ -1061,7 +1061,7 @@ table _Medidas
 		lineageTag: a67c0fa4-d96d-4e33-9a00-aa191fd5cba3
 
 	/// Tiempo promedio a la primera respuesta (primer comentario) en formato legible, con el calendario elegido.
-	measure 'Tiempo Promedio a Primera Respuesta' =
+	measure 'Tiempo promedio de SLA de primera respuesta' =
 			VAR Hrs = [Prom Horas SLA Respuesta]
 			VAR M = ROUND(Hrs * 60, 0)
 			VAR D = INT(M / 1440)

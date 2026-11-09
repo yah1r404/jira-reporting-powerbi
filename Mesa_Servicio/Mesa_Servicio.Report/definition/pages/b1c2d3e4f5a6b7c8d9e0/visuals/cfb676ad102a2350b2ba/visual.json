@@ -1,5 +1,5 @@
 {
-  "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/visualContainer/2.13.0/schema.json",
+  "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/visualContainer/2.14.0/schema.json",
   "name": "cfb676ad102a2350b2ba",
   "position": {
     "x": 1215.5963302752293,
@@ -73,7 +73,7 @@
                       "Entity": "_Medidas"
                     }
                   },
-                  "Property": "Tiempo Promedio a Primera Respuesta"
+                  "Property": "Tiempo promedio de SLA de primera respuesta"
                 }
               },
               "queryRef": "_Medidas.Tiempo Promedio a Primera Respuesta",
@@ -164,28 +164,6 @@
         "root": {}
       }
     ],
-    "visualContainerObjects": {
-      "title": [
-        {
-          "properties": {
-            "show": {
-              "expr": {
-                "Literal": {
-                  "Value": "true"
-                }
-              }
-            },
-            "text": {
-              "expr": {
-                "Literal": {
-                  "Value": "'Cumplimiento de SLA por tipo de solicitud'"
-                }
-              }
-            }
-          }
-        }
-      ]
-    },
     "objects": {
       "columnHeaders": [
         {
@@ -515,6 +493,28 @@
               "expr": {
                 "Literal": {
                   "Value": "4D"
+                }
+              }
+            }
+          }
+        }
+      ]
+    },
+    "visualContainerObjects": {
+      "title": [
+        {
+          "properties": {
+            "show": {
+              "expr": {
+                "Literal": {
+                  "Value": "true"
+                }
+              }
+            },
+            "text": {
+              "expr": {
+                "Literal": {
+                  "Value": "'Cumplimiento de SLA por tipo de solicitud'"
                 }
               }
             }
