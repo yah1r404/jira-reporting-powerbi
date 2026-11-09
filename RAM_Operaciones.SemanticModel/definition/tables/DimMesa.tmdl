@@ -22,11 +22,11 @@ table DimMesa
 
 	column Orden
 		dataType: int64
+		isHidden
 		formatString: 0
 		lineageTag: 7c8d9e0f-1a2b-4c3d-4e5f-6a7b8c9d0e1f
 		summarizeBy: none
 		sourceColumn: Orden
-		isHidden
 
 		annotation SummarizationSetBy = Automatic
 
@@ -41,3 +41,4 @@ table DimMesa
 	annotation PBI_ResultType = Table
 
 	annotation PBI_NavigationStepName = Navegación
+

@@ -1,21 +1,21 @@
 /// Tickets de las 7 mesas de RAM (GFIN, ALMCN, MDSI, COT, MDSC, MDSIT, PRYECT): todo el histórico, todos los estados. Búsqueda ligera, un solo JQL combinado, sin historial de cambios (no es el objetivo de este tablero). No se carga al modelo; FactTickets le da forma de tabla y clasifica cada ticket en su mesa.
 expression RAM_Issues =
 		let
-
+		
 		    // ========================================
 		    // CONFIGURACIÓN
 		    // ========================================
-
+		
 		    JiraBaseUrl = "https://secureopsmx.atlassian.net",
-
+		
 		    // Las 7 claves de proyecto de RAM. La clasificación clave -> nombre de mesa vive en FactTickets (MesaMap),
 		    // confirmada con el negocio: MDSI agrupa "Comercial" y "Órdenes de clientes" en un solo proyecto.
 		    Proyectos = {"GFIN", "ALMCN", "MDSI", "COT", "MDSC", "MDSIT", "PRYECT"},
 		    JQL = "project in (" & Text.Combine(Proyectos, ",") & ") ORDER BY created DESC",
-
+		
 		    // Tamaño de página medido para este conjunto de campos (límite real de Jira observado en otros tableros del entorno)
 		    PageSize = "100",
-
+		
 		    // Solo los campos que usa el modelo. customfield_10010 = Request Type (JSM); puede venir vacío en proyectos
 		    // que no son mesa de servicio (ej. Proyectos, Almacén) y se etiqueta "Sin request type" al transformar.
 		    BaseFields = {
@@ -23,12 +23,12 @@ expression RAM_Issues =
 		        "resolutiondate", "assignee", "reporter", "project", "customfield_10010"
 		    },
 		    JiraFields = Text.Combine(BaseFields, ","),
-
-
+		
+		
 		    // ========================================
 		    // BÚSQUEDA PAGINADA (las 7 mesas en un solo JQL combinado)
 		    // ========================================
-
+		
 		    GetPage = (NextToken as nullable text) as record =>
 		        let
 		            BaseQuery = [jql = JQL, maxResults = PageSize, fields = JiraFields],
@@ -47,7 +47,7 @@ expression RAM_Issues =
 		                    ]
 		                )
 		            ),
-
+		
 		    Search =
 		        List.Combine(
 		            List.Generate(
@@ -61,7 +61,7 @@ expression RAM_Issues =
 		                each [issues]
 		            )
 		        ),
-
+		
 		    // List.Buffer: la lista se guarda en memoria y no se vuelve a pedir a Jira al recorrerla otra vez
 		    RawIssues = List.Buffer(Search)
 		in
@@ -89,3 +89,4 @@ expression MesaMap =
 	annotation PBI_NavigationStepName = Navegación
 
 	annotation PBI_ResultType = List
+

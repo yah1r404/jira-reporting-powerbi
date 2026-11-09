@@ -3,8 +3,7 @@ table Actualizacion
 	lineageTag: 5a6b7c8d-9e0f-4a1b-2c3d-4e5f6a7b8c9f
 
 	column 'Última Actualización'
-		dataType: dateTime
-		formatString: General Date
+		dataType: string
 		lineageTag: 6b7c8d9e-0f1a-4b2c-3d4e-5f6a7b8c9d00
 		summarizeBy: none
 		sourceColumn: Última Actualización
@@ -22,3 +21,4 @@ table Actualizacion
 	annotation PBI_ResultType = Table
 
 	annotation PBI_NavigationStepName = Navegación
+

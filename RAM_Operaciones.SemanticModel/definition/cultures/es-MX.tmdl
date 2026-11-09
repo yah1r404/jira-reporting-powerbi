@@ -2,7 +2,343 @@ cultureInfo es-MX
 
 	linguisticMetadata =
 			{
-			  "Version": "4.1.0",
-			  "Language": "en-US"
+			  "Version": "2.0.0",
+			  "Language": "en-US",
+			  "Entities": {
+			    "facttickets.prioridad": {
+			      "Definition": {
+			        "Binding": {
+			          "ConceptualEntity": "FactTickets",
+			          "ConceptualProperty": "Prioridad"
+			        }
+			      },
+			      "State": "Generated"
+			    },
+			    "facttickets.estado": {
+			      "Definition": {
+			        "Binding": {
+			          "ConceptualEntity": "FactTickets",
+			          "ConceptualProperty": "Estado"
+			        }
+			      },
+			      "State": "Generated",
+			      "Terms": [
+			        {
+			          "Estado": {
+			            "State": "Suggested",
+			            "Source": {
+			              "Type": "External",
+			              "Agent": "PowerBI.VisualColumnRename"
+			            },
+			            "Weight": 0.9
+			          }
+			        }
+			      ]
+			    },
+			    "facttickets.tipo_de_solicitud": {
+			      "Definition": {
+			        "Binding": {
+			          "ConceptualEntity": "FactTickets",
+			          "ConceptualProperty": "Tipo de Solicitud"
+			        }
+			      },
+			      "State": "Generated",
+			      "Terms": [
+			        {
+			          "Tipo de Solicitud": {
+			            "State": "Suggested",
+			            "Source": {
+			              "Type": "External",
+			              "Agent": "PowerBI.VisualColumnRename"
+			            },
+			            "Weight": 0.9
+			          }
+			        }
+			      ]
+			    },
+			    "table_medidas.sin_clasificar": {
+			      "Definition": {
+			        "Binding": {
+			          "ConceptualEntity": "_Medidas",
+			          "ConceptualProperty": "% Sin Clasificar"
+			        }
+			      },
+			      "State": "Generated"
+			    },
+			    "table_medidas.tickets": {
+			      "Definition": {
+			        "Binding": {
+			          "ConceptualEntity": "_Medidas",
+			          "ConceptualProperty": "Total de tickets"
+			        }
+			      },
+			      "State": "Generated",
+			      "Terms": [
+			        {
+			          "Total de tickets": {
+			            "State": "Suggested",
+			            "Source": {
+			              "Type": "External",
+			              "Agent": "PowerBI.VisualColumnRename"
+			            },
+			            "Weight": 0.9
+			          }
+			        }
+			      ]
+			    },
+			    "table_medidas.abiertos": {
+			      "Definition": {
+			        "Binding": {
+			          "ConceptualEntity": "_Medidas",
+			          "ConceptualProperty": "% Abiertos"
+			        }
+			      },
+			      "State": "Generated",
+			      "Terms": [
+			        {
+			          "% Abiertos": {
+			            "State": "Suggested",
+			            "Source": {
+			              "Type": "External",
+			              "Agent": "PowerBI.VisualColumnRename"
+			            },
+			            "Weight": 0.9
+			          }
+			        }
+			      ]
+			    },
+			    "table_medidas.tickets_mes_actual": {
+			      "Definition": {
+			        "Binding": {
+			          "ConceptualEntity": "_Medidas",
+			          "ConceptualProperty": "Tickets Mes Actual"
+			        }
+			      },
+			      "State": "Generated"
+			    },
+			    "table_medidas.mesas_con_actividad": {
+			      "Definition": {
+			        "Binding": {
+			          "ConceptualEntity": "_Medidas",
+			          "ConceptualProperty": "Mesas con Actividad"
+			        }
+			      },
+			      "State": "Generated",
+			      "Terms": [
+			        {
+			          "Mesas con Actividad": {
+			            "State": "Suggested",
+			            "Source": {
+			              "Type": "External",
+			              "Agent": "PowerBI.VisualColumnRename"
+			            },
+			            "Weight": 0.9
+			          }
+			        }
+			      ]
+			    },
+			    "table_medidas.variación_mensual_": {
+			      "Definition": {
+			        "Binding": {
+			          "ConceptualEntity": "_Medidas",
+			          "ConceptualProperty": "Variación Mensual %"
+			        }
+			      },
+			      "State": "Generated"
+			    },
+			    "table_medidas.inventario_abierto": {
+			      "Definition": {
+			        "Binding": {
+			          "ConceptualEntity": "_Medidas",
+			          "ConceptualProperty": "Tickets abiertos"
+			        }
+			      },
+			      "State": "Generated",
+			      "Terms": [
+			        {
+			          "Tickets abiertos": {
+			            "State": "Suggested",
+			            "Source": {
+			              "Type": "External",
+			              "Agent": "PowerBI.VisualColumnRename"
+			            },
+			            "Weight": 0.9
+			          }
+			        }
+			      ]
+			    },
+			    "table_medidas.ranking_mesa": {
+			      "Definition": {
+			        "Binding": {
+			          "ConceptualEntity": "_Medidas",
+			          "ConceptualProperty": "Ranking Mesa"
+			        }
+			      },
+			      "State": "Generated"
+			    },
+			    "table_medidas.del_total": {
+			      "Definition": {
+			        "Binding": {
+			          "ConceptualEntity": "_Medidas",
+			          "ConceptualProperty": "% del Total"
+			        }
+			      },
+			      "State": "Generated"
+			    },
+			    "table_medidas.tickets_sin_tipo_de_solicitud": {
+			      "Definition": {
+			        "Binding": {
+			          "ConceptualEntity": "_Medidas",
+			          "ConceptualProperty": "Tickets Sin Tipo de Solicitud"
+			        }
+			      },
+			      "State": "Generated"
+			    },
+			    "table_medidas.antigüedad_promedio_abiertos_días": {
+			      "Definition": {
+			        "Binding": {
+			          "ConceptualEntity": "_Medidas",
+			          "ConceptualProperty": "Antigüedad Promedio Abiertos (Días)"
+			        }
+			      },
+			      "State": "Generated"
+			    },
+			    "table_medidas.inventario_total": {
+			      "Definition": {
+			        "Binding": {
+			          "ConceptualEntity": "_Medidas",
+			          "ConceptualProperty": "Inventario Total"
+			        }
+			      },
+			      "State": "Generated"
+			    },
+			    "table_medidas.tickets_únicos_control": {
+			      "Definition": {
+			        "Binding": {
+			          "ConceptualEntity": "_Medidas",
+			          "ConceptualProperty": "Tickets Únicos (Control)"
+			        }
+			      },
+			      "State": "Generated"
+			    },
+			    "table_medidas.tickets_sin_mesa": {
+			      "Definition": {
+			        "Binding": {
+			          "ConceptualEntity": "_Medidas",
+			          "ConceptualProperty": "Tickets Sin Mesa"
+			        }
+			      },
+			      "State": "Generated"
+			    },
+			    "table_medidas.duplicados_detectados": {
+			      "Definition": {
+			        "Binding": {
+			          "ConceptualEntity": "_Medidas",
+			          "ConceptualProperty": "Duplicados Detectados"
+			        }
+			      },
+			      "State": "Generated"
+			    },
+			    "table_medidas.última_actualización": {
+			      "Definition": {
+			        "Binding": {
+			          "ConceptualEntity": "_Medidas",
+			          "ConceptualProperty": "Última Actualización"
+			        }
+			      },
+			      "State": "Generated",
+			      "Terms": [
+			        {
+			          "Última Actualización": {
+			            "State": "Suggested",
+			            "Source": {
+			              "Type": "External",
+			              "Agent": "PowerBI.VisualColumnRename"
+			            },
+			            "Weight": 0.9
+			          }
+			        }
+			      ]
+			    },
+			    "dimmesa.mesa": {
+			      "Definition": {
+			        "Binding": {
+			          "ConceptualEntity": "DimMesa",
+			          "ConceptualProperty": "Mesa"
+			        }
+			      },
+			      "State": "Generated",
+			      "Terms": [
+			        {
+			          "Mesa": {
+			            "State": "Suggested",
+			            "Source": {
+			              "Type": "External",
+			              "Agent": "PowerBI.VisualColumnRename"
+			            },
+			            "Weight": 0.9
+			          }
+			        }
+			      ]
+			    },
+			    "dimfecha.año_mes": {
+			      "Definition": {
+			        "Binding": {
+			          "ConceptualEntity": "DimFecha",
+			          "ConceptualProperty": "Año Mes"
+			        }
+			      },
+			      "State": "Generated",
+			      "Terms": [
+			        {
+			          "Periodo": {
+			            "State": "Suggested",
+			            "Source": {
+			              "Type": "External",
+			              "Agent": "PowerBI.VisualColumnRename"
+			            },
+			            "Weight": 0.9
+			          }
+			        }
+			      ]
+			    },
+			    "dimfecha.trimestre": {
+			      "Definition": {
+			        "Binding": {
+			          "ConceptualEntity": "DimFecha",
+			          "ConceptualProperty": "Trimestre"
+			        }
+			      },
+			      "State": "Generated"
+			    },
+			    "dimfecha.año": {
+			      "Definition": {
+			        "Binding": {
+			          "ConceptualEntity": "DimFecha",
+			          "ConceptualProperty": "Año"
+			        }
+			      },
+			      "State": "Generated"
+			    },
+			    "table_medidas.tickets1": {
+			      "Definition": {
+			        "Binding": {
+			          "ConceptualEntity": "_Medidas",
+			          "ConceptualProperty": "Tickets"
+			        }
+			      },
+			      "State": "Generated"
+			    },
+			    "table_medidas.inventario_abierto1": {
+			      "Definition": {
+			        "Binding": {
+			          "ConceptualEntity": "_Medidas",
+			          "ConceptualProperty": "Inventario Abierto"
+			        }
+			      },
+			      "State": "Generated"
+			    }
+			  }
 			}
 		contentType: json
+

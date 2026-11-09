@@ -2,7 +2,7 @@ table _Medidas
 	lineageTag: 7c8d9e0f-1a2b-4c3d-4e5f-6a7b8c9d0e11
 
 	/// Tickets únicos en el contexto de filtros actual (mesa, estado, prioridad, fecha de creación, etc.).
-	measure Tickets = DISTINCTCOUNT(FactTickets[Key])
+	measure 'Total de tickets' = DISTINCTCOUNT(FactTickets[Key])
 		formatString: #,##0
 		displayFolder: Ejecutivo
 		lineageTag: 8d9e0f1a-2b3c-4d4e-5f6a-7b8c9d0e1f12
@@ -13,7 +13,7 @@ table _Medidas
 			VAR Fin = TODAY()
 			RETURN
 			    CALCULATE(
-			        [Tickets],
+			        [Total de tickets],
 			        REMOVEFILTERS(DimFecha),
 			        FactTickets[Fecha Creación] >= Inicio,
 			        FactTickets[Fecha Creación] <= Fin
@@ -28,7 +28,7 @@ table _Medidas
 			VAR Fin = EOMONTH(TODAY(), -1)
 			RETURN
 			    CALCULATE(
-			        [Tickets],
+			        [Total de tickets],
 			        REMOVEFILTERS(DimFecha),
 			        FactTickets[Fecha Creación] >= Inicio,
 			        FactTickets[Fecha Creación] <= Fin
@@ -55,25 +55,25 @@ table _Medidas
 		lineageTag: 3c4d5e6f-7a8b-4c9d-0e1f-2a3b4c5d6e17
 
 	/// % de tickets cuya clave de proyecto no corresponde a ninguna de las 7 mesas conocidas. Debería ser 0% con el JQL actual.
-	measure '% Sin Clasificar' = DIVIDE(CALCULATE([Tickets], FactTickets[Mesa] = "Sin clasificar"), [Tickets])
+	measure '% Sin Clasificar' = DIVIDE(CALCULATE([Total de tickets], FactTickets[Mesa] = "Sin clasificar"), [Total de tickets])
 		formatString: 0.0%
 		displayFolder: Ejecutivo
 		lineageTag: 4d5e6f7a-8b9c-4d0e-1f2a-3b4c5d6e7f18
 
 	/// % de tickets cuyo estado actual no está en la categoría "Cerrado" (inventario abierto o pendiente).
-	measure '% Abiertos' = DIVIDE(CALCULATE([Tickets], FactTickets[Está Abierto] = TRUE), [Tickets])
+	measure '% Abiertos' = DIVIDE(CALCULATE([Total de tickets], FactTickets[Está Abierto] = TRUE), [Total de tickets])
 		formatString: 0.0%
 		displayFolder: Ejecutivo
 		lineageTag: 5e6f7a8b-9c0d-4e1f-2a3b-4c5d6e7f8a19
 
 	/// Tickets totales existentes según su estado actual, ignorando el filtro de fecha de creación (pero respetando mesa/estado/prioridad).
-	measure 'Inventario Total' = CALCULATE([Tickets], REMOVEFILTERS(DimFecha))
+	measure 'Inventario Total' = CALCULATE([Total de tickets], REMOVEFILTERS(DimFecha))
 		formatString: #,##0
 		displayFolder: Inventario
 		lineageTag: 6f7a8b9c-0d1e-4f2a-3b4c-5d6e7f8a9b20
 
 	/// Tickets actualmente abiertos o pendientes (categoría de estado distinta de "Cerrado"), sin filtrar por fecha de creación.
-	measure 'Inventario Abierto' = CALCULATE([Inventario Total], FactTickets[Está Abierto] = TRUE)
+	measure 'Tickets abiertos' = CALCULATE([Inventario Total], FactTickets[Está Abierto] = TRUE)
 		formatString: #,##0
 		displayFolder: Inventario
 		lineageTag: 7a8b9c0d-1e2f-4a3b-4c5d-6e7f8a9b0c21
@@ -89,24 +89,24 @@ table _Medidas
 		lineageTag: 8b9c0d1e-2f3a-4b4c-5d6e-7f8a9b0c1d22
 
 	/// Participación de la mesa (o del contexto actual) sobre el total de tickets, ignorando el filtro de mesa.
-	measure '% del Total' = DIVIDE([Tickets], CALCULATE([Tickets], REMOVEFILTERS(DimMesa)))
+	measure '% del Total' = DIVIDE([Total de tickets], CALCULATE([Total de tickets], REMOVEFILTERS(DimMesa)))
 		formatString: 0.0%
 		displayFolder: Por Mesa
 		lineageTag: 9c0d1e2f-3a4b-4c5d-6e7f-8a9b0c1d2e23
 
 	/// Posición de la mesa por volumen de tickets (1 = la de más volumen), dentro de los filtros activos salvo el de mesa.
-	measure 'Ranking Mesa' = RANKX(ALL(DimMesa[Mesa]), CALCULATE([Tickets]), , DESC, Dense)
+	measure 'Ranking Mesa' = RANKX(ALL(DimMesa[Mesa]), CALCULATE([Total de tickets]), , DESC, Dense)
 		formatString: #,##0
 		displayFolder: Por Mesa
 		lineageTag: 0d1e2f3a-4b5c-4d6e-7f8a-9b0c1d2e3f24
 
 	/// Tickets creados en el mismo periodo de calendario, un mes antes del periodo seleccionado (día/mes/trimestre/año, según el nivel de DimFecha en el visual).
-	measure 'Tickets Periodo Anterior' = CALCULATE([Tickets], DATEADD(DimFecha[Date], -1, MONTH))
+	measure 'Tickets Periodo Anterior' = CALCULATE([Total de tickets], DATEADD(DimFecha[Date], -1, MONTH))
 		formatString: #,##0
 		displayFolder: Temporal
 		lineageTag: 1e2f3a4b-5c6d-4e7f-8a9b-0c1d2e3f4a25
 
-	measure 'Variación vs Periodo Anterior %' = DIVIDE([Tickets] - [Tickets Periodo Anterior], [Tickets Periodo Anterior])
+	measure 'Variación vs Periodo Anterior %' = DIVIDE([Total de tickets] - [Tickets Periodo Anterior], [Tickets Periodo Anterior])
 		formatString: +0.0%;-0.0%;0.0%
 		displayFolder: Temporal
 		lineageTag: 2f3a4b5c-6d7e-4f8a-9b0c-1d2e3f4a5b26
@@ -117,12 +117,12 @@ table _Medidas
 		displayFolder: Calidad
 		lineageTag: 3a4b5c6d-7e8f-4a9b-0c1d-2e3f4a5b6c27
 
-	measure 'Tickets Sin Mesa' = CALCULATE([Tickets], FactTickets[Mesa] = "Sin clasificar")
+	measure 'Tickets Sin Mesa' = CALCULATE([Total de tickets], FactTickets[Mesa] = "Sin clasificar")
 		formatString: #,##0
 		displayFolder: Calidad
 		lineageTag: 4b5c6d7e-8f9a-4b0c-1d2e-3f4a5b6c7d28
 
-	measure 'Tickets Sin Tipo de Solicitud' = CALCULATE([Tickets], FactTickets[Tipo de Solicitud] = "Sin request type")
+	measure 'Tickets Sin Tipo de Solicitud' = CALCULATE([Total de tickets], FactTickets[Tipo de Solicitud] = "Sin request type")
 		formatString: #,##0
 		displayFolder: Calidad
 		lineageTag: 5c6d7e8f-9a0b-4c1d-2e3f-4a5b6c7d8e29
@@ -138,11 +138,20 @@ table _Medidas
 		displayFolder: Calidad
 		lineageTag: 7e8f9a0b-1c2d-4e3f-4a5b-6c7d8e9f0a31
 
+	column Columna1
+		dataType: int64
+		formatString: 0
+		lineageTag: 40d2d040-192b-4465-8302-417945c763d5
+		summarizeBy: sum
+		sourceColumn: Columna1
+
+		annotation SummarizationSetBy = Automatic
+
 	partition _Medidas = m
 		mode: import
-		source =
-				#table(type table [Columna1 = Int64.Type], {{1}})
+		source = #table(type table [Columna1 = Int64.Type], {{1}})
 
 	annotation PBI_ResultType = Table
 
 	annotation PBI_NavigationStepName = Navegación
+

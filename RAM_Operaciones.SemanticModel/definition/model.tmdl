@@ -11,7 +11,7 @@ annotation __PBI_TimeIntelligenceEnabled = 0
 
 annotation PBI_ProTooling = ["DevMode"]
 
-annotation PBI_QueryOrder = ["RAM_Issues","MesaMap","_Medidas","FactTickets","DimMesa","DimFecha","Actualizacion"]
+annotation PBI_QueryOrder = ["RAM_Issues","MesaMap","_Medidas","FactTickets","DimMesa","Actualizacion"]
 
 ref table _Medidas
 ref table FactTickets
@@ -20,3 +20,4 @@ ref table DimFecha
 ref table Actualizacion
 
 ref cultureInfo es-MX
+

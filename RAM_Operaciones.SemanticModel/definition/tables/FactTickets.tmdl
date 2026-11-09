@@ -182,25 +182,25 @@ table FactTickets
 		mode: import
 		source =
 				let
-
+				
 				    Issues = RAM_Issues,
-
-
+				
+				
 				    // ========================================
 				    // CLASIFICACIÓN DE MESA (regla única en MesaMap, compartida con DimMesa)
 				    // ========================================
-
+				
 				    MesaDe = (ClaveProyecto as nullable text) as text =>
 				        let
 				            Match = List.Select(MesaMap, each [Clave] = ClaveProyecto)
 				        in
 				            if List.IsEmpty(Match) then "Sin clasificar" else Match{0}[Mesa],
-
-
+				
+				
 				    // ========================================
 				    // AYUDANTES
 				    // ========================================
-
+				
 				    // Jira devuelve fechas con zona ("-0600"); se pasan a hora de Mérida (UTC-6, sin horario de verano)
 				    ToLocal = (t as nullable text) as nullable datetime =>
 				        if t = null then null
@@ -213,10 +213,10 @@ table FactTickets
 				                    else t
 				            in
 				                DateTimeZone.RemoveZone(DateTimeZone.SwitchZone(DateTimeZone.FromText(Iso), -6)),
-
+				
 				    NameOf = (r as any, f as text) as any =>
 				        if r is record then Record.FieldOrDefault(r, f, null) else null,
-
+				
 				    // Normaliza statusCategory.key (independiente del idioma): new / indeterminate / done
 				    CategoriaDe = (StatusRec as any) as text =>
 				        let
@@ -226,12 +226,12 @@ table FactTickets
 				            else if CatKey = "indeterminate" then "En curso"
 				            else if CatKey = "new" then "Nuevo"
 				            else "Sin categoría",
-
-
+				
+				
 				    // ========================================
 				    // UN RENGLÓN POR TICKET
 				    // ========================================
-
+				
 				    Rows =
 				        List.Transform(
 				            Issues,
@@ -276,7 +276,7 @@ table FactTickets
 				                        #"Está Abierto" = Categoria <> "Cerrado"
 				                    ]
 				        ),
-
+				
 				    Tickets =
 				        Table.FromRecords(
 				            Rows,
@@ -303,7 +303,7 @@ table FactTickets
 				                #"Está Abierto" = logical
 				            ]
 				        ),
-
+				
 				    // Quita duplicados por Key (control de calidad: un ticket no debe contarse dos veces)
 				    SinDuplicados = Table.Distinct(Tickets, {"Key"})
 				in
@@ -312,3 +312,4 @@ table FactTickets
 	annotation PBI_ResultType = Table
 
 	annotation PBI_NavigationStepName = Navegación
+
