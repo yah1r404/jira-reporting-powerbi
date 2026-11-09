@@ -1645,6 +1645,295 @@ table _Medidas
 		displayFolder: Línea de Tiempo
 		lineageTag: 5364240f-4c8a-4f73-99d9-237f954afad8
 
+	/// Tickets del nivel. N1 sin técnico seleccionado: todos los tickets (mismo total que la hoja SLA). N2 o con técnico: tickets en que participó.
+	measure 'Tickets Nivel' =
+			VAR TodosLosTickets = SELECTEDVALUE(FactParticipacion[Nivel]) = "N1" && NOT ISFILTERED(FactParticipacion[Técnico]) && NOT ISFILTERED(FactParticipacion[Identificación]) && NOT ISFILTERED(FactParticipacion[Cuenta])
+			RETURN
+			    IF(TodosLosTickets, [Tickets], CALCULATE([Tickets], TREATAS(VALUES(FactParticipacion[Key]), SLA_Tickets[Key])))
+		formatString: #,##0
+		displayFolder: Calidad N1 N2
+		lineageTag: 2dd83fe8-b77f-46a4-bccc-bce0710f63eb
+
+	/// Participaciones técnicas: un ticket con dos técnicos suma 2. Base de la distribución de la carga.
+	measure 'Participaciones Nivel' = COUNTROWS(FactParticipacion)
+		formatString: #,##0
+		displayFolder: Calidad N1 N2
+		lineageTag: a271a2ec-6f9f-454e-88a1-9360d1644392
+
+	/// Participaciones del técnico entre el total de participaciones del nivel con los mismos filtros.
+	measure '% Participación Nivel' = DIVIDE([Participaciones Nivel], CALCULATE([Participaciones Nivel], REMOVEFILTERS(FactParticipacion[Técnico], FactParticipacion[Cuenta], FactParticipacion[Identificación])))
+		formatString: 0.0%;-0.0%;0.0%
+		displayFolder: Calidad N1 N2
+		lineageTag: eba97a1e-b75d-46b2-af9a-83b2e074ced7
+
+	/// Tickets que hoy tiene el técnico: es el responsable actual o figura en Técnicos asignados.
+	measure 'Tickets Asignados Nivel' = CALCULATE(DISTINCTCOUNT(FactParticipacion[Key]), FactParticipacion[Asignado actualmente] = TRUE())
+		formatString: #,##0
+		displayFolder: Calidad N1 N2
+		lineageTag: 397ec421-6c3a-461e-9073-0ce2bc296784
+
+	/// Tickets resueltos del nivel o técnico.
+	measure 'Tickets Resueltos Nivel' =
+			VAR TodosLosTickets = SELECTEDVALUE(FactParticipacion[Nivel]) = "N1" && NOT ISFILTERED(FactParticipacion[Técnico]) && NOT ISFILTERED(FactParticipacion[Identificación]) && NOT ISFILTERED(FactParticipacion[Cuenta])
+			RETURN
+			    IF(TodosLosTickets, [Tickets Resueltos], CALCULATE([Tickets Resueltos], TREATAS(VALUES(FactParticipacion[Key]), SLA_Tickets[Key])))
+		formatString: #,##0
+		displayFolder: Calidad N1 N2
+		lineageTag: 5937d880-4f35-410b-b6a5-16a007a296d1
+
+	/// Tickets sin resolver del nivel o técnico.
+	measure 'Tickets Pendientes Nivel' =
+			VAR TodosLosTickets = SELECTEDVALUE(FactParticipacion[Nivel]) = "N1" && NOT ISFILTERED(FactParticipacion[Técnico]) && NOT ISFILTERED(FactParticipacion[Identificación]) && NOT ISFILTERED(FactParticipacion[Cuenta])
+			RETURN
+			    IF(TodosLosTickets, [Tickets Abiertos], CALCULATE([Tickets Abiertos], TREATAS(VALUES(FactParticipacion[Key]), SLA_Tickets[Key])))
+		formatString: #,##0
+		displayFolder: Calidad N1 N2
+		lineageTag: 8f326cdd-1ca1-4b5e-9906-336d33f51970
+
+	/// Tickets auditados con respuesta válida en el campo AQL del nivel. Sin técnico: todos los auditados; con técnico: los suyos.
+	measure 'AQL Auditados' =
+			VAR Nivel = SELECTEDVALUE(FactParticipacion[Nivel])
+			VAR SinTecnico = NOT ISFILTERED(FactParticipacion[Técnico]) && NOT ISFILTERED(FactParticipacion[Identificación]) && NOT ISFILTERED(FactParticipacion[Cuenta])
+			VAR Campo1 = CALCULATE([Tickets], SLA_Tickets[AQL N1 Resultado] IN {"Positivo", "Negativo"})
+			VAR Campo2 = CALCULATE([Tickets], SLA_Tickets[AQL N2 Resultado] IN {"Positivo", "Negativo"})
+			RETURN
+			    SWITCH(
+			        TRUE(),
+			        Nivel = "N1" && SinTecnico, Campo1,
+			        Nivel = "N2" && SinTecnico, Campo2,
+			        Nivel = "N1", CALCULATE([Tickets], SLA_Tickets[AQL N1 Resultado] IN {"Positivo", "Negativo"}, TREATAS(VALUES(FactParticipacion[Key]), SLA_Tickets[Key])),
+			        Nivel = "N2", CALCULATE([Tickets], SLA_Tickets[AQL N2 Resultado] IN {"Positivo", "Negativo"}, TREATAS(VALUES(FactParticipacion[Key]), SLA_Tickets[Key]))
+			    )
+		formatString: #,##0
+		displayFolder: Calidad N1 N2
+		lineageTag: de8bf6b9-db05-4d89-a086-a4b95883a7b5
+
+	/// Auditados con evaluación Incorrecto.
+	measure 'AQL Negativos' =
+			VAR Nivel = SELECTEDVALUE(FactParticipacion[Nivel])
+			VAR SinTecnico = NOT ISFILTERED(FactParticipacion[Técnico]) && NOT ISFILTERED(FactParticipacion[Identificación]) && NOT ISFILTERED(FactParticipacion[Cuenta])
+			VAR Campo1 = CALCULATE([Tickets], SLA_Tickets[AQL N1 Resultado] IN {"Negativo"})
+			VAR Campo2 = CALCULATE([Tickets], SLA_Tickets[AQL N2 Resultado] IN {"Negativo"})
+			RETURN
+			    SWITCH(
+			        TRUE(),
+			        Nivel = "N1" && SinTecnico, Campo1,
+			        Nivel = "N2" && SinTecnico, Campo2,
+			        Nivel = "N1", CALCULATE([Tickets], SLA_Tickets[AQL N1 Resultado] IN {"Negativo"}, TREATAS(VALUES(FactParticipacion[Key]), SLA_Tickets[Key])),
+			        Nivel = "N2", CALCULATE([Tickets], SLA_Tickets[AQL N2 Resultado] IN {"Negativo"}, TREATAS(VALUES(FactParticipacion[Key]), SLA_Tickets[Key]))
+			    )
+		formatString: #,##0
+		displayFolder: Calidad N1 N2
+		lineageTag: 5221dae5-b9ef-44c8-8210-e091495e539b
+
+	/// Auditados con evaluación Correcto.
+	measure 'AQL Positivos' =
+			VAR Nivel = SELECTEDVALUE(FactParticipacion[Nivel])
+			VAR SinTecnico = NOT ISFILTERED(FactParticipacion[Técnico]) && NOT ISFILTERED(FactParticipacion[Identificación]) && NOT ISFILTERED(FactParticipacion[Cuenta])
+			VAR Campo1 = CALCULATE([Tickets], SLA_Tickets[AQL N1 Resultado] IN {"Positivo"})
+			VAR Campo2 = CALCULATE([Tickets], SLA_Tickets[AQL N2 Resultado] IN {"Positivo"})
+			RETURN
+			    SWITCH(
+			        TRUE(),
+			        Nivel = "N1" && SinTecnico, Campo1,
+			        Nivel = "N2" && SinTecnico, Campo2,
+			        Nivel = "N1", CALCULATE([Tickets], SLA_Tickets[AQL N1 Resultado] IN {"Positivo"}, TREATAS(VALUES(FactParticipacion[Key]), SLA_Tickets[Key])),
+			        Nivel = "N2", CALCULATE([Tickets], SLA_Tickets[AQL N2 Resultado] IN {"Positivo"}, TREATAS(VALUES(FactParticipacion[Key]), SLA_Tickets[Key]))
+			    )
+		formatString: #,##0
+		displayFolder: Calidad N1 N2
+		lineageTag: c6ec530c-9e1d-422f-8c1d-6a5bd53b4c9a
+
+	/// Control: valores de AQL distintos de Correcto/Incorrecto. Debe ser 0.
+	measure 'AQL Otro Valor' =
+			VAR Nivel = SELECTEDVALUE(FactParticipacion[Nivel])
+			VAR SinTecnico = NOT ISFILTERED(FactParticipacion[Técnico]) && NOT ISFILTERED(FactParticipacion[Identificación]) && NOT ISFILTERED(FactParticipacion[Cuenta])
+			VAR Campo1 = CALCULATE([Tickets], SLA_Tickets[AQL N1 Resultado] IN {"Otro valor"})
+			VAR Campo2 = CALCULATE([Tickets], SLA_Tickets[AQL N2 Resultado] IN {"Otro valor"})
+			RETURN
+			    SWITCH(
+			        TRUE(),
+			        Nivel = "N1" && SinTecnico, Campo1,
+			        Nivel = "N2" && SinTecnico, Campo2,
+			        Nivel = "N1", CALCULATE([Tickets], SLA_Tickets[AQL N1 Resultado] IN {"Otro valor"}, TREATAS(VALUES(FactParticipacion[Key]), SLA_Tickets[Key])),
+			        Nivel = "N2", CALCULATE([Tickets], SLA_Tickets[AQL N2 Resultado] IN {"Otro valor"}, TREATAS(VALUES(FactParticipacion[Key]), SLA_Tickets[Key]))
+			    )
+		formatString: #,##0
+		displayFolder: Calidad N1 N2
+		lineageTag: 33edafcc-7b5a-4c72-b7ac-3511c450063a
+
+	/// AQL = auditados negativos / auditados con respuesta (solo la muestra auditada).
+	measure '% AQL' = DIVIDE([AQL Negativos], [AQL Auditados])
+		formatString: 0.0%;-0.0%;0.0%
+		displayFolder: Calidad N1 N2
+		lineageTag: d0cef84f-67b4-4a36-ac4f-e00d58f799d3
+
+	/// Auditados positivos / auditados con respuesta.
+	measure '% Calidad Satisfactoria' = DIVIDE([AQL Positivos], [AQL Auditados])
+		formatString: 0.0%;-0.0%;0.0%
+		displayFolder: Calidad N1 N2
+		lineageTag: 90a03fbe-3d37-40e5-888a-4dbf04e172bf
+
+	/// Semáforo del AQL: azul <= 5% negativos, ámbar <= 15%, rojo arriba.
+	measure 'Color % AQL' =
+			VAR v = [% AQL]
+			RETURN
+			    SWITCH(
+			        TRUE(),
+			        ISBLANK(v), "#5B6B7F",
+			        v <= 1 - [Meta % SLA], "#06519A",
+			        v <= 1 - [Umbral Alerta % SLA], "#C98A00",
+			        "#C8382E"
+			    )
+		displayFolder: Calidad N1 N2
+		lineageTag: 4e787d9b-888a-45e2-95de-e5125cb8c7d5
+
+	/// Subtítulo de la tarjeta de tickets.
+	measure 'Texto Tickets Nivel' = FORMAT([Tickets Resueltos Nivel] + 0, "#,##0") & " resueltos · " & FORMAT([Tickets Pendientes Nivel] + 0, "#,##0") & " pendientes"
+		displayFolder: Calidad N1 N2
+		lineageTag: 415b9d3b-f6a9-49d4-83cb-2b272e70ae09
+
+	/// Subtítulo de la tarjeta de incumplidos de resolución.
+	measure 'Texto Incumplidos Nivel' = IF([SLA Resolución Evaluados Nivel] > 0, FORMAT([% SLA Resolución Incumplimiento Nivel], "0.0%") & " de " & FORMAT([SLA Resolución Evaluados Nivel], "#,##0") & " evaluados", "Sin tickets evaluados")
+		displayFolder: Calidad N1 N2
+		lineageTag: 57f595ea-66a6-4979-9e6c-1f6cb138ce71
+
+	/// Subtítulo de la tarjeta de auditados: tamaño de la muestra frente a los resueltos.
+	measure 'Texto Auditados Nivel' = IF([Tickets Resueltos Nivel] > 0, FORMAT(DIVIDE([AQL Auditados], [Tickets Resueltos Nivel]) + 0, "0.0%") & " de los resueltos", "Sin tickets resueltos")
+		displayFolder: Calidad N1 N2
+		lineageTag: c150ba3f-1682-4975-8caf-0e41d2603b02
+
+	/// Subtítulo de la tarjeta de AQL.
+	measure 'Texto AQL Nivel' = IF([AQL Auditados] > 0, FORMAT([AQL Negativos], "#,##0") & " negativos · calidad " & FORMAT([% Calidad Satisfactoria], "0.0%"), "Sin auditorías en el periodo")
+		displayFolder: Calidad N1 N2
+		lineageTag: 69c4a766-03ba-46f3-890a-a30fd910d411
+
+	/// Estado del SLA de resolución del ticket (calendario elegido).
+	measure 'Estado SLA del Ticket' = IF([Calendario Es RAM], SELECTEDVALUE(SLA_Tickets[SLA Resolución Estado RAM]), SELECTEDVALUE(SLA_Tickets[SLA Resolución Estado]))
+		displayFolder: Calidad N1 N2
+		lineageTag: 11312cb5-8515-47e6-9787-9ed5a4cacaa5
+
+	/// Primera respuesta dentro de la meta (calendario elegido).
+	measure 'SLA Respuesta Cumplidos Nivel' =
+			VAR TodosLosTickets = SELECTEDVALUE(FactParticipacion[Nivel]) = "N1" && NOT ISFILTERED(FactParticipacion[Técnico]) && NOT ISFILTERED(FactParticipacion[Identificación]) && NOT ISFILTERED(FactParticipacion[Cuenta])
+			RETURN
+			    IF(TodosLosTickets, [SLA Respuesta Cumplidos], CALCULATE([SLA Respuesta Cumplidos], TREATAS(VALUES(FactParticipacion[Key]), SLA_Tickets[Key])))
+		formatString: #,##0
+		displayFolder: Calidad N1 N2
+		lineageTag: 10dc003a-444f-4ec0-9bf2-93a9616fcac0
+
+	/// Primera respuesta fuera de la meta (calendario elegido).
+	measure 'SLA Respuesta Incumplidos Nivel' =
+			VAR TodosLosTickets = SELECTEDVALUE(FactParticipacion[Nivel]) = "N1" && NOT ISFILTERED(FactParticipacion[Técnico]) && NOT ISFILTERED(FactParticipacion[Identificación]) && NOT ISFILTERED(FactParticipacion[Cuenta])
+			RETURN
+			    IF(TodosLosTickets, [SLA Respuesta Incumplidos], CALCULATE([SLA Respuesta Incumplidos], TREATAS(VALUES(FactParticipacion[Key]), SLA_Tickets[Key])))
+		formatString: #,##0
+		displayFolder: Calidad N1 N2
+		lineageTag: 4428edab-da6f-4b71-843d-4208e81ca328
+
+	/// Tickets con SLA de primera respuesta evaluado.
+	measure 'SLA Respuesta Evaluados Nivel' = [SLA Respuesta Cumplidos Nivel] + [SLA Respuesta Incumplidos Nivel]
+		formatString: #,##0
+		displayFolder: Calidad N1 N2
+		lineageTag: 97b7f170-b7cd-4311-802a-adf89281353b
+
+	/// % de cumplimiento de primera respuesta (misma medida que la hoja SLA).
+	measure '% SLA Respuesta Nivel' =
+			VAR TodosLosTickets = SELECTEDVALUE(FactParticipacion[Nivel]) = "N1" && NOT ISFILTERED(FactParticipacion[Técnico]) && NOT ISFILTERED(FactParticipacion[Identificación]) && NOT ISFILTERED(FactParticipacion[Cuenta])
+			RETURN
+			    IF(TodosLosTickets, [% SLA Primera Respuesta], CALCULATE([% SLA Primera Respuesta], TREATAS(VALUES(FactParticipacion[Key]), SLA_Tickets[Key])))
+		formatString: 0.0%;-0.0%;0.0%
+		displayFolder: Calidad N1 N2
+		lineageTag: 53624941-0109-45d7-8bff-26d250f22b6e
+
+	/// % de incumplimiento de primera respuesta.
+	measure '% SLA Respuesta Incumplimiento Nivel' = DIVIDE([SLA Respuesta Incumplidos Nivel], [SLA Respuesta Evaluados Nivel])
+		formatString: 0.0%;-0.0%;0.0%
+		displayFolder: Calidad N1 N2
+		lineageTag: 0376883f-f36f-4c14-a897-bf57b4c21ae2
+
+	/// Resueltos dentro de la meta de resolución (calendario elegido).
+	measure 'SLA Resolución Cumplidos Nivel' =
+			VAR TodosLosTickets = SELECTEDVALUE(FactParticipacion[Nivel]) = "N1" && NOT ISFILTERED(FactParticipacion[Técnico]) && NOT ISFILTERED(FactParticipacion[Identificación]) && NOT ISFILTERED(FactParticipacion[Cuenta])
+			RETURN
+			    IF(TodosLosTickets, [SLA Resolución Cumplidos], CALCULATE([SLA Resolución Cumplidos], TREATAS(VALUES(FactParticipacion[Key]), SLA_Tickets[Key])))
+		formatString: #,##0
+		displayFolder: Calidad N1 N2
+		lineageTag: a1ec1f41-a710-490e-8c41-c78b80114f7b
+
+	/// Pasaron la meta de resolución (calendario elegido); incluye abiertos ya vencidos.
+	measure 'SLA Resolución Incumplidos Nivel' =
+			VAR TodosLosTickets = SELECTEDVALUE(FactParticipacion[Nivel]) = "N1" && NOT ISFILTERED(FactParticipacion[Técnico]) && NOT ISFILTERED(FactParticipacion[Identificación]) && NOT ISFILTERED(FactParticipacion[Cuenta])
+			RETURN
+			    IF(TodosLosTickets, [SLA Resolución Incumplidos], CALCULATE([SLA Resolución Incumplidos], TREATAS(VALUES(FactParticipacion[Key]), SLA_Tickets[Key])))
+		formatString: #,##0
+		displayFolder: Calidad N1 N2
+		lineageTag: 86748a2b-3acd-46cb-82c9-fbdb7c2d498d
+
+	/// Tickets con SLA de resolución evaluado (cumplidos + incumplidos).
+	measure 'SLA Resolución Evaluados Nivel' = [SLA Resolución Cumplidos Nivel] + [SLA Resolución Incumplidos Nivel]
+		formatString: #,##0
+		displayFolder: Calidad N1 N2
+		lineageTag: 0bf2cbd4-0dba-46e9-8729-10465169de91
+
+	/// % de cumplimiento de resolución (misma medida que la hoja SLA).
+	measure '% SLA Resolución Nivel' =
+			VAR TodosLosTickets = SELECTEDVALUE(FactParticipacion[Nivel]) = "N1" && NOT ISFILTERED(FactParticipacion[Técnico]) && NOT ISFILTERED(FactParticipacion[Identificación]) && NOT ISFILTERED(FactParticipacion[Cuenta])
+			RETURN
+			    IF(TodosLosTickets, [% SLA Resolución], CALCULATE([% SLA Resolución], TREATAS(VALUES(FactParticipacion[Key]), SLA_Tickets[Key])))
+		formatString: 0.0%;-0.0%;0.0%
+		displayFolder: Calidad N1 N2
+		lineageTag: e4bc71eb-2757-4dc2-a225-07c743cf0315
+
+	/// % de incumplimiento de resolución.
+	measure '% SLA Resolución Incumplimiento Nivel' = DIVIDE([SLA Resolución Incumplidos Nivel], [SLA Resolución Evaluados Nivel])
+		formatString: 0.0%;-0.0%;0.0%
+		displayFolder: Calidad N1 N2
+		lineageTag: 78d469db-45fd-4d60-a926-c15ac15d2685
+
+	/// Semáforo de primera respuesta: azul >= meta, ámbar >= umbral, rojo debajo.
+	measure 'Color % SLA Respuesta Nivel' =
+			VAR v = [% SLA Respuesta Nivel]
+			RETURN
+			    SWITCH(
+			        TRUE(),
+			        ISBLANK(v), "#5B6B7F",
+			        v >= [Meta % SLA], "#06519A",
+			        v >= [Umbral Alerta % SLA], "#C98A00",
+			        "#C8382E"
+			    )
+		displayFolder: Calidad N1 N2
+		lineageTag: 1c46c879-a60b-4f54-b61c-f7e7e28a0a65
+
+	/// Semáforo de resolución: azul >= meta, ámbar >= umbral, rojo debajo.
+	measure 'Color % SLA Resolución Nivel' =
+			VAR v = [% SLA Resolución Nivel]
+			RETURN
+			    SWITCH(
+			        TRUE(),
+			        ISBLANK(v), "#5B6B7F",
+			        v >= [Meta % SLA], "#06519A",
+			        v >= [Umbral Alerta % SLA], "#C98A00",
+			        "#C8382E"
+			    )
+		displayFolder: Calidad N1 N2
+		lineageTag: 7a28defe-0a62-4c74-b8df-6fa1e086a923
+
+	/// Subtítulo de la tarjeta de primera respuesta.
+	measure 'Texto Respuesta Nivel' = FORMAT([SLA Respuesta Cumplidos Nivel] + 0, "#,##0") & " cumplen · " & FORMAT([SLA Respuesta Incumplidos Nivel] + 0, "#,##0") & " incumplen"
+		displayFolder: Calidad N1 N2
+		lineageTag: af132cb9-2cd6-4555-bfb3-8efa2f98d134
+
+	/// Subtítulo de la tarjeta de resolución.
+	measure 'Texto Resolución Nivel' = FORMAT([SLA Resolución Cumplidos Nivel] + 0, "#,##0") & " cumplen · " & FORMAT([SLA Resolución Incumplidos Nivel] + 0, "#,##0") & " incumplen"
+		displayFolder: Calidad N1 N2
+		lineageTag: 77706ae6-a0ed-4190-a4b6-0a8973275d89
+
+	/// Estado del SLA de primera respuesta del ticket (calendario elegido).
+	measure 'Estado SLA Respuesta del Ticket' = IF([Calendario Es RAM], SELECTEDVALUE(SLA_Tickets[SLA Respuesta Estado RAM]), SELECTEDVALUE(SLA_Tickets[SLA Respuesta Estado]))
+		displayFolder: Calidad N1 N2
+		lineageTag: c32e6428-6508-4b83-a90d-82257cd85828
+
 	partition _Medidas = m
 		mode: import
 		source =

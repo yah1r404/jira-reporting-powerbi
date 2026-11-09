@@ -11,7 +11,7 @@ annotation __PBI_TimeIntelligenceEnabled = 0
 
 annotation PBI_ProTooling = ["DevMode"]
 
-annotation PBI_QueryOrder = ["_Medidas","Jira_MDSC_Issues","SLA_Tickets","FactStatusHistory","FactAssigneeHistory","HorasLaborales","FactTecnicos"]
+annotation PBI_QueryOrder = ["_Medidas","Jira_MDSC_Issues","SLA_Tickets","FactStatusHistory","FactAssigneeHistory","HorasLaborales","FactTecnicos","Tecnicos_Nivel","FactParticipacion"]
 
 ref table DimFecha
 ref table _Medidas
@@ -27,6 +27,7 @@ ref table 'SLA Comparación'
 ref table 'Estado SLA'
 ref table 'Grupo de Tiempo'
 ref table 'Fila Línea de Tiempo'
+ref table FactParticipacion
 
 ref cultureInfo es-MX
 

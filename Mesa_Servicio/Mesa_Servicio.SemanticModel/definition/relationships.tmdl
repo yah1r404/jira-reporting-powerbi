@@ -14,3 +14,7 @@ relationship f9a0b1c2-d3e4-4f56-8a67-b8c9d0e1f203
 	fromColumn: FactTecnicos.Key
 	toColumn: SLA_Tickets.Key
 
+relationship bc587baf-b004-401b-a7af-d3460489be83
+	fromColumn: FactParticipacion.Key
+	toColumn: SLA_Tickets.Key
+

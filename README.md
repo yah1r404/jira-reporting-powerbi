@@ -43,6 +43,8 @@ Para abrirlo, abre `Mesa_Servicio/Mesa_Servicio.pbip` con Power BI Desktop (ante
 | `FactStatusHistory` | Un renglón por cada tramo que un ticket pasó en un estado (**Tiempo en estado**). | Sí |
 | `FactTecnicos` | Un renglón por ticket y **técnico de campo** (campo *Técnico(s) asignado(s)*). Excluye cuentas de equipo (*Servicios Equipo…*) y agrupa por nombre (una persona puede tener dos cuentas). | Sí |
 | `FactAssigneeHistory` | Un renglón por cada tramo que un ticket estuvo asignado a una persona (**Tiempo en asignación**). | Sí |
+| `FactParticipacion` | Un renglón por ticket, **técnico N1/N2** y nivel. Grupo *Assignee*: participó si fue responsable en algún momento (historial); grupo *Técnicos asignados*: figura en el campo. Si alguien aparece por las dos vías cuenta una vez (columna *Identificación*). | Sí |
+| `Tecnicos_Nivel` | Catálogo fijo de técnicos por nivel (N1, N2) y mecanismo de identificación, con alias. **Para cambiar a alguien de nivel se edita solo aquí.** | No |
 
 ### Campos de Jira usados
 
@@ -54,6 +56,7 @@ Para abrirlo, abre `Mesa_Servicio/Mesa_Servicio.pbip` con Power BI Desktop (ante
 | Tiempo hasta primera respuesta / resolución (SLA JSM, solo referencia, oculto) | `customfield_10936` / `customfield_10937` |
 | Técnico(s) asignado(s) | `customfield_11042` |
 | Organizations (cliente) | `customfield_10002` |
+| AQL N1 / AQL N2 (auditoría de calidad: Correcto / Incorrecto) | `customfield_11469` / `customfield_11470` |
 | Tipo de ticket (radio buttons) | se busca por nombre al actualizar |
 
 ### Flujos de la mesa
@@ -74,6 +77,7 @@ DimFecha ──1:*──> SLA_Tickets             (Created Date)
 SLA_Tickets ──1:*──> FactStatusHistory    (Key)
 SLA_Tickets ──1:*──> FactAssigneeHistory  (Key)
 SLA_Tickets ──1:*──> FactTecnicos         (Key)
+SLA_Tickets ──1:*──> FactParticipacion    (Key)
 ```
 
 Todas las relaciones son de uno a muchos y en una sola dirección. `DimFecha` es un calendario calculado que cubre las fechas de `SLA_Tickets`.
@@ -119,6 +123,8 @@ Todas las relaciones son de uno a muchos y en una sola dirección. `DimFecha` es
 - **Horario de cálculo** de Tiempo en estado y Tiempo en asignación: **operativo RAM** (L-V 7:00-23:00, sáb-dom 8:00-18:00; predeterminado) o **24/7**. Se define en la función `HorasLaborales` (columna `Horas Hábiles` de cada historial).
 - **Tiempo en estado** está en horas y no incluye estados finales (Resuelta, Cerrada). Si un ticket sigue en un estado, su tramo cuenta hasta la hora del último refresh.
 - **Técnicos de campo**: un ticket con varios técnicos cuenta **una vez por técnico** (participaciones) y **una sola vez** en *Tickets con Técnico* (únicos). El SLA y los tiempos se **atribuyen por participación**, no por responsabilidad (el responsable es el Assignee). Abiertos = categoría *Por hacer*; en proceso = sin resolver y ya en atención; resueltos = con fecha de resolución.
+- **Calidad N1 y N2** (`FactParticipacion`): **N1 sin técnico seleccionado = todos los tickets**, con las mismas medidas que la hoja SLA (% SLA primera respuesta y % SLA resolución, mismas cifras). En N2 el total son los tickets con participación N2. Al elegir un técnico, el SLA de sus tickets se le atribuye por participación; en los totales cada ticket cuenta una vez.
+- **AQL**: solo usa la muestra auditada. AQL = auditados con *Incorrecto* / auditados con respuesta (*Correcto* o *Incorrecto*); calidad satisfactoria = *Correcto* / auditados. Los tickets sin auditar no cuentan y un valor distinto queda como *Otro valor* (medida de control `AQL Otro Valor`, debe ser 0). La tendencia diaria va por **fecha de resolución** (Resolved). **El AQL va separado de la participación**: sin técnico seleccionado cuenta todos los tickets auditados en el campo del nivel; al elegir un técnico, solo los suyos.
 - **Tiempo en asignación** está en horas según el horario de cálculo, desde la creación hasta la resolución, y **solo cuenta tickets resueltos**. El tiempo sin responsable no se atribuye a nadie (se ve aparte en *Prom Horas Sin Asignar*).
 - **Reasignaciones**: cambios de responsable, sin contar la primera asignación.
 - **Vista Ejecutiva consistente con el resto:** con *SLA objetivo* = "Según cada ticket" (predeterminado), cumple/no cumple es el **mismo estado del SLA calculado** que usan las demás páginas, así que los números coinciden. Solo al elegir una meta del cliente (4, 6, 15 o 18 h) se recalcula contra esas horas.
@@ -135,9 +141,10 @@ Todas las relaciones son de uno a muchos y en una sola dirección. `DimFecha` es
 | **02 - Tiempo en estado** | Mesa MDSC | 1920 × 1080. Tickets analizados, tiempo promedio en estados, estado con más tiempo, % en espera, tiempo sin atender; horas por estado y tipo de servicio, tendencia por semana y mes, tablas por tipo de servicio y por request type. Solo estados vigentes; selector de horario |
 | **03 - Tiempo en asignación** | Mesa MDSC | 1920 × 1080. Personas asignadas, tickets asignados (con total), personas y participaciones por ticket (enteros, redondeados hacia arriba), tiempo promedio de participación; por persona y por tipo de solicitud. Sin "Sin asignar" |
 | **04 - Línea de Tiempo** | Mesa MDSC | 1920 × 1080. Sin tabla de tickets (está en la 07). Diagrama tipo Gantt por ticket, hora por hora desde la creación (0h a 48h+): en qué grupo estuvo (N1, N2 RAM, N2 QCOM u Otro); horas por estado vs. meta del SLA (global y por ticket) y consumo del SLA. Filtros propios: ticket y SLA objetivo del cliente |
-| **05 - Técnicos de Campo** | Mesa MDSC | Participación individual de los técnicos de campo según *Técnicos asignados* (complementa a Tiempo en asignación, que mide por Assignee): KPIs, tickets por técnico, abiertos/en proceso/resueltos, tipo de trabajo por request type, tendencia mensual, SLA y tiempos de sus tickets y detalle de tickets por técnico. Filtros propios: técnico de campo y estado del ticket. Página más alta (1800 px, con scroll) |
-| **06 - Detalle SLA** *(oculta)* | Mesa MDSC | Tabla ticket por ticket con estado de SLA y link a Jira |
-| **07 - Tickets seleccionados** *(oculta)* | Mesa MDSC | 1920 × 1080. Tabla de los tickets elegidos en la Línea de tiempo (el filtro de ticket está sincronizado entre las dos hojas) |
+| **05 - Calidad del servicio N1** | Mesa MDSC | Técnicos N1 (por Assignee): tickets atendidos, cumplidos e incumplidos de SLA, % de cumplimiento, tickets auditados y AQL N1; SLA por técnico, tendencia mensual, AQL por día de resolución, resultados por técnico y detalle. Filtros propios: técnico N1 y estado |
+| **06 - Métricas de N2** | Mesa MDSC | Reemplaza a *Técnicos de Campo*. Técnicos N2 por Assignee (incluye *Servicios Equipo 1-3*) y por Técnicos asignados: mismos indicadores con AQL N2 y % de participación. Filtros propios: técnico N2, estado e identificación |
+| **07 - Detalle SLA** *(oculta)* | Mesa MDSC | Tabla ticket por ticket con estado de SLA y link a Jira |
+| **08 - Tickets seleccionados** *(oculta)* | Mesa MDSC | 1920 × 1080. Tabla de los tickets elegidos en la Línea de tiempo (el filtro de ticket está sincronizado entre las dos hojas) |
 
 Las hojas 06 y 07 están ocultas (no salen en el menú ni en las pestañas al publicar). Todas las páginas comparten la misma estructura: barra lateral con el logo y el menú (página activa en amarillo), encabezado con título y descripción, barra de filtros y una línea con los **filtros activos**.
 
@@ -177,6 +184,7 @@ Las hojas 06 y 07 están ocultas (no salen en el menú ni en las pestañas al pu
 
 - Confirmar las metas reales de % SLA para el semáforo.
 - Validar los números contra Jira después del primer refresh completo.
+- Después del refresh, revisar los valores reales de AQL N1/N2 (la medida `AQL Otro Valor` debe dar 0) y que los 19 técnicos de `Tecnicos_Nivel` aparezcan (en Jira la cuenta del equipo 3 se llama `servicio_equipo3`; *Ricardo Alvarado* fue responsable de 66 tickets y no está en el catálogo).
 
 ## 7. Tablero ejecutivo QuattroCom (`IEP_Incident/IEP_Incident.pbip`)
 

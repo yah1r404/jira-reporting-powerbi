@@ -583,6 +583,42 @@ table SLA_Tickets
 
 		annotation SummarizationSetBy = Automatic
 
+	/// Valor del campo AQL N1 de Jira (customfield_11469), tal como viene. Vacío = ticket no auditado en N1.
+	column 'AQL N1'
+		dataType: string
+		lineageTag: 17c93d77-eacb-42c3-8e63-a4bd100a0d11
+		summarizeBy: none
+		sourceColumn: AQL N1
+
+		annotation SummarizationSetBy = Automatic
+
+	/// Resultado de la auditoría N1: Positivo (Correcto), Negativo (Incorrecto), Otro valor (no reconocido, no entra al cálculo) o vacío (no auditado).
+	column 'AQL N1 Resultado'
+		dataType: string
+		lineageTag: d33a3e47-ce30-443f-be95-2c124d1428eb
+		summarizeBy: none
+		sourceColumn: AQL N1 Resultado
+
+		annotation SummarizationSetBy = Automatic
+
+	/// Valor del campo AQL N2 de Jira (customfield_11470), tal como viene. Vacío = ticket no auditado en N2.
+	column 'AQL N2'
+		dataType: string
+		lineageTag: 9308a10e-336d-4e0b-a59c-a7bdda11fa05
+		summarizeBy: none
+		sourceColumn: AQL N2
+
+		annotation SummarizationSetBy = Automatic
+
+	/// Resultado de la auditoría N2: Positivo (Correcto), Negativo (Incorrecto), Otro valor (no reconocido, no entra al cálculo) o vacío (no auditado).
+	column 'AQL N2 Resultado'
+		dataType: string
+		lineageTag: e12d4bb3-0c5d-4c77-b57c-a158d6a3415c
+		summarizeBy: none
+		sourceColumn: AQL N2 Resultado
+
+		annotation SummarizationSetBy = Automatic
+
 	partition SLA_Tickets = m
 		mode: import
 		source =
@@ -610,6 +646,14 @@ table SLA_Tickets
 				
 				    NameOf = (r as any, f as text) as any =>
 				        if r is record then Record.FieldOrDefault(r, f, null) else null,
+				
+				    // Resultado de una auditoría AQL: Correcto = Positivo, Incorrecto = Negativo.
+				    // Vacío = no auditado (null). Cualquier otro valor queda como "Otro valor" para revisarlo y no entra al cálculo.
+				    AqlResultado = (v as nullable text) as nullable text =>
+				        if v = null or Text.Trim(v) = "" then null
+				        else
+				            let n = Text.Lower(Text.Trim(v))
+				            in if n = "correcto" then "Positivo" else if n = "incorrecto" then "Negativo" else "Otro valor",
 				
 				    // Resume un campo SLA de JSM: meta, tiempo transcurrido y estado
 				    SlaInfo = (v as any) as record =>
@@ -668,7 +712,9 @@ table SLA_Tickets
 				                    Resolved = ToLocal(Record.FieldOrDefault(f, "resolutiondate", null)),
 				                    Respuesta = SlaInfo(Record.FieldOrDefault(f, "customfield_10936", null)),
 				                    Resolucion = SlaInfo(Record.FieldOrDefault(f, "customfield_10937", null)),
-				                    PrimerComentario = ToLocal(i[primerComentario])
+				                    PrimerComentario = ToLocal(i[primerComentario]),
+				                    AqlN1 = NameOf(Record.FieldOrDefault(f, "customfield_11469", null), "value"),
+				                    AqlN2 = NameOf(Record.FieldOrDefault(f, "customfield_11470", null), "value")
 				                in
 				                    [
 				                        Key = i[key],
@@ -702,7 +748,11 @@ table SLA_Tickets
 				                        #"JSM Resolución Estado" = Resolucion[Estado],
 				                        #"Primer Comentario" = PrimerComentario,
 				                        #"Horas RAM a Primer Comentario" =
-				                            if PrimerComentario = null then null else HorasLaborales(CreatedAt, PrimerComentario)
+				                            if PrimerComentario = null then null else HorasLaborales(CreatedAt, PrimerComentario),
+				                        #"AQL N1" = AqlN1,
+				                        #"AQL N1 Resultado" = AqlResultado(AqlN1),
+				                        #"AQL N2" = AqlN2,
+				                        #"AQL N2 Resultado" = AqlResultado(AqlN2)
 				                    ]
 				        ),
 				
@@ -734,7 +784,11 @@ table SLA_Tickets
 				                #"JSM Resolución Horas" = nullable number,
 				                #"JSM Resolución Estado" = text,
 				                #"Primer Comentario" = nullable datetime,
-				                #"Horas RAM a Primer Comentario" = nullable number
+				                #"Horas RAM a Primer Comentario" = nullable number,
+				                #"AQL N1" = nullable text,
+				                #"AQL N1 Resultado" = nullable text,
+				                #"AQL N2" = nullable text,
+				                #"AQL N2 Resultado" = nullable text
 				            ]
 				        )
 				

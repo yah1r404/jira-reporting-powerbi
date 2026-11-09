@@ -3,7 +3,7 @@
   "name": "a183f6869735500cfc57",
   "position": {
     "x": 16,
-    "y": 439,
+    "y": 482,
     "z": 16000,
     "height": 38,
     "width": 208,
@@ -42,7 +42,7 @@
             "text": {
               "expr": {
                 "Literal": {
-                  "Value": "'Técnicos de campo'"
+                  "Value": "'Métricas de N2'"
                 }
               }
             },
@@ -95,7 +95,7 @@
             "text": {
               "expr": {
                 "Literal": {
-                  "Value": "'Técnicos de campo'"
+                  "Value": "'Métricas de N2'"
                 }
               }
             },
@@ -148,7 +148,7 @@
             "text": {
               "expr": {
                 "Literal": {
-                  "Value": "'Técnicos de campo'"
+                  "Value": "'Métricas de N2'"
                 }
               }
             },

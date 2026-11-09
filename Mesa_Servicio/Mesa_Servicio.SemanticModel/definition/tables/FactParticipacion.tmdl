@@ -1,0 +1,166 @@
+/// Participación de los técnicos N1 y N2 en cada ticket: un renglón por ticket, técnico y nivel.
+/// Grupo Assignee: participó si fue responsable en algún momento (historial). Grupo Técnicos asignados: participó si figura en el campo.
+/// Un ticket con varios técnicos aparece una vez por técnico; un técnico cuenta una sola vez por ticket.
+table FactParticipacion
+	lineageTag: 85e84fdb-8324-4aa3-a458-f18334afb067
+
+	/// Clave del ticket.
+	column Key
+		dataType: string
+		lineageTag: bee32359-e23d-4f28-a338-430bd55e241f
+		summarizeBy: none
+		sourceColumn: Key
+
+		annotation SummarizationSetBy = Automatic
+
+	/// Técnico según el catálogo Tecnicos_Nivel (nombre unificado aunque en Jira aparezca escrito distinto).
+	column Técnico
+		dataType: string
+		lineageTag: e13fd6ca-53fc-44c7-a330-3f2df6366771
+		summarizeBy: none
+		sourceColumn: Técnico
+
+		annotation SummarizationSetBy = Automatic
+
+	/// Cuenta de correo del técnico según el catálogo.
+	column Cuenta
+		dataType: string
+		lineageTag: cef0bbdb-f53c-4c1d-b956-27c2dc8c7051
+		summarizeBy: none
+		sourceColumn: Cuenta
+
+		annotation SummarizationSetBy = Automatic
+
+	/// Nivel de atención: N1 o N2.
+	column Nivel
+		dataType: string
+		lineageTag: d16ef01f-fc94-4a25-a51b-7f74d22f703b
+		summarizeBy: none
+		sourceColumn: Nivel
+
+		annotation SummarizationSetBy = Automatic
+
+	/// Por qué vía se identificó la participación: Assignee, Técnicos asignados o ambas.
+	column Identificación
+		dataType: string
+		lineageTag: a2f3ec2e-b977-42b8-9674-12fab1dd7c17
+		summarizeBy: none
+		sourceColumn: Identificación
+
+		annotation SummarizationSetBy = Automatic
+
+	/// TRUE si hoy es el responsable del ticket o figura en Técnicos asignados.
+	column 'Asignado actualmente'
+		dataType: boolean
+		formatString: """TRUE"";""TRUE"";""FALSE"""
+		lineageTag: d9abe6de-7a0e-4c6a-a446-8fbd9a4986df
+		summarizeBy: none
+		sourceColumn: Asignado actualmente
+
+		annotation SummarizationSetBy = Automatic
+
+	partition FactParticipacion = m
+		mode: import
+		source =
+				let
+				    Issues = Jira_MDSC_Issues,
+				    Catalogo = Tecnicos_Nivel,
+				
+				    // Clave de comparación: minúsculas, sin acentos y solo letras y números
+				    // ("Servicios_Equipo1", "Servicios Equipo1" y "Servicios Equipo 1" dan la misma clave)
+				    Acentos = {{"á", "a"}, {"é", "e"}, {"í", "i"}, {"ó", "o"}, {"ú", "u"}, {"ü", "u"}, {"ñ", "n"}},
+				    Clave = (t as nullable text) as text =>
+				        if t = null then ""
+				        else Text.Select(List.Accumulate(Acentos, Text.Lower(t), (s, r) => Text.Replace(s, r{0}, r{1})), {"a".."z", "0".."9"}),
+				
+				    // Una entrada por cada nombre, cuenta o alias con que se reconoce a cada técnico del catálogo
+				    Claves =
+				        List.Buffer(
+				            List.Combine(
+				                List.Transform(
+				                    Table.ToRecords(Catalogo),
+				                    (t) =>
+				                        List.Transform(
+				                            List.Distinct(List.Select(List.Transform({t[#"Técnico"], t[Cuenta]} & t[Alias], Clave), each _ <> "")),
+				                            (k) => [Clave = k, #"Técnico" = t[#"Técnico"], Cuenta = t[Cuenta], Nivel = t[Nivel], #"Identificación" = t[#"Identificación"]]
+				                        )
+				                )
+				            )
+				        ),
+				
+				    // Entradas del catálogo (de un mecanismo de identificación) que coinciden con alguno de los nombres
+				    Buscar = (Ident as text, Nombres as list) as list =>
+				        let
+				            Ks = List.Buffer(List.Select(List.Transform(Nombres, Clave), each _ <> ""))
+				        in
+				            List.Select(Claves, each [#"Identificación"] = Ident and List.Contains(Ks, [Clave])),
+				
+				    // Nombre visible y correo (si Jira lo entrega) de un usuario
+				    Nombres = (u as any) as list =>
+				        if u is record
+				        then List.RemoveNulls({Record.FieldOrDefault(u, "displayName", null), Record.FieldOrDefault(u, "emailAddress", null)})
+				        else {},
+				
+				    Filas =
+				        List.Combine(
+				            List.Transform(
+				                Issues,
+				                (i) =>
+				                    let
+				                        f = i[fields],
+				                        // Grupo Assignee: responsable actual y todos los que fueron responsables según el historial
+				                        Actual = Nombres(Record.FieldOrDefault(f, "assignee", null)),
+				                        ClavesActual = List.Transform(Actual, Clave),
+				                        Historicos =
+				                            List.Combine(
+				                                List.Transform(
+				                                    i[histories],
+				                                    (h) =>
+				                                        List.Combine(
+				                                            List.Transform(
+				                                                List.Select(Record.FieldOrDefault(h, "items", {}), each Record.FieldOrDefault(_, "field", null) = "assignee"),
+				                                                (it) => List.RemoveNulls({Record.FieldOrDefault(it, "fromString", null), Record.FieldOrDefault(it, "toString", null)})
+				                                            )
+				                                        )
+				                                )
+				                            ),
+				                        PorAssignee =
+				                            List.Transform(
+				                                Buscar("Assignee", Actual & Historicos),
+				                                (c) => [Key = i[key], #"Técnico" = c[#"Técnico"], Cuenta = c[Cuenta], Nivel = c[Nivel], Fuente = "Assignee", EsActual = List.Contains(ClavesActual, c[Clave])]
+				                            ),
+				                        // Grupo Técnicos asignados: cada técnico del campo cuenta por separado
+				                        Campo = Record.FieldOrDefault(f, "customfield_11042", null),
+				                        DelCampo = if Campo is list then List.Combine(List.Transform(Campo, Nombres)) else {},
+				                        PorCampo =
+				                            List.Transform(
+				                                Buscar("Técnicos asignados", DelCampo),
+				                                (c) => [Key = i[key], #"Técnico" = c[#"Técnico"], Cuenta = c[Cuenta], Nivel = c[Nivel], Fuente = "Técnicos asignados", EsActual = true]
+				                            )
+				                    in
+				                        PorAssignee & PorCampo
+				            )
+				        ),
+				
+				    Tabla =
+				        Table.FromRecords(
+				            Filas,
+				            type table [Key = text, #"Técnico" = text, Cuenta = text, Nivel = text, Fuente = text, EsActual = logical]
+				        ),
+				
+				    // Un renglón por ticket, técnico y nivel: si alguien aparece por las dos vías (p. ej. Manuel de Jesus Ku Canul)
+				    // o con dos nombres, cuenta una sola vez y se anota por qué vías apareció.
+				    Agrupado =
+				        Table.Group(
+				            Tabla,
+				            {"Key", "Técnico", "Cuenta", "Nivel"},
+				            {
+				                {"Identificación", each Text.Combine(List.Sort(List.Distinct([Fuente])), " y "), type text},
+				                {"Asignado actualmente", each List.AnyTrue([EsActual]), type logical}
+				            }
+				        )
+				in
+				    Agrupado
+
+	annotation PBI_ResultType = Table
+

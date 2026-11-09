@@ -55,10 +55,12 @@ expression Jira_MDSC_Issues =
 		    // customfield_10937 = Tiempo hasta resolución (SLA JSM)
 		    // customfield_11042 = Técnico(s) asignado(s)
 		    // customfield_10002 = Organizations (cliente)
+		    // customfield_11469 = AQL N1 (auditoría de calidad N1: Correcto / Incorrecto)
+		    // customfield_11470 = AQL N2 (auditoría de calidad N2: Correcto / Incorrecto)
 		    BaseFields = {
 		        "summary", "status", "issuetype", "assignee", "created", "resolutiondate",
 		        "customfield_10010", "customfield_10936", "customfield_10937", "customfield_11042",
-		        "customfield_10002"
+		        "customfield_10002", "customfield_11469", "customfield_11470"
 		    },
 		
 		    JiraFields =
@@ -337,4 +339,51 @@ expression HorasLaborales =
 	lineageTag: 0a1b2c3d-4e5f-4a6b-8c7d-9e0f1a2b3c4d
 
 	annotation PBI_ResultType = Function
+
+/// Catálogo de técnicos por nivel de atención (páginas Calidad del servicio N1 y Métricas de N2). No se carga al modelo.
+/// Identificación: "Assignee" = se mide por el responsable del ticket (en cualquier momento, según el historial);
+/// "Técnicos asignados" = se mide por el campo Técnico(s) asignado(s) (customfield_11042).
+/// El cruce con Jira ignora mayúsculas, acentos, espacios y guiones bajos, y también acepta la cuenta y los alias.
+/// Para cambiar a alguien de nivel o agregar un técnico, editar solo esta tabla.
+expression Tecnicos_Nivel =
+		let
+		    Fuente =
+		        #table(
+		            type table [#"Técnico" = text, Cuenta = text, Nivel = text, #"Identificación" = text, Alias = list],
+		            {
+		                // N1: se mide por Assignee (responsable del ticket en algún momento)
+		                {"Antonyo Angel Herrera Herrera", "aherrera@redesmayab.com", "N1", "Assignee", {"Antonyo Herrera"}},
+		                {"Wilberth de Jesús Cuytun Hernández", "wcuytun@redesmayab.com", "N1", "Assignee", {"Wilberth Cuytun"}},
+		                {"Josué Alejandro Villafaña Herrera", "jvillafana@redesmayab.com", "N1", "Assignee", {"Josué Villafaña"}},
+		                {"Elias Canseco Garcia", "ecanseco@redesmayab.com", "N1", "Assignee", {"Elias Canseco"}},
+		
+		                // N2, grupo 1: se mide por Assignee (incluye las cuentas de equipo de campo)
+		                {"Dennis Emmanuel Zavala Avila", "dzavala@redesmayab.com", "N2", "Assignee", {}},
+		                {"Diego Aguilar", "daguilar@redesmayab.com", "N2", "Assignee", {}},
+		                {"Saúl Gutiérrez Vázquez", "sgutierrez@redesmayab.com", "N2", "Assignee", {"Saúl Gutiérrez"}},
+		                {"José Javier Fuentes Cruz", "jfuentes@redesmayab.com", "N2", "Assignee", {}},
+		                {"Victor Manuel Dzul de la Peña", "vdzul@redesmayab.com", "N2", "Assignee", {}},
+		                {"Manuel de Jesus Ku Canul", "tecnicoredes@redesmayab.com", "N2", "Assignee", {}},
+		                {"Servicios Equipo 1", "servicios_equipo1@redesmayab.com", "N2", "Assignee", {"Servicios_Equipo1", "Servicios Equipo1"}},
+		                {"Servicios Equipo 2", "servicios_equipo2@redesmayab.com", "N2", "Assignee", {"Servicios_Equipo2", "Servicios Equipo2"}},
+		                {"Servicios Equipo 3", "servicios_equipo3@redesmayab.com", "N2", "Assignee", {"Servicios_Equipo3", "Servicios Equipo3", "servicio_equipo3"}},
+		                // Agregado a N2 el 08/11/2026 (responsable de tickets en Jira; cuenta de correo por confirmar)
+		                {"Ricardo Alvarado", "", "N2", "Assignee", {}},
+		
+		                // N2, grupo 2: se mide por el campo "Técnico(s) asignado(s)" (customfield_11042)
+		                {"Angel Amiel Rodriguez Lopez", "alopez@redesmayab.com", "N2", "Técnicos asignados", {}},
+		                {"Rodolfo Ramírez Ramos", "rramirez@redesmayab.com", "N2", "Técnicos asignados", {}},
+		                {"Esner Augusto Cel Cardenas", "ecel@redesmayab.com", "N2", "Técnicos asignados", {}},
+		                {"Manuel de Jesus Ku Canul", "tecnicoredes@redesmayab.com", "N2", "Técnicos asignados", {}},
+		                {"Fabian jesus Figueroa fuentes", "ffigueroa@redesmayab.com", "N2", "Técnicos asignados", {}},
+		                {"Josafat Alexander Cel Cardenas", "jcel@redesmayab.com", "N2", "Técnicos asignados", {}}
+		            }
+		        )
+		in
+		    Fuente
+	lineageTag: 692f6baf-1036-4ebf-80dc-161762da2be9
+
+	annotation PBI_NavigationStepName = Navegación
+
+	annotation PBI_ResultType = Table
 
